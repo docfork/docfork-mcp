@@ -1,5 +1,5 @@
 {
-  "name": "docfork-mcp",
+  "name": "docfork",
   "version": "0.4.4",
   "description": "@latest docs for 9000+ libraries in your AI code editor, with a single MCP.",
   "type": "module",
