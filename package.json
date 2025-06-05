@@ -1,0 +1,49 @@
+{
+  "name": "docfork-mcp",
+  "version": "0.0.1",
+  "description": "MCP server for Docfork.",
+  "type": "module",
+  "main": "src/index.ts",
+  "scripts": {
+    "dev": "node --loader ts-node/esm src/index.ts",
+    "build": "tsc && chmod 755 dist/index.js",
+    "start": "node dist/index.js",
+    "inspector": "npx @modelcontextprotocol/inspector node dist/index.js",
+    "lint": "eslint \"**/*.{js,ts,tsx}\" --fix",
+    "format": "prettier --write \"**/*.{js,ts,tsx,json,md}\"",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/docfork/mcp"
+  },
+  "keywords": [
+    "modelcontextprotocol",
+    "mcp",
+    "docfork"
+  ],
+  "author": "Docfork",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/docfork/mcp/issues"
+  },
+  "homepage": "https://github.com/docfork/mcp#readme",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.1",
+    "dotenv": "^16.5.0",
+    "zod": "^3.25.42"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.28.0",
+    "@types/dotenv": "^6.1.1",
+    "@types/node": "^22.15.29",
+    "@typescript-eslint/eslint-plugin": "^8.33.0",
+    "@typescript-eslint/parser": "^8.33.0",
+    "eslint": "^9.28.0",
+    "eslint-plugin-prettier": "^5.4.1",
+    "globals": "^16.2.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.33.0"
+  }
+}
