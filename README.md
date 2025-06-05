@@ -298,11 +298,33 @@ The configuration on Windows is slightly different compared to Linux or macOS (_
 }
 ```
 
+### 🔧 Environment Variables
+
+The Docfork MCP server supports the following environment variables:
+
+- `DEFAULT_MINIMUM_TOKENS`: Set the minimum token count for documentation retrieval (default: 10000)
+
+Example configuration with environment variables:
+
+```json
+{
+  "mcpServers": {
+    "docfork": {
+      "command": "npx",
+      "args": ["-y", "docfork@latest"],
+      "env": {
+        "DEFAULT_MINIMUM_TOKENS": "10000"
+      }
+    }
+  }
+}
+```
+
 ### Available Tools
 
 Docfork MCP provides the following tool that LLMs can use:
 
-- `search`: Searches the library and returns its documentation.
+- `get-library-docs`: Searches the library and returns its documentation.
   - `libraryName` (required): The name of the library to search for
   - `topic` (required): Focus the docs on a specific topic (e.g., "routing", "hooks")
   - `tokens` (optional, default 10000, max 50000): Max number of tokens to return. Values less than the configured `DEFAULT_MINIMUM_TOKENS` value or the default value of 10000 are automatically increased to that value.

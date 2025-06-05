@@ -34,8 +34,8 @@ function createServerInstance() {
   const server = new McpServer({
     name: "Docfork",
     description:
-      "Retrieves up-to-date documentation and code examples for any library.",
-    version: "0.0.1",
+      "Gets the latest documentation and code examples for any library.",
+    version: "0.4.4",
     capabilities: {
       resources: {},
       tools: {},

@@ -1,13 +1,13 @@
 {
   "name": "docfork",
-  "version": "0.4.4",
-  "description": "@latest docs for 9000+ libraries in your AI code editor, with a single MCP.",
+  "version": "0.4.5",
+  "description": "MCP server for Docfork",
   "type": "module",
   "main": "src/index.ts",
   "scripts": {
     "dev": "node --loader ts-node/esm src/index.ts",
     "build": "tsc && chmod 755 dist/index.js",
-    "start": "node dist/index.js",
+    "start": "MCP_TRANSPORT=http node dist/index.js",
     "inspector": "npx @modelcontextprotocol/inspector node dist/index.js",
     "lint": "eslint \"**/*.{js,ts,tsx}\" --fix",
     "format": "prettier --write \"**/*.{js,ts,tsx,json,md}\"",
@@ -15,7 +15,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/docfork/mcp"
+    "url": "git+https://github.com/docfork/mcp.git"
   },
   "keywords": [
     "modelcontextprotocol",
@@ -24,6 +24,12 @@
   ],
   "author": "Docfork",
   "license": "MIT",
+  "bin": {
+    "docfork": "dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
   "bugs": {
     "url": "https://github.com/docfork/mcp/issues"
   },
