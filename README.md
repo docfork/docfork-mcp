@@ -2,7 +2,7 @@
 
 @latest docs for 9000+ libraries in your AI code editor, with a single MCP.
 
-[![Install MCP Server](https://cursor.com/deeplink/mcp-install-light.svg)](https://cursor.com/install-mcp?name=docfork&config=eyJjb21tYW5kIjoibnB4IC15IGRvY2ZvcmtAbGF0ZXN0In0%3D) [![Website](https://img.shields.io/badge/Website-docfork.com-%23f64235)](https://docfork.com) [![smithery badge](https://smithery.ai/badge/@docfork/mcp)](https://smithery.ai/server/@docfork/mcp)
+[![Install MCP Server](https://cursor.com/deeplink/mcp-install-light.svg)](https://cursor.com/install-mcp?name=docfork&config=eyJjb21tYW5kIjoibnB4IC15IGRvY2ZvcmtAbGF0ZXN0In0%3D) [![Website](https://img.shields.io/badge/Website-docfork.com-%23088DCC)](https://docfork.com) [![smithery badge](https://smithery.ai/badge/@docfork/mcp)](https://smithery.ai/server/@docfork/mcp)
 
 ## The Problem: Expired Knowledge
 
@@ -10,7 +10,7 @@
 - ❌ API ghost towns & hallucinations
 - ❌ Old or mismatched versions
 
-## The Solution: Real-Time Docs, Daily
+## The Solution: Fresh Docs, Daily
 
 - ✅ Refreshed documentation daily
 - ✅ Accurate examples from current docs
@@ -29,7 +29,11 @@ Create a basic Next.js app with the App Router. use docfork
 - Node.js ≥ v18
 - Cursor/Windsurf/Claude Desktop (any MCP client)
 
-### ⚡ Quick Setup (Cursor)
+### ⚡ Install in Cursor
+
+[![Install MCP Server](https://cursor.com/deeplink/mcp-install-light.svg)](https://cursor.com/install-mcp?name=docfork&config=eyJjb21tYW5kIjoibnB4IC15IGRvY2ZvcmtAbGF0ZXN0In0%3D)
+
+or manually:
 
 1. `Settings` -> `Cursor Settings` -> `MCP Tools`
 2. Add New MCP Server
@@ -95,6 +99,26 @@ Add this to your global `~/.cursor/mcp.json` (or per-project in `./.cursor/mcp.j
 
 </details>
 
+</details>
+
+<details>
+<summary><b>Installing via Smithery</b></summary>
+
+### Installing via Smithery
+
+To install Docfork MCP Server for any client automatically via [Smithery](https://smithery.ai/server/@docfork/mcp):
+
+```bash
+npx -y @smithery/cli@latest install @docfork/mcp --client <CLIENT_NAME> --key <YOUR_SMITHERY_KEY>
+```
+
+You can find your Smithery key in the [Smithery.ai webpage](https://smithery.ai/server/@docfork/mcp).
+
+</details>
+
+<details>
+<summary><b>Install in Windsurf</b></summary>
+
 ### Install in Windsurf
 
 Add this to your Windsurf MCP config. See [Windsurf MCP docs](https://docs.windsurf.com/windsurf/mcp) for more info.
@@ -123,6 +147,11 @@ Add this to your Windsurf MCP config. See [Windsurf MCP docs](https://docs.winds
   }
 }
 ```
+
+</details>
+
+<details>
+<summary><b>Install in VS Code</b></summary>
 
 ### Install in VS Code
 
@@ -155,6 +184,11 @@ Add this to your VS Code MCP config. See [VS Code MCP docs](https://code.visuals
 }
 ```
 
+</details>
+
+<details>
+<summary><b>Install in Zed</b></summary>
+
 ### Install in Zed
 
 One-click install:
@@ -176,6 +210,11 @@ Or Manual config (for power users):
 }
 ```
 
+</details>
+
+<details>
+<summary><b>Install in Claude Code</b></summary>
+
 ### Install in Claude Code
 
 Run this command. See [Claude Code MCP docs](https://docs.anthropic.com/en/docs/agents-and-tools/claude-code/tutorials#set-up-model-context-protocol-mcp) for more info.
@@ -192,6 +231,11 @@ claude mcp add --transport sse docfork https://mcp.docfork.com/sse
 claude mcp add docfork -- npx -y docfork
 ```
 
+</details>
+
+<details>
+<summary><b>Install in Claude Desktop</b></summary>
+
 ### Install in Claude Desktop
 
 Add this to your Claude Desktop `claude_desktop_config.json` file. See [Claude Desktop MCP docs](https://modelcontextprotocol.io/quickstart/user) for more info.
@@ -206,6 +250,11 @@ Add this to your Claude Desktop `claude_desktop_config.json` file. See [Claude D
   }
 }
 ```
+
+</details>
+
+<details>
+<summary><b>Install in BoltAI</b></summary>
 
 ### Install in BoltAI
 
@@ -223,6 +272,11 @@ Open the "Settings" page of the app, navigate to "Plugins," and enter the follow
 ```
 
 More info is available on [BoltAI's Documentation site](https://docs.boltai.com/docs/plugins/mcp-servers). For BoltAI on iOS, [see this guide](https://docs.boltai.com/docs/boltai-mobile/mcp-servers).
+
+</details>
+
+<details>
+<summary><b>Using Docker</b></summary>
 
 ### Using Docker
 
@@ -281,6 +335,11 @@ If you prefer to run the MCP server in a Docker container:
 
    _Note: This is an example configuration. Please refer to the specific examples for your MCP client (like Cursor, VS Code, etc.) earlier in this README to adapt the structure (e.g., `mcpServers` vs `servers`). Also, ensure the image name in `args` matches the tag used during the `docker build` command._
 
+</details>
+
+<details>
+<summary><b>Install in Windows</b></summary>
+
 ### Install in Windows
 
 The configuration on Windows is slightly different compared to Linux or macOS (_`Cline` is used in the example_). The same principle applies to other editors; refer to the configuration of `command` and `args`.
@@ -298,7 +357,9 @@ The configuration on Windows is slightly different compared to Linux or macOS (_
 }
 ```
 
-### 🔧 Environment Variables
+</details>
+
+## 🔧 Environment Variables
 
 The Docfork MCP server supports the following environment variables:
 
@@ -320,7 +381,7 @@ Example configuration with environment variables:
 }
 ```
 
-### Available Tools
+## 🔨 Available Tools
 
 Docfork MCP provides the following tool that LLMs can use:
 
@@ -334,13 +395,13 @@ Docfork MCP provides the following tool that LLMs can use:
 Clone the project and install dependencies:
 
 ```bash
-bun i
+npm i
 ```
 
 Build:
 
 ```bash
-bun run build
+npm run build
 ```
 
 ### Local Configuration Example
@@ -398,10 +459,10 @@ For errors like `Error: Cannot find module 'uriTemplate.js'`, try the `--experim
 
 ### Troubleshooting Common MCP Client Errors
 
-1. Append @latest to the package name to pull the newest release.
-2. Swap npx for bunx if the command stalls or fails.
+1. Append `@latest` to the package name to pull the newest release.
+2. Swap `npx` for `bunx` if the command stalls or fails.
 3. Prefer Deno as a drop-in alternative when you hit bundler issues.
-4. Verify you’re on Node.js v18+ so fetch is available natively.
+4. Verify you're on Node.js v18+ so `fetch` is available natively.
 
 ## ⚠️ Disclaimer
 
@@ -411,12 +472,16 @@ If you spot content that is suspicious, inappropriate, or potentially harmful, p
 
 By using Docfork, you agree to do so at your own discretion and risk.
 
-## 🌟 Connect with Us
+## 🌟 Connect with us
 
 Stay in the loop and meet the community:
 
-- 🐦 Follow us on X → @docfork_ai for product news, tips, and memes
+- 🐦 Follow us on X → [@docfork_ai](https://x.com/docfork_ai) for product news and updates
 - 🌐 Visit our [Website](https://docfork.com)
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=docfork/mcp&type=Date)](https://www.star-history.com/#docfork/mcp&Date)
 
 ## License
 
