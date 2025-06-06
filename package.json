@@ -1,6 +1,6 @@
 {
   "name": "docfork",
-  "version": "0.4.5",
+  "version": "0.4.6",
   "description": "MCP server for Docfork",
   "type": "module",
   "main": "src/index.ts",
