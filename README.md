@@ -359,6 +359,69 @@ The configuration on Windows is slightly different compared to Linux or macOS (_
 
 </details>
 
+<details>
+<summary><b>Install in Augment Code</b></summary>
+
+### Install in Augment Code
+
+To configure Docfork MCP in Augment Code, follow these steps:
+
+1. Press Cmd/Ctrl Shift P or go to the hamburger menu in the Augment panel
+2. Select Edit Settings
+3. Under Advanced, click Edit in settings.json
+4. Add the server configuration to the `mcpServers` array in the `augment.advanced` object
+
+```json
+"augment.advanced": {
+    "mcpServers": [
+        {
+            "name": "docfork",
+            "command": "npx",
+            "args": ["-y", "docfork"]
+        }
+    ]
+}
+```
+
+Once the MCP server is added, restart your editor. If you receive any errors, check the syntax to make sure closing brackets or commas are not missing.
+
+</details>
+
+<details>
+<summary><b>Install in Roo Code</b></summary>
+
+### Install in Roo Code
+
+Add this to your Roo Code MCP configuration file. See [Roo Code MCP docs](https://docs.roocode.com/features/mcp/using-mcp-in-roo) for more info.
+
+#### Roo Code Remote Server Connection
+
+```json
+{
+  "mcpServers": {
+    "docfork": {
+      "type": "streamable-http",
+      "url": "https://mcp.docfork.com/mcp"
+    }
+  }
+}
+```
+
+#### Roo Code Local Server Connection
+
+```json
+{
+  "mcpServers": {
+    "docfork": {
+      "command": "npx",
+      "args": ["-y", "docfork"]
+    }
+  }
+}
+```
+
+</details>
+
 ## 🔧 Environment Variables
 
 The Docfork MCP server supports the following environment variables:
