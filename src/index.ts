@@ -48,8 +48,8 @@ function createServerInstance() {
     `Retrieves up-to-date documentation and code examples for any library. This tool automatically searches for the library by name and fetches its documentation.
 
 Usage:
-1. Provide the author and library name pair (e.g., "vercel/next.js", "reactjs/react.dev", "vuejs/docs")
-2. Specify a topic to focus the documentation on (e.g., "hooks", "routing", "authentication")
+1. Provide the author and library name pair (e.g., "vercel/next.js", "shadcn-ui/ui", "vuejs/docs")
+2. Specify a topic to focus the documentation on (e.g., "dynamic", "routing", "authentication")
 
 The tool will:
 1. Automatically find and select the most relevant library based on the provided name
