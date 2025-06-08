@@ -35,7 +35,7 @@ function createServerInstance() {
     name: "Docfork",
     description:
       "Gets the latest documentation and code examples for any library.",
-    version: "0.4.4",
+    version: "0.5.0",
     capabilities: {
       resources: {},
       tools: {},
@@ -48,13 +48,13 @@ function createServerInstance() {
     `Retrieves up-to-date documentation and code examples for any library. This tool automatically searches for the library by name and fetches its documentation.
 
 Usage:
-1. Provide the library name (e.g., "react", "express", "mongodb")
+1. Provide the author and library name pair (e.g., "vercel/next.js", "reactjs/react.dev", "vuejs/docs")
 2. Specify a topic to focus the documentation on (e.g., "hooks", "routing", "authentication")
 
 The tool will:
-1. Search for libraries matching the provided name
-2. Select the most relevant library based on name similarity, trust score, and documentation coverage
-3. Fetch the documentation for the selected library, and the relevant sections by topic
+1. Automatically find and select the most relevant library based on the provided name
+2. Fetch comprehensive documentation for the selected library
+3. Return relevant sections focused on the specified topic
 
 Response includes:
 - Library selection explanation
@@ -64,7 +64,7 @@ Response includes:
       libraryName: z
         .string()
         .describe(
-          "Library name to search for and retrieve documentation (e.g., 'react', 'express', 'mongodb')"
+          "Author and library name pair to search for and retrieve documentation (e.g., 'vercel/next.js', 'reactjs/react.dev', 'vuejs/docs')"
         ),
       topic: z
         .string()
