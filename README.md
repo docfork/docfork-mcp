@@ -6,8 +6,8 @@
 
 ## ❌ The Problem: Expired Knowledge
 
--  Out of date code & stale data
-   API ghost towns & hallucinations
+- Out of date code & stale data
+- API ghost towns & hallucinations
 - Old or mismatched versions
 
 ## ✅ The Solution: Fresh Docs at Warp Speede
