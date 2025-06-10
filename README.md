@@ -10,11 +10,11 @@
 - API ghost towns & hallucinations
 - Old or mismatched versions
 
-## ✅ The Solution: Fresh Docs at Warp Speede
+## ✅ The Solution: Fresh docs at warp speed
 
-- Refreshed documentation constantly being synced up
-- Accurate examples from current docs
-- Super Fast MCP (sub-second reponses) for your AI code editor
+- Always in sync with the latest version of docs
+- Accurate descriptions and code examples
+- Sub-second retrieval results in your AI code editor
 
 Just tell Cursor to **`use docfork`**
 
