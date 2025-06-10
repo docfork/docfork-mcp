@@ -4,17 +4,17 @@
 
 [![Install MCP Server](https://cursor.com/deeplink/mcp-install-light.svg)](https://cursor.com/install-mcp?name=docfork&config=eyJjb21tYW5kIjoibnB4IC15IGRvY2ZvcmtAbGF0ZXN0In0%3D) [![Website](https://img.shields.io/badge/Website-docfork.com-%23088DCC)](https://docfork.com) [![smithery badge](https://smithery.ai/badge/@docfork/mcp)](https://smithery.ai/server/@docfork/mcp)
 
-## The Problem: Expired Knowledge
+## ❌ The Problem: Expired Knowledge
 
-- ❌ Out of date code & stale data
-- ❌ API ghost towns & hallucinations
-- ❌ Old or mismatched versions
+-  Out of date code & stale data
+   API ghost towns & hallucinations
+- Old or mismatched versions
 
-## The Solution: Fresh Docs, Daily
+## ✅ The Solution: Fresh Docs at Warp Speede
 
-- ✅ Refreshed documentation daily
-- ✅ Accurate examples from current docs
-- ✅ Super Fast MCP for your AI code editor
+- Refreshed documentation constantly being synced up
+- Accurate examples from current docs
+- Super Fast MCP (sub-second reponses) for your AI code editor
 
 Just tell Cursor to **`use docfork`**
 
