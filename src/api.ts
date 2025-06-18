@@ -24,6 +24,7 @@ export async function fetchLibraryDocs(
       method: "GET",
       headers: {
         "Content-Type": "application/json",
+        "X-Docfork-Source": "mcp",
       },
     });
 
