@@ -1,3 +1,5 @@
+[![MseeP.ai Security Assessment Badge](https://mseep.net/pr/docfork-docfork-mcp-badge.png)](https://mseep.ai/app/docfork-docfork-mcp)
+
 # Docfork: 🌿 Fresh docs for your AI Code Editor
 
 @latest docs for 9000+ libraries in your AI code editor, with a single MCP.
