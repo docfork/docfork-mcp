@@ -107,7 +107,7 @@ function createServerInstance() {
     name: "Docfork",
     description:
       "Gets the latest documentation and code examples for any library.",
-    version: "0.5.5",
+    version: "0.6.0",
     capabilities: {
       resources: {},
       tools: {},
