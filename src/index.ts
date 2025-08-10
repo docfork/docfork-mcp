@@ -43,9 +43,11 @@ function createServerInstance() {
   });
 
   // Register Docfork tool
-  server.tool(
+  server.registerTool(
     "get-library-docs",
-    `Retrieves up-to-date documentation and code examples for any library. This tool automatically searches for the library by name and fetches its documentation.
+    {
+      title: "Get Library Documentation",
+      description: `Retrieves up-to-date documentation and code examples for any library. This tool automatically searches for the library by name and fetches its documentation.
 
 Usage:
 1. Provide the author and library name pair (e.g., "vercel/next.js", "shadcn-ui/ui", "vuejs/docs")
@@ -60,29 +62,30 @@ Response includes:
 - Library selection explanation
 - Comprehensive documentation with code examples
 - Focused content if a topic was specified`,
-    {
-      libraryName: z
-        .string()
-        .describe(
-          "Author and library name pair to search for and retrieve documentation (e.g., 'vercel/next.js', 'reactjs/react.dev', 'vuejs/docs')"
-        ),
-      topic: z
-        .string()
-        .describe(
-          "Topic to focus documentation on (e.g., 'hooks', 'routing', 'authentication')"
-        ),
-      tokens: z
-        .preprocess(
-          (val) => (typeof val === "string" ? Number(val) : val),
-          z.number()
-        )
-        .transform((val) =>
-          val < DEFAULT_MINIMUM_TOKENS ? DEFAULT_MINIMUM_TOKENS : val
-        )
-        .optional()
-        .describe(
-          `Maximum number of tokens of documentation to retrieve (default: ${DEFAULT_MINIMUM_TOKENS}). Higher values provide more context but consume more tokens.`
-        ),
+      inputSchema: {
+        libraryName: z
+          .string()
+          .describe(
+            "Author and library name pair to search for and retrieve documentation (e.g., 'vercel/next.js', 'reactjs/react.dev', 'vuejs/docs')"
+          ),
+        topic: z
+          .string()
+          .describe(
+            "Topic to focus documentation on (e.g., 'hooks', 'routing', 'authentication')"
+          ),
+        tokens: z
+          .preprocess(
+            (val) => (typeof val === "string" ? Number(val) : val),
+            z.number()
+          )
+          .transform((val) =>
+            val < DEFAULT_MINIMUM_TOKENS ? DEFAULT_MINIMUM_TOKENS : val
+          )
+          .optional()
+          .describe(
+            `Maximum number of tokens of documentation to retrieve (default: ${DEFAULT_MINIMUM_TOKENS}). Higher values provide more context but consume more tokens.`
+          ),
+      },
     },
     async ({ libraryName, topic, tokens = DEFAULT_MINIMUM_TOKENS }) => {
       try {
