@@ -1,48 +1,59 @@
-# Docfork: 🌿 Fresh docs for your AI Code Editor
+# Docfork: 🌿 @latest Docs to 9000+ Code Libraries for Any Prompt
 
-@latest docs for 9000+ libraries in your AI code editor, with a single MCP.
-
-[![Install MCP Server](https://cursor.com/deeplink/mcp-install-light.svg)](https://cursor.com/install-mcp?name=docfork&config=eyJjb21tYW5kIjoibnB4IC15IGRvY2ZvcmtAbGF0ZXN0In0%3D) [![Website](https://img.shields.io/badge/Website-docfork.com-%23088DCC)](https://docfork.com) [![smithery badge](https://smithery.ai/badge/@docfork/mcp)](https://smithery.ai/server/@docfork/mcp)
+[![Install MCP Server](https://cursor.com/deeplink/mcp-install-light.svg)](https://cursor.com/install-mcp?name=docfork&config=eyJjb21tYW5kIjoibnB4IC15IGRvY2ZvcmtAbGF0ZXN0In0%3D) [![Website](https://img.shields.io/badge/Website-docfork.com-%23088DCC)](https://docfork.com) [![smithery badge](https://smithery.ai/badge/@docfork/mcp)](https://smithery.ai/server/@docfork/mcp) [<img alt="Install in VS Code (npx)" src="https://img.shields.io/badge/VS_Code-VS_Code?style=flat-square&label=Install%20Docfork%20MCP&color=0098FF">](https://insiders.vscode.dev/redirect?url=vscode%3Amcp%2Finstall%3F%7B%22name%22%3A%22docfork%22%2C%22command%22%3A%22npx%22%2C%22args%22%3A%5B%22-y%22%2C%22docfork%40latest%22%5D%7D)
 
 ## ❌ The Problem: Expired Knowledge
 
-- Out of date code & stale data
-- API ghost towns & hallucinations
+- Out of date code examples & stale data from year-old model training
+- Hallucinated syntax & APIs
 - Old or mismatched versions
 
-## ✅ The Solution: Fresh docs at warp speed
+## ✅ The Solution: @latest docs at warp speed
 
 - Always in sync with the latest version of docs
 - Accurate descriptions and code examples
-- Sub-second retrieval results in your AI code editor
+- Sub-second retrieval results (500ms @ p95) in your AI code editor
 
-Just tell Cursor to **`use docfork`**
+Docfork MCP pulls @latest documentation and code examples straight from the source - and adds them right into your context.
+
+Just tell Cursor to **`use docfork`**:
 
 ```txt
 Create a basic Next.js app with the App Router. use docfork
 ```
 
-## 🛠️ Get Started in Seconds
+## 🛠️ Installation
 
 ### 📋 Requirements
 
 - Node.js ≥ v18
 - Cursor/Windsurf/Claude Desktop (any MCP client)
+ 
+<details>
+<summary><b>Installing via Smithery</b></summary>
 
-### ⚡ Install in Cursor
+### Installing via Smithery
 
-[![Install MCP Server](https://cursor.com/deeplink/mcp-install-light.svg)](https://cursor.com/install-mcp?name=docfork&config=eyJjb21tYW5kIjoibnB4IC15IGRvY2ZvcmtAbGF0ZXN0In0%3D)
+To install Docfork MCP Server for any client automatically via [Smithery](https://smithery.ai/server/@docfork/mcp):
 
-or manually:
+```bash
+npx -y @smithery/cli@latest install @docfork/mcp --client <CLIENT_NAME> --key <YOUR_SMITHERY_KEY>
+```
 
-1. `Settings` -> `Cursor Settings` -> `MCP Tools`
-2. Add New MCP Server
-3. Or configure per-project via `.cursor/mcp.json`
+You can find your Smithery key in the [Smithery.ai webpage](https://smithery.ai/server/@docfork/mcp).
 
-Recommended Setup:
-Add this to your global `~/.cursor/mcp.json` (or per-project in `./.cursor/mcp.json`):
+</details>
+
+<details>
+<summary><b>Install in Cursor</b></summary>
+  
+Go to: `Settings` -> `Cursor Settings` -> `Tools & Integrations` -> `Add a custom MCP server`
+
+Pasting the following config into your Cursor `~/.cursor/mcp.json` file is the recommended approach. You can also install in a specific project by creating `.cursor/mcp.json` in your project folder. See [Cursor MCP docs](https://docs.cursor.com/context/model-context-protocol) for more info.
 
 #### Cursor Remote Server Connection
+
+[![Install MCP Server](https://cursor.com/deeplink/mcp-install-light.svg)](https://cursor.com/en/install-mcp?name=docfork&config=JTdCJTIydXJsJTIyJTNBJTIyaHR0cHMlM0ElMkYlMkZtY3AuZG9jZm9yay5jb20lMkZtY3AlMjIlN0Q%3D)
 
 ```json
 {
@@ -56,6 +67,8 @@ Add this to your global `~/.cursor/mcp.json` (or per-project in `./.cursor/mcp.j
 
 #### Cursor Local Server Connection
 
+[![Install MCP Server](https://cursor.com/deeplink/mcp-install-light.svg)](https://cursor.com/install-mcp?name=docfork&config=eyJjb21tYW5kIjoibnB4IC15IGRvY2ZvcmtAbGF0ZXN0In0%3D)
+
 ```json
 {
   "mcpServers": {
@@ -66,6 +79,8 @@ Add this to your global `~/.cursor/mcp.json` (or per-project in `./.cursor/mcp.j
   }
 }
 ```
+
+</details>
 
 <details>
 <summary>Alternative: Use Bun</summary>
@@ -96,23 +111,6 @@ Add this to your global `~/.cursor/mcp.json` (or per-project in `./.cursor/mcp.j
   }
 }
 ```
-
-</details>
-
-</details>
-
-<details>
-<summary><b>Installing via Smithery</b></summary>
-
-### Installing via Smithery
-
-To install Docfork MCP Server for any client automatically via [Smithery](https://smithery.ai/server/@docfork/mcp):
-
-```bash
-npx -y @smithery/cli@latest install @docfork/mcp --client <CLIENT_NAME> --key <YOUR_SMITHERY_KEY>
-```
-
-You can find your Smithery key in the [Smithery.ai webpage](https://smithery.ai/server/@docfork/mcp).
 
 </details>
 
