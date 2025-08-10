@@ -7,7 +7,7 @@
  * - Session ID generation and storage for stateful connections
  * - Request body parsing for POST requests
  * - Proper CORS headers with Mcp-Session-Id exposure
- * - DNS rebinding protection for local server security
+ * - Flexible hostname support for deployment environments
  * - Support for GET/DELETE requests for SSE notifications and session termination
  * - Backwards compatibility with legacy SSE transport
  */
@@ -275,14 +275,6 @@ async function main() {
                 // Store the transport by session ID
                 streamableTransports[sessionId] = transport;
               },
-              // DNS rebinding protection enabled for local servers
-              enableDnsRebindingProtection: true,
-              allowedHosts: [
-                "127.0.0.1",
-                "localhost",
-                "localhost:3000",
-                "127.0.0.1:3000",
-              ],
             });
 
             // Clean up transport when closed
