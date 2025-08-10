@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "node --loader ts-node/esm src/index.ts",
     "build": "tsc && chmod 755 dist/index.js",
-    "start": "MCP_TRANSPORT=http node dist/index.js",
+    "start": "MCP_TRANSPORT=streamable-http node dist/index.js",
     "inspector": "npx @modelcontextprotocol/inspector node dist/index.js",
     "lint": "eslint \"**/*.{js,ts,tsx}\" --fix",
     "format": "prettier --write \"**/*.{js,ts,tsx,json,md}\"",

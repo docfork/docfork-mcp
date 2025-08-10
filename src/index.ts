@@ -208,7 +208,7 @@ Response includes:
 async function main() {
   const transportType = process.env.MCP_TRANSPORT || "stdio";
 
-  if (transportType === "http" || transportType === "sse") {
+  if (transportType === "streamable-http" || transportType === "sse") {
     // Get initial port from environment or use default
     const initialPort = process.env.PORT
       ? parseInt(process.env.PORT, 10)
