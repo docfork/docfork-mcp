@@ -28,7 +28,7 @@ Create a basic Next.js app with the App Router. use docfork
 
 - Node.js ≥ v18
 - Cursor/Windsurf/Claude Desktop (any MCP client)
- 
+
 <details>
 <summary><b>Installing via Smithery</b></summary>
 
@@ -426,7 +426,16 @@ The Docfork MCP server supports the following environment variables:
 
 - `DEFAULT_MINIMUM_TOKENS`: Set the minimum token count for documentation retrieval (default: 10000)
 
-Example configuration with environment variables:
+### For HTTP/SSE Transport Only
+
+The following environment variables are only relevant when running the server as an HTTP/SSE service (not for standard `npx` usage):
+
+- `MCP_TRANSPORT`: Set the transport type for MCP communication (default: "stdio", options: "stdio", "http", "sse")
+- `PORT`: Set the port number for HTTP/SSE transport (default: 3000, only used when MCP_TRANSPORT is "http" or "sse")
+
+### Example Configurations
+
+**Standard node server configuration (most common):**
 
 ```json
 {
@@ -440,6 +449,17 @@ Example configuration with environment variables:
     }
   }
 }
+```
+
+**HTTP/SSE server configuration (for custom deployments):**
+
+These environment variables are used when you're running your own instance of the Docfork server, not when connecting to remote servers. For remote server connections, use the URL-based configurations shown earlier in this README (e.g., `"url": "https://mcp.docfork.com/mcp"`).
+
+If you're self-hosting and want to run the server with HTTP/SSE transport:
+
+```bash
+# Set environment variables and run
+MCP_TRANSPORT=http PORT=3000 npx -y docfork@latest
 ```
 
 ## 🔨 Available Tools
