@@ -1,4 +1,4 @@
-# Docfork: 🌿 @latest Docs to 9000+ Code Libraries for Any Prompt
+# Docfork MCP: 🌿 @latest Docs to 9000+ Code Libraries in a Single Tool Call
 
 [![Install MCP Server](https://cursor.com/deeplink/mcp-install-light.svg)](https://cursor.com/install-mcp?name=docfork&config=eyJjb21tYW5kIjoibnB4IC15IGRvY2ZvcmtAbGF0ZXN0In0%3D) [![Website](https://img.shields.io/badge/Website-docfork.com-%23088DCC)](https://docfork.com) [![smithery badge](https://smithery.ai/badge/@docfork/mcp)](https://smithery.ai/server/@docfork/mcp) [<img alt="Install in VS Code (npx)" src="https://img.shields.io/badge/VS_Code-VS_Code?style=flat-square&label=Install%20Docfork%20MCP&color=0098FF">](https://insiders.vscode.dev/redirect?url=vscode%3Amcp%2Finstall%3F%7B%22name%22%3A%22docfork%22%2C%22command%22%3A%22npx%22%2C%22args%22%3A%5B%22-y%22%2C%22docfork%40latest%22%5D%7D)
 
