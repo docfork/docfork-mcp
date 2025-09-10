@@ -2,6 +2,7 @@
   "name": "docfork",
   "version": "0.6.1",
   "description": "MCP server for Docfork",
+  "mcpName": "io.github.docfork/docfork-mcp",
   "type": "module",
   "main": "dist/index.js",
   "scripts": {
@@ -15,7 +16,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/docfork/mcp.git"
+    "url": "git+https://github.com/docfork/docfork-mcp.git"
   },
   "keywords": [
     "modelcontextprotocol",
@@ -31,9 +32,9 @@
     "dist"
   ],
   "bugs": {
-    "url": "https://github.com/docfork/mcp/issues"
+    "url": "https://github.com/docfork/docfork-mcp/issues"
   },
-  "homepage": "https://github.com/docfork/mcp#readme",
+  "homepage": "https://github.com/docfork/docfork-mcp#readme",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.17.2",
     "dotenv": "^17.2.1",
