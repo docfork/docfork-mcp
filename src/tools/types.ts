@@ -1,5 +1,3 @@
-import { z } from "zod";
-
 /**
  * Tool configuration interface that matches our actual usage
  */

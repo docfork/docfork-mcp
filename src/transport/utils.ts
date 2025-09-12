@@ -52,6 +52,7 @@ export function parseRequestBody(req: IncomingMessage): Promise<any> {
           resolve({});
         }
       } catch (error) {
+        console.error("Error parsing request body:", error);
         reject(new Error("Invalid JSON in request body"));
       }
     });
