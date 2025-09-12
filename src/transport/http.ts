@@ -7,6 +7,7 @@ import { isInitializeRequest } from "@modelcontextprotocol/sdk/types.js";
 import { createServerInstance } from "../server/server.js";
 import { ServerConfig } from "../server/config.js";
 import { getClientIp, parseRequestBody } from "./utils.js";
+import escape from "escape-html";
 
 // Store transports by session ID
 const streamableTransports: Record<string, StreamableHTTPServerTransport> = {};
@@ -160,7 +161,7 @@ export async function startHttpServer(config: ServerConfig): Promise<void> {
         const sseTransport = sseTransports[sessionId];
         if (!sseTransport) {
           res.writeHead(400);
-          res.end(`No transport found for sessionId: ${sessionId}`);
+          res.end(`No transport found for sessionId: ${escape(sessionId)}`);
           return;
         }
 
