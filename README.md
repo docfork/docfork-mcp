@@ -1,6 +1,11 @@
-# Docfork MCP: 🌿 @latest Docs to 9000+ Code Libraries in a Single Tool Call
+![Cover](public/cover.png)
 
-[![Install MCP Server](https://cursor.com/deeplink/mcp-install-light.svg)](https://cursor.com/install-mcp?name=docfork&config=eyJjb21tYW5kIjoibnB4IC15IGRvY2ZvcmtAbGF0ZXN0In0%3D) [![Website](https://img.shields.io/badge/Website-docfork.com-%23088DCC)](https://docfork.com) [![smithery badge](https://smithery.ai/badge/@docfork/mcp)](https://smithery.ai/server/@docfork/mcp) [<img alt="Install in VS Code (npx)" src="https://img.shields.io/badge/VS_Code-VS_Code?style=flat-square&label=Install%20Docfork%20MCP&color=0098FF">](https://insiders.vscode.dev/redirect?url=vscode%3Amcp%2Finstall%3F%7B%22name%22%3A%22docfork%22%2C%22command%22%3A%22npx%22%2C%22args%22%3A%5B%22-y%22%2C%22docfork%40latest%22%5D%7D)
+# Docfork MCP - Up-to-date Docs for Devs and AI Agents in a Single Tool Call
+
+[![Website](https://img.shields.io/badge/Website-docfork.com-%23088DCC)](https://docfork.com) [![smithery badge](https://smithery.ai/badge/@docfork/mcp)](https://smithery.ai/server/@docfork/mcp) [![NPM Version](https://img.shields.io/npm/v/docfork?color=red)](https://www.npmjs.com/package/docfork) [![MIT licensed](https://img.shields.io/npm/l/docfork)](./LICENSE)
+
+
+[![Install MCP Server](https://cursor.com/deeplink/mcp-install-light.svg)](cursor://anysphere.cursor-deeplink/mcp/install?name=docfork&config=eyJ1cmwiOiJodHRwOi8vbWNwLmRvY2ZvcmsuY29tL21jcCJ9) [<img alt="Install in VS Code (npx)" src="https://img.shields.io/badge/Install%20in%20VS%20Code-0098FF?style=for-the-badge&logo=visualstudiocode&logoColor=white">](https://insiders.vscode.dev/redirect?url=vscode%3Amcp%2Finstall%3F%7B%22name%22%3A%22docfork%22%2C%22command%22%3A%22npx%22%2C%22args%22%3A%5B%22-y%22%2C%22docfork%40latest%22%5D%7D)
 
 ## ❌ The Problem: Expired Knowledge
 
@@ -8,7 +13,7 @@
 - Hallucinated syntax & APIs
 - Old or mismatched versions
 
-## ✅ The Solution: @latest docs at warp speed
+## ✅ The Solution: Up-to-date docs at warp speed
 
 - Always in sync with the latest version of docs
 - Accurate descriptions and code examples
@@ -861,10 +866,13 @@ See [Local and Remote MCPs for Perplexity](https://www.perplexity.ai/help-center
 
 Docfork MCP provides the following tool that LLMs can use:
 
-- `get-library-docs`: Searches the library and returns its documentation.
-  - `libraryName` (required): The name of the library to search for
-  - `topic` (required): Focus the docs on a specific topic (e.g., "routing", "hooks")
-  - `tokens` (optional, default 10000, max 50000): Max number of tokens to return. Values less than the configured `DEFAULT_MINIMUM_TOKENS` value or the default value of 10000 are automatically increased to that value.
+- `get-library-docs`: Retrieves up-to-date documentation and code examples for any library with intelligent search capabilities.
+  - `libraryName` (optional): General library name for hybrid search (e.g., "shadcn UI components", "react", "next.js")
+  - `libraryId` (optional): Exact repository identifier for precise matching (e.g., "shadcn-ui/ui", "vercel/next.js", "facebook/react")
+  - `topic` (required): Focus the docs on a specific topic (e.g., "sidebar", "button styling", "routing", "authentication")
+  - `tokens` (optional, default 10000): Maximum number of tokens of documentation to retrieve. Values less than the configured `DEFAULT_MINIMUM_TOKENS` value are automatically increased to that value.
+
+**Note**: Either `libraryName` or `libraryId` must be provided. The tool uses exact matching when `libraryId` is provided and hybrid search when `libraryName` is used.
 
 ## 💡 Tips
 
