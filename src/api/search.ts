@@ -1,4 +1,4 @@
-const BASE_URL = "https://api.docfork.com/v2/mcp";
+import { BASE_URL } from "./index.js";
 
 /**
  * Fetch documentation for a library using the Docfork API
@@ -8,7 +8,7 @@ const BASE_URL = "https://api.docfork.com/v2/mcp";
  * @param isExactSearch - Whether to force exact search (overrides auto-detection)
  * @returns Promise<string | null>
  */
-export async function fetchLibraryDocs(
+export async function search(
   topic: string,
   libraryId: string | undefined,
   libraryName: string | undefined,
@@ -46,7 +46,6 @@ export async function fetchLibraryDocs(
         // 422 now returns text directly, so just return it as-is
         return responseText;
       }
-
       // Try to get error details from response body for other errors
       let errorDetails = "";
       try {
@@ -54,7 +53,9 @@ export async function fetchLibraryDocs(
         // Try to parse as JSON first
         try {
           const errorData = JSON.parse(responseText);
-          errorDetails = errorData.error || errorData.message || "";
+          // Based on API schema, error responses always have a 'message' field
+          errorDetails =
+            errorData.message || errorData.error || "Unknown error";
         } catch {
           // If not valid JSON, use the raw text
           errorDetails = responseText.substring(0, 200); // Limit length
