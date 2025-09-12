@@ -1,19 +1,30 @@
-const BASE_URL = "https://api.docfork.com/v1/mcp/";
+const BASE_URL = "https://api.docfork.com/v2/mcp";
 
 /**
  * Fetch documentation for a library using the Docfork API
- * @param libraryName - The name of the library to search for
+ * @param libraryIdentifier - The name or ID of the library to search for
  * @param topic - The topic to search for
  * @param tokens - The number of tokens to use for the search
+ * @param isExactSearch - Whether to force exact search (overrides auto-detection)
  * @returns Promise<string | null>
  */
 export async function fetchLibraryDocs(
-  libraryName: string,
   topic: string,
+  libraryId: string | undefined,
+  libraryName: string | undefined,
   tokens?: number
 ): Promise<string | null> {
-  const url = new URL(`${BASE_URL}public/search`);
-  url.searchParams.append("libraryName", libraryName);
+  const url = new URL(`${BASE_URL}/search`);
+
+  // Determine search type: use explicit parameter or auto-detect
+  if (libraryId) {
+    url.searchParams.append("libraryId", libraryId);
+  } else if (libraryName) {
+    url.searchParams.append("libraryName", libraryName);
+  } else {
+    throw new Error("Either libraryId or libraryName must be provided");
+  }
+
   url.searchParams.append("topic", topic);
   if (tokens) {
     url.searchParams.append("tokens", tokens.toString());
@@ -24,12 +35,19 @@ export async function fetchLibraryDocs(
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        "X-Docfork-Source": "mcp",
+        "User-Agent": "docfork-mcp",
       },
     });
 
     if (!response.ok) {
-      // Try to get error details from response body
+      // Handle 422 responses - now returns text with suggestions
+      if (response.status === 422) {
+        const responseText = await response.text();
+        // 422 now returns text directly, so just return it as-is
+        return responseText;
+      }
+
+      // Try to get error details from response body for other errors
       let errorDetails = "";
       try {
         const responseText = await response.text();
@@ -50,26 +68,26 @@ export async function fetchLibraryDocs(
         ? `${response.status} ${response.statusText}: ${errorDetails}`
         : `${response.status} ${response.statusText}`;
 
-      throw new Error(
-        `Failed to fetch documentation for library "${libraryName}" (topic: "${topic}"): ${errorMessage}`
-      );
+      throw new Error(errorMessage);
     }
 
-    // The API returns a plain string, not JSON
+    // Both 200 and 422 now return text, not JSON
     const responseText = await response.text();
+
+    // Return the text response directly
     return responseText;
   } catch (error) {
-    // Re-throw our custom errors as-is
+    // Re-throw HTTP errors as-is (they contain status codes and details)
     if (
       error instanceof Error &&
-      error.message.includes("Failed to fetch documentation")
+      /^\d{3}\s/.test(error.message) // Matches "404 Not Found:" pattern
     ) {
       throw error;
     }
 
     // Handle network errors and other fetch failures
-    throw new Error(
-      `Network error while fetching documentation for library "${libraryName}" (topic: "${topic}"): ${error instanceof Error ? error.message : String(error)}`
-    );
+    const networkErrorMessage =
+      error instanceof Error ? error.message : String(error);
+    throw new Error(`Network error: ${networkErrorMessage}`);
   }
 }

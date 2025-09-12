@@ -107,7 +107,7 @@ function createServerInstance() {
     name: "Docfork",
     description:
       "Gets the latest documentation and code examples for any library.",
-    version: "0.6.0",
+    version: "0.7.0",
     capabilities: {
       resources: {},
       tools: {},
@@ -119,31 +119,42 @@ function createServerInstance() {
     "get-library-docs",
     {
       title: "Get Library Documentation",
-      description: `Retrieves up-to-date documentation and code examples for any library. This tool automatically searches for the library by name and fetches its documentation.
+      description: `Retrieves up-to-date documentation and code examples for any library. This tool automatically searches for libraries and fetches their documentation with intelligent search capabilities.
 
 Usage:
-1. Provide the author and library name pair (e.g., "vercel/next.js", "shadcn-ui/ui", "vuejs/docs")
-2. Specify a topic to focus the documentation on (e.g., "dynamic", "routing", "authentication")
+1. Provide either:
+   - libraryId: Exact repository identifier (e.g., "shadcn-ui/ui", "vercel/next.js") for precise matching
+   - libraryName: General library name (e.g., "shadcn UI components", "react") for broader search
+2. Specify a topic to focus the documentation on (e.g., "sidebar", "button styling", "routing")
 
 The tool will:
-1. Automatically find and select the most relevant library based on the provided name
-2. Fetch comprehensive documentation for the selected library
-3. Return relevant sections focused on the specified topic
+1. Use exact matching when libraryId is provided (shows alternatives if primary search fails)
+2. Use hybrid search when libraryName is provided (focuses on best match)
+3. Find the most relevant library and documentation sections
+4. Return comprehensive documentation with code examples focused on the specified topic
 
 Response includes:
-- Library selection explanation
-- Comprehensive documentation with code examples
-- Focused content if a topic was specified`,
+- Primary library information (title, description, version, source type)
+- Relevant documentation sections with code snippets
+- Other matching libraries if applicable
+- Properly formatted markdown with syntax-highlighted code blocks`,
       inputSchema: {
         libraryName: z
           .string()
+          .optional()
           .describe(
-            "Author and library name pair to search for and retrieve documentation (e.g., 'vercel/next.js', 'reactjs/react.dev', 'vuejs/docs')"
+            "Library name for hybrid search (e.g., 'shadcn UI components', 'react', 'next.js'). Use this for general library searches."
+          ),
+        libraryId: z
+          .string()
+          .optional()
+          .describe(
+            "Exact library identifier for precise matching (e.g., 'shadcn-ui/ui', 'vercel/next.js', 'facebook/react'). Use this when you know the specific library identifier."
           ),
         topic: z
           .string()
           .describe(
-            "Topic to focus documentation on (e.g., 'hooks', 'routing', 'authentication')"
+            "Topic to focus documentation on (e.g., 'sidebar', 'button styling', 'routing', 'authentication')"
           ),
         tokens: z
           .preprocess(
@@ -159,21 +170,41 @@ Response includes:
           ),
       },
     },
-    async ({ libraryName, topic, tokens = DEFAULT_MINIMUM_TOKENS }) => {
+    async ({
+      libraryName,
+      libraryId,
+      topic,
+      tokens = DEFAULT_MINIMUM_TOKENS,
+    }) => {
       try {
-        // Step 1: Search for libraries
-        const searchResponse = await fetchLibraryDocs(
-          libraryName,
-          topic,
-          tokens
-        );
-
-        if (!searchResponse) {
+        // Validate that at least one library identifier is provided
+        if (!libraryName && !libraryId) {
           return {
             content: [
               {
                 type: "text",
-                text: `No libraries found matching "${libraryName}". Please try a different library name or check the spelling.`,
+                text: "Error: Either 'libraryName' or 'libraryId' must be provided to search for documentation.",
+              },
+            ],
+          };
+        }
+
+        // Prioritize libraryId over libraryName if both are provided
+        const searchResponse = await fetchLibraryDocs(
+          topic,
+          libraryId,
+          libraryName,
+          tokens
+        );
+
+        if (!searchResponse) {
+          const identifierType = libraryId ? "library ID" : "library name";
+          const identifier = libraryId || libraryName;
+          return {
+            content: [
+              {
+                type: "text",
+                text: `No libraries found matching ${identifierType} "${identifier}". Please try a different ${identifierType} or check the spelling.`,
               },
             ],
           };
@@ -190,11 +221,15 @@ Response includes:
       } catch (error) {
         const errorMessage =
           error instanceof Error ? error.message : String(error);
+        const searchIdentifier = libraryId || libraryName || "unknown";
+        const identifierType = libraryId ? "library ID" : "library name";
+
+        // Provide contextual error message
         return {
           content: [
             {
               type: "text",
-              text: `Error retrieving documentation for "${libraryName}" (topic: "${topic}"): ${errorMessage}`,
+              text: `Failed to retrieve documentation for ${identifierType} "${searchIdentifier}" with topic "${topic}": ${errorMessage}`,
             },
           ],
         };
