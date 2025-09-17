@@ -1,19 +1,25 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-07-09/server.schema.json",
-  "name": "io.github.docfork/docfork-mcp",
+  "name": "com.docfork/docfork-mcp",
   "description": "MCP server for Docfork",
   "status": "active",
   "repository": {
     "url": "https://github.com/docfork/docfork-mcp",
     "source": "github"
   },
-  "version": "0.6.1",
+  "version": "0.7.2",
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://mcp.docfork.com/mcp"
+    }
+  ],
   "packages": [
     {
       "registry_type": "npm",
       "registry_base_url": "https://registry.npmjs.org",
       "identifier": "docfork",
-      "version": "0.6.1",
+      "version": "0.7.2",
       "transport": {
         "type": "stdio"
       },
