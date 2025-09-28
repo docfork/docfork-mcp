@@ -5,24 +5,51 @@ import { randomUUID } from "node:crypto";
 import { isInitializeRequest } from "@modelcontextprotocol/sdk/types.js";
 import { createServerInstance } from "../server/server.js";
 import { ServerConfig } from "../server/middleware.js";
-import { getClientIp, parseRequestBody } from "./utils.js";
-import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { Server } from "@modelcontextprotocol/sdk/server/index.js";
+import { IncomingMessage } from "node:http";
 
 // Session management - persistent storage by session ID
 const transports: Record<string, StreamableHTTPServerTransport> = {};
-const servers: Record<string, McpServer> = {};
+const servers: Record<string, Server> = {};
 const sessionClientInfo: Record<string, { name?: string; userAgent?: string }> =
   {};
 
 /**
  * Get information about active sessions (for debugging/monitoring)
  */
-export function getSessionInfo() {
+function getSessionInfo() {
   return {
     activeSessions: Object.keys(transports).length,
     sessionIds: Object.keys(transports),
     clientInfo: { ...sessionClientInfo },
   };
+}
+
+/**
+ * Parse request body as JSON
+ */
+function parseRequestBody(req: IncomingMessage): Promise<any> {
+  return new Promise((resolve, reject) => {
+    let body = "";
+    req.on("data", (chunk) => {
+      body += chunk.toString();
+    });
+    req.on("end", () => {
+      try {
+        if (body) {
+          resolve(JSON.parse(body));
+        } else {
+          resolve({});
+        }
+      } catch (error) {
+        console.error("Error parsing request body:", error);
+        reject(new Error("Invalid JSON in request body"));
+      }
+    });
+    req.on("error", (error) => {
+      reject(error);
+    });
+  });
 }
 
 /**
@@ -75,9 +102,6 @@ export async function startHttpServer(config: ServerConfig): Promise<void> {
     }
 
     try {
-      // Extract client IP address for tracking
-      const clientIp = getClientIp(req);
-
       if (url === "/mcp") {
         if (req.method === "POST") {
           // Parse request body for POST requests
@@ -196,20 +220,48 @@ export async function startHttpServer(config: ServerConfig): Promise<void> {
     }
   });
 
-  // Function to attempt server listen with port fallback
-  const startServer = (port: number, maxAttempts = 10) => {
-    httpServer.once("error", (err: NodeJS.ErrnoException) => {
-      if (err.code === "EADDRINUSE" && port < initialPort + maxAttempts) {
-        console.warn(`Port ${port} is in use, trying port ${port + 1}...`);
-        startServer(port + 1, maxAttempts);
-      } else {
-        console.error(`Failed to start server: ${err.message}`);
-        process.exit(1);
+  // Function to find available port and start server
+  const findAvailablePort = async (
+    startPort: number,
+    maxAttempts = 10
+  ): Promise<number> => {
+    for (let port = startPort; port < startPort + maxAttempts; port++) {
+      try {
+        await new Promise<void>((resolve, reject) => {
+          const testServer = createServer();
+          testServer.once("error", (err: NodeJS.ErrnoException) => {
+            if (err.code === "EADDRINUSE") {
+              reject(err);
+            } else {
+              reject(err);
+            }
+          });
+          testServer.listen(port, () => {
+            testServer.close(() => resolve());
+          });
+        });
+        return port; // Port is available
+      } catch (err: any) {
+        if (err.code === "EADDRINUSE") {
+          console.warn(`Port ${port} is in use, trying port ${port + 1}...`);
+          continue;
+        } else {
+          throw err;
+        }
       }
-    });
+    }
+    throw new Error(
+      `No available ports found in range ${startPort}-${startPort + maxAttempts - 1}`
+    );
+  };
 
-    httpServer.listen(port, () => {
-      actualPort = port;
+  // Find available port first, then start the server once
+  const availablePort = await findAvailablePort(initialPort);
+  actualPort = availablePort;
+
+  await new Promise<void>((resolve, reject) => {
+    httpServer.once("error", reject);
+    httpServer.listen(availablePort, () => {
       console.error(
         `Docfork Documentation MCP Server running on ${config.transport.toUpperCase()}:`
       );
@@ -218,9 +270,7 @@ export async function startHttpServer(config: ServerConfig): Promise<void> {
       console.error(
         `  • Session info: http://localhost:${actualPort}/sessions`
       );
+      resolve();
     });
-  };
-
-  // Start the server with initial port
-  startServer(initialPort);
+  });
 }

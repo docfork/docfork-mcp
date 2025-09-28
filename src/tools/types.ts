@@ -1,4 +1,23 @@
 /**
+ * Item returned by the searchDocs tool
+ */
+export interface SearchDocsItem {
+  libraryId: string; // unique identifier for the library
+  title: string;
+  description: string;
+}
+
+/**
+ * DeepResearch shape for OpenAI compatibility
+ */
+export interface DeepResearchShape {
+  id: string;
+  title: string;
+  text: string;
+  url: string;
+}
+
+/**
  * Tool configuration interface that matches our actual usage
  */
 export interface ToolConfig {

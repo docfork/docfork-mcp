@@ -3,13 +3,14 @@
 /**
  * Docfork MCP Server
  *
- * Updated to use modern Streamable HTTP transport with proper session management:
- * - Persistent session ID generation and storage for stateful connections
- * - Request body parsing for POST requests
- * - Proper CORS headers with Mcp-Session-Id exposure
- * - Flexible hostname support for deployment environments
- * - Support for DELETE requests for session termination
- * - Session cleanup and lifecycle management
+ * A Model Context Protocol server that provides documentation search capabilities.
+ * Supports both stdio and HTTP transports with proper session management.
+ *
+ * Features:
+ * - Search for documentation libraries by name or ID
+ * - Search within specific library documentation for detailed content
+ * - Modern Streamable HTTP transport with session management
+ * - Flexible configuration through environment variables
  */
 
 import { getServerConfig } from "./server/middleware.js";
@@ -19,15 +20,27 @@ import { startHttpServer } from "./transport/http.js";
 async function main() {
   const config = getServerConfig();
 
+  // Determine transport type from config
   if (config.transport === "streamable-http") {
     await startHttpServer(config);
   } else {
-    // Default to stdio transport
+    // Default to stdio transport for MCP client compatibility
     await startStdioServer(config);
   }
 }
 
+// Handle graceful shutdown
+process.on("SIGINT", async () => {
+  console.error("Received SIGINT, shutting down gracefully...");
+  process.exit(0);
+});
+
+process.on("SIGTERM", async () => {
+  console.error("Received SIGTERM, shutting down gracefully...");
+  process.exit(0);
+});
+
 main().catch((error) => {
-  console.error("Fatal error in main():", error);
+  console.error("Fatal error running server:", error);
   process.exit(1);
 });

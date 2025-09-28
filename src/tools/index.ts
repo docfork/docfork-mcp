@@ -1,27 +1,34 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import {
-  getLibraryDocsToolConfig,
-  getLibraryDocsHandler,
-} from "./get-library-docs.js";
+import { searchDocsToolConfig, searchDocsHandler } from "./search-docs.js";
+import { readDocsToolConfig, readDocsHandler } from "./read-docs.js";
 
 /**
  * Register all tools with the MCP server
  */
 export function registerTools(server: McpServer) {
-  // Register the get-library-docs tool
+  // Register docfork-search-docs
   server.registerTool(
-    getLibraryDocsToolConfig.name,
+    searchDocsToolConfig.name,
     {
-      title: getLibraryDocsToolConfig.title,
-      description: getLibraryDocsToolConfig.description,
-      inputSchema: getLibraryDocsToolConfig.inputSchema,
+      title: searchDocsToolConfig.title,
+      description: searchDocsToolConfig.description,
+      inputSchema: searchDocsToolConfig.inputSchema,
     },
-    getLibraryDocsHandler
+    searchDocsHandler
+  );
+
+  // Register docfork-read-docs
+  server.registerTool(
+    readDocsToolConfig.name,
+    {
+      title: readDocsToolConfig.title,
+      description: readDocsToolConfig.description,
+      inputSchema: readDocsToolConfig.inputSchema,
+    },
+    readDocsHandler
   );
 }
 
 // Export individual tool configs for external use if needed
-export {
-  getLibraryDocsToolConfig,
-  getLibraryDocsHandler,
-} from "./get-library-docs.js";
+export { searchDocsToolConfig, searchDocsHandler } from "./search-docs.js";
+export { readDocsToolConfig, readDocsHandler } from "./read-docs.js";
