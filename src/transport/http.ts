@@ -5,7 +5,7 @@ import { parse } from "url";
 import { randomUUID } from "node:crypto";
 import { isInitializeRequest } from "@modelcontextprotocol/sdk/types.js";
 import { createServerInstance } from "../server/server.js";
-import { ServerConfig } from "../server/config.js";
+import { ServerConfig } from "../server/middleware.js";
 import { getClientIp, parseRequestBody } from "./utils.js";
 import escape from "escape-html";
 

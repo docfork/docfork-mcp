@@ -1,6 +1,6 @@
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { createServerInstance } from "../server/server.js";
-import { ServerConfig } from "../server/config.js";
+import { ServerConfig } from "../server/middleware.js";
 
 /**
  * Start the server with stdio transport

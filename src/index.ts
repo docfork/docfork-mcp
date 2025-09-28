@@ -12,7 +12,7 @@
  * - Backwards compatibility with legacy SSE transport
  */
 
-import { getServerConfig } from "./server/config.js";
+import { getServerConfig } from "./server/middleware.js";
 import { startStdioServer } from "./transport/stdio.js";
 import { startHttpServer } from "./transport/http.js";
 
