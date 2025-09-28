@@ -8,7 +8,12 @@ import {
   McpError,
 } from "@modelcontextprotocol/sdk/types.js";
 import { ServerConfig } from "./middleware.js";
-import { searchDocsToolConfig, searchDocsHandler, readDocsToolConfig, readDocsHandler } from "../tools/index.js";
+import {
+  searchDocsToolConfig,
+  searchDocsHandler,
+  readDocsToolConfig,
+  readDocsHandler,
+} from "../tools/index.js";
 
 /**
  * Create a new MCP server instance
@@ -35,12 +40,35 @@ export function createServerInstance(config: ServerConfig): Server {
       {
         name: searchDocsToolConfig.name,
         description: searchDocsToolConfig.description,
-        inputSchema: searchDocsToolConfig.inputSchema,
+        inputSchema: {
+          type: "object",
+          properties: {
+            query: {
+              type: "string",
+              description: searchDocsToolConfig.inputSchema.query.description,
+            },
+          },
+          required: ["query"],
+        },
       },
       {
         name: readDocsToolConfig.name,
         description: readDocsToolConfig.description,
-        inputSchema: readDocsToolConfig.inputSchema,
+        inputSchema: {
+          type: "object",
+          properties: Object.keys(readDocsToolConfig.inputSchema).reduce(
+            (acc, key) => {
+              const schema = readDocsToolConfig.inputSchema[key];
+              acc[key] = {
+                type: "string",
+                description: schema.description,
+              };
+              return acc;
+            },
+            {} as any
+          ),
+          required: Object.keys(readDocsToolConfig.inputSchema),
+        },
       },
     ],
   }));
@@ -64,31 +92,18 @@ export function createServerInstance(config: ServerConfig): Server {
     console.error("MCP Server error:", error);
   };
 
-  // Prompts: docfork equivalents of Ref's
+  // Prompts
   server.setRequestHandler(ListPromptsRequestSchema, async () => ({
     prompts: [
       {
         name: "search_docs",
         description:
-          "A quick way to check technical documentation. Searches public documentation sources using Docfork.",
+          "Search for up-to-date documentation and code examples for any library or framework. Gets the latest docs straight from the source.",
         arguments: [
           {
             name: "query",
             description:
-              "The rest of your prompt or question you want informed by docs",
-            required: true,
-          },
-        ],
-      },
-      {
-        name: "my_docs",
-        description:
-          "Search through your private documentation, repos, and PDFs indexed by Docfork.",
-        arguments: [
-          {
-            name: "query",
-            description:
-              "The rest of your prompt or question you want informed by your private docs",
+              "Your question or topic you want documentation for (e.g., 'Next.js routing', 'React hooks', 'Tailwind CSS setup')",
             required: true,
           },
         ],
@@ -100,7 +115,10 @@ export function createServerInstance(config: ServerConfig): Server {
     const { name, arguments: args } = request.params as any;
     const query = args?.query as string | undefined;
     if (!query) {
-      throw new McpError(ErrorCode.InvalidParams, "Missing required argument: query");
+      throw new McpError(
+        ErrorCode.InvalidParams,
+        "Missing required argument: query"
+      );
     }
 
     if (name === "search_docs") {
@@ -108,18 +126,10 @@ export function createServerInstance(config: ServerConfig): Server {
         messages: [
           {
             role: "user" as const,
-            content: { type: "text" as const, text: `${query}\n\nSearch docfork with source=public` },
-          },
-        ],
-      };
-    }
-
-    if (name === "my_docs") {
-      return {
-        messages: [
-          {
-            role: "user" as const,
-            content: { type: "text" as const, text: `${query}\n\nSearch docfork with source=private` },
+            content: {
+              type: "text" as const,
+              text: `${query}\n\nUse docfork to get the latest documentation and code examples.`,
+            },
           },
         ],
       };

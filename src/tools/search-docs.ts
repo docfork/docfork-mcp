@@ -10,15 +10,18 @@ import {
 const OPENAI_MODE = process.env.DOCFORK_OPENAI_MODE === "1";
 
 export const searchDocsToolConfig: ToolConfig = {
-  name: "docfork-search-docs",
+  name: OPENAI_MODE ? "search" : "docfork-search-docs",
   title: "Search Documentation",
-  description:
-    "Search for documentation across the web, GitHub, and other sources. Use 'docfork-read-docs' to read a URL.",
+  description: OPENAI_MODE
+    ? "Search for documents using semantic search. Returns a list of relevant search results."
+    : "Search for documentation across the web, GitHub, and other sources. Use 'docfork-read-docs' to read a URL.",
   inputSchema: {
     query: z
       .string()
       .describe(
-        "Query for documentation. Include language/framework/library names."
+        OPENAI_MODE
+          ? "Search query string. Natural language queries work best for semantic search."
+          : "Query for documentation. Include language/framework/library names."
       ),
   },
 };
@@ -27,7 +30,10 @@ export const searchDocsHandler: ToolHandler = async ({ query }) => {
   if (!query || typeof query !== "string" || query.trim() === "") {
     return {
       content: [
-        { type: "text", text: "Error: 'query' is required for doc search." },
+        {
+          type: "text",
+          text: "[search-docs tool] Error: 'query' is required for doc search.",
+        },
       ],
     };
   }
@@ -39,42 +45,42 @@ export const searchDocsHandler: ToolHandler = async ({ query }) => {
       return { content: [{ type: "text", text: data }] };
     }
 
-    const itemsTyped = data as Array<SearchDocsItem>;
-
-    if (!itemsTyped || itemsTyped.length === 0) {
-      return { content: [{ type: "text", text: "No results found" }] };
+    if (!data || data.length === 0) {
+      return {
+        content: [
+          { type: "text", text: "[search-docs tool] No results found" },
+        ],
+      };
     }
 
     if (OPENAI_MODE) {
-      const shaped: DeepResearchShape[] = itemsTyped.map((library) => ({
+      // OpenAI ChatGPT format: {"results": [{"id": "...", "title": "...", "url": "..."}]}
+      const results = data.map((library) => ({
         id: library.libraryId,
         title: library.title,
-        text: library.description,
-        url: library.libraryId,
+        url: `https://docfork.com/library/${library.libraryId}`, // Provide a proper URL for citations
       }));
       return {
         content: [
           {
             type: "text",
-            text: JSON.stringify(shaped),
+            text: JSON.stringify({ results }),
           },
         ],
       };
     }
 
-    // Non-OpenAI: one text part per library with key fields.
+    // Standard format: one text part per library with key fields
     return {
-      content: itemsTyped.map((library) => ({
+      content: data.map((library) => ({
         type: "text" as const,
-        text: `libraryId: ${library.libraryId}\n title: ${library.title}\n description: ${library.description}`,
+        text: `libraryId: ${library.libraryId}\ntitle: ${library.title}\ndescription: ${library.description}`,
       })),
     };
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error);
     return {
-      content: [
-        { type: "text", text: `Error during documentation search: ${msg}` },
-      ],
+      content: [{ type: "text", text: `[search-docs tool] ${msg}` }],
     };
   }
 };
