@@ -9,7 +9,7 @@ export interface ServerConfig {
   version: string;
   defaultMinimumTokens: number;
   port: number;
-  transport: "stdio" | "streamable-http" | "sse";
+  transport: "stdio" | "streamable-http";
 }
 
 export function getServerConfig(): ServerConfig {

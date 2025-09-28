@@ -4,12 +4,12 @@
  * Docfork MCP Server
  *
  * Updated to use modern Streamable HTTP transport with proper session management:
- * - Session ID generation and storage for stateful connections
+ * - Persistent session ID generation and storage for stateful connections
  * - Request body parsing for POST requests
  * - Proper CORS headers with Mcp-Session-Id exposure
  * - Flexible hostname support for deployment environments
- * - Support for GET/DELETE requests for SSE notifications and session termination
- * - Backwards compatibility with legacy SSE transport
+ * - Support for DELETE requests for session termination
+ * - Session cleanup and lifecycle management
  */
 
 import { getServerConfig } from "./server/middleware.js";
@@ -19,7 +19,7 @@ import { startHttpServer } from "./transport/http.js";
 async function main() {
   const config = getServerConfig();
 
-  if (config.transport === "streamable-http" || config.transport === "sse") {
+  if (config.transport === "streamable-http") {
     await startHttpServer(config);
   } else {
     // Default to stdio transport
