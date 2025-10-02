@@ -9,5 +9,5 @@ export async function startStdioServer(config: ServerConfig): Promise<void> {
   const server = createServerInstance(config);
   const transport = new StdioServerTransport();
   await server.connect(transport);
-  console.error("Docfork Documentation MCP Server running on stdio");
+  console.error("Docfork MCP Server running on stdio");
 }

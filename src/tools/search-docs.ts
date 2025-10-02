@@ -1,13 +1,19 @@
 import { z } from "zod";
 import { searchDocs } from "../api/search-docs.js";
+import { ToolConfig, ToolHandler, OpenAISearchResult } from "./types.js";
 import {
-  ToolConfig,
-  ToolHandler,
-  SearchDocsItem,
-  DeepResearchShape,
-} from "./types.js";
+  isOpenAIMode,
+  validateOpenAIMode,
+  createParameterError,
+  createErrorResponse,
+  createOpenAISearchResponse,
+  generateLibraryUrl,
+} from "./utils.js";
 
-const OPENAI_MODE = process.env.DOCFORK_OPENAI_MODE === "1";
+// Validate environment on module load
+validateOpenAIMode();
+
+const OPENAI_MODE = isOpenAIMode();
 
 export const searchDocsToolConfig: ToolConfig = {
   name: OPENAI_MODE ? "search" : "docfork-search-docs",
@@ -26,16 +32,15 @@ export const searchDocsToolConfig: ToolConfig = {
   },
 };
 
-export const searchDocsHandler: ToolHandler = async ({ query }) => {
+export const searchDocsHandler: ToolHandler = async (args: {
+  query?: string;
+}) => {
+  const query = args.query;
   if (!query || typeof query !== "string" || query.trim() === "") {
-    return {
-      content: [
-        {
-          type: "text",
-          text: "[search-docs tool] Error: 'query' is required for doc search.",
-        },
-      ],
-    };
+    return createParameterError(
+      OPENAI_MODE ? "search" : "search-docs",
+      "query"
+    );
   }
 
   try {
@@ -46,28 +51,21 @@ export const searchDocsHandler: ToolHandler = async ({ query }) => {
     }
 
     if (!data || data.length === 0) {
-      return {
-        content: [
-          { type: "text", text: "[search-docs tool] No results found" },
-        ],
-      };
+      return createErrorResponse(
+        OPENAI_MODE ? "search" : "search-docs",
+        "No results found"
+      );
     }
 
     if (OPENAI_MODE) {
-      // OpenAI ChatGPT format: {"results": [{"id": "...", "title": "...", "url": "..."}]}
-      const results = data.map((library) => ({
+      // OpenAI format:
+      const results: OpenAISearchResult[] = data.map((library) => ({
         id: library.libraryId,
         title: library.title,
-        url: `https://docfork.com/library/${library.libraryId}`, // Provide a proper URL for citations
+        text: library.description, // Use description as the text snippet
+        url: generateLibraryUrl(library.libraryId), // Use consistent URL generation
       }));
-      return {
-        content: [
-          {
-            type: "text",
-            text: JSON.stringify({ results }),
-          },
-        ],
-      };
+      return createOpenAISearchResponse(results);
     }
 
     // Standard format: one text part per library with key fields
@@ -79,8 +77,6 @@ export const searchDocsHandler: ToolHandler = async ({ query }) => {
     };
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error);
-    return {
-      content: [{ type: "text", text: `[search-docs tool] ${msg}` }],
-    };
+    return createErrorResponse(OPENAI_MODE ? "search" : "search-docs", msg);
   }
 };

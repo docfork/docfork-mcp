@@ -1,10 +1,6 @@
 import { BASE_URL } from "./index.js";
 
 export async function readDocs(urlToRead: string): Promise<string> {
-  if (!urlToRead || urlToRead.trim() === "") {
-    throw new Error("[read-docs endpoint] URL is required");
-  }
-
   const url = new URL(`${BASE_URL}/read`);
   url.searchParams.set("url", urlToRead);
 
@@ -19,7 +15,7 @@ export async function readDocs(urlToRead: string): Promise<string> {
   if (!response.ok) {
     const text = await response.text();
     throw new Error(
-      `[read-docs endpoint] ${response.status} ${response.statusText}: ${text.slice(0, 500)}`
+      `${response.status} ${response.statusText}: ${text.slice(0, 500)}`
     );
   }
 

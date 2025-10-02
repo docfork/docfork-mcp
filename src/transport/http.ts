@@ -74,7 +74,7 @@ export function cleanupSession(sessionId: string): boolean {
 }
 
 /**
- * Start the server with HTTP-based transports (streamable-http or sse)
+ * Start the server with HTTP-based transports (streamable-http)
  */
 export async function startHttpServer(config: ServerConfig): Promise<void> {
   // Get initial port from config
@@ -263,7 +263,7 @@ export async function startHttpServer(config: ServerConfig): Promise<void> {
     httpServer.once("error", reject);
     httpServer.listen(availablePort, () => {
       console.error(
-        `Docfork Documentation MCP Server running on ${config.transport.toUpperCase()}:`
+        `Docfork MCP Server running on ${config.transport.toUpperCase()}:`
       );
       console.error(`  • HTTP endpoint: http://localhost:${actualPort}/mcp`);
       console.error(`  • Health check: http://localhost:${actualPort}/ping`);

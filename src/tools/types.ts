@@ -42,3 +42,38 @@ export type ToolHandler = (args: { [x: string]: any }) => Promise<{
   isError?: boolean;
   _meta?: Record<string, unknown>;
 }>;
+
+/**
+ * OpenAI response format for search results
+ */
+export interface OpenAISearchResult {
+  id: string;
+  title: string;
+  text: string; // Required by OpenAI spec - snippet/preview text
+  url: string;
+}
+
+/**
+ * OpenAI response format for document fetch
+ */
+export interface OpenAIDocumentResult {
+  id: string;
+  title: string;
+  text: string;
+  url: string;
+  metadata: {
+    source: string;
+    fetched_at: string;
+  };
+}
+
+/**
+ * Common error response format
+ */
+export interface ToolErrorResponse {
+  content: Array<{
+    type: "text";
+    text: string;
+  }>;
+  isError?: boolean;
+}

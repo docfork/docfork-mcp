@@ -2,9 +2,6 @@ import { BASE_URL } from "./index.js";
 import { SearchDocsItem } from "../tools/types.js";
 
 export async function searchDocs(query: string): Promise<SearchDocsItem[] | string> {
-  if (!query || query.trim() === "") {
-    throw new Error("[search-docs endpoint] Query is required");
-  }
 
   const url = new URL(`${BASE_URL}/search`);
   url.searchParams.set("query", query);
@@ -20,7 +17,7 @@ export async function searchDocs(query: string): Promise<SearchDocsItem[] | stri
   if (!response.ok) {
     const text = await response.text();
     throw new Error(
-      `[search-docs endpoint] ${response.status} ${response.statusText}: ${text.slice(0, 500)}`
+      `${response.status} ${response.statusText}: ${text.slice(0, 500)}`
     );
   }
 

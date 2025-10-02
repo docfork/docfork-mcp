@@ -1,8 +1,19 @@
 import { z } from "zod";
 import { readDocs } from "../api/read-docs.js";
-import { ToolConfig, ToolHandler, DeepResearchShape } from "./types.js";
+import { ToolConfig, ToolHandler, OpenAIDocumentResult } from "./types.js";
+import {
+  isOpenAIMode,
+  validateOpenAIMode,
+  createParameterError,
+  createErrorResponse,
+  createOpenAIDocumentResponse,
+  extractHostname,
+} from "./utils.js";
 
-const OPENAI_MODE = process.env.DOCFORK_OPENAI_MODE === "1";
+// Validate environment on module load
+validateOpenAIMode();
+
+const OPENAI_MODE = isOpenAIMode();
 
 export const readDocsToolConfig: ToolConfig = {
   name: OPENAI_MODE ? "fetch" : "docfork-read-docs",
@@ -19,45 +30,48 @@ export const readDocsToolConfig: ToolConfig = {
       },
 };
 
-export const readDocsHandler: ToolHandler = async ({ url, id }) => {
-  // In OpenAI mode, use 'id' parameter, otherwise use 'url'
-  const targetUrl = OPENAI_MODE ? id : url;
-  const paramName = OPENAI_MODE ? "id" : "url";
+export const readDocsHandler: ToolHandler = async (args: {
+  url?: string;
+  id?: string;
+}) => {
+  if (OPENAI_MODE) {
+    // OpenAI mode: expect 'id' parameter which should be a URL from search results
+    const documentId = args.id;
+    if (!documentId || typeof documentId !== "string") {
+      return createParameterError("fetch", "id");
+    }
 
-  if (!targetUrl || typeof targetUrl !== "string") {
-    return {
-      content: [
-        {
-          type: "text",
-          text: `[read-docs tool] Error: '${paramName}' is required.`,
-        },
-      ],
-    };
-  }
+    try {
+      const text = await readDocs(documentId);
 
-  try {
-    const text = await readDocs(targetUrl);
-
-    if (OPENAI_MODE) {
-      // OpenAI ChatGPT format
-      const result = {
-        id: targetUrl,
-        title: `Documentation from ${new URL(targetUrl).hostname}`, // Extract hostname for title
+      const result: OpenAIDocumentResult = {
+        id: documentId,
+        title: `Documentation from ${extractHostname(documentId)}`,
         text,
-        url: targetUrl,
+        url: documentId,
         metadata: {
           source: "docfork",
           fetched_at: new Date().toISOString(),
         },
       };
-      return { content: [{ type: "text", text: JSON.stringify(result) }] };
+      return createOpenAIDocumentResponse(result);
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : String(error);
+      return createErrorResponse("fetch", msg);
+    }
+  } else {
+    // Standard MCP mode: expect 'url' parameter
+    const targetUrl = args.url;
+    if (!targetUrl || typeof targetUrl !== "string") {
+      return createParameterError("read-docs", "url");
     }
 
-    return { content: [{ type: "text", text }] };
-  } catch (error) {
-    const msg = error instanceof Error ? error.message : String(error);
-    return {
-      content: [{ type: "text", text: `[read-docs tool] ${msg}` }],
-    };
+    try {
+      const text = await readDocs(targetUrl);
+      return { content: [{ type: "text", text }] };
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : String(error);
+      return createErrorResponse("read-docs", msg);
+    }
   }
 };
