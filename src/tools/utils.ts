@@ -1,8 +1,4 @@
-import {
-  ToolErrorResponse,
-  OpenAISearchResult,
-  OpenAIDocumentResult,
-} from "./types.js";
+import { ToolErrorResponse, DeepResearchResult } from "./types.js";
 
 /**
  * Check if OpenAI mode is enabled
@@ -52,32 +48,19 @@ export function createParameterError(
 }
 
 /**
- * Create OpenAI search results response
+ * Create Deep Research compatible response
  */
-export function createOpenAISearchResponse(results: OpenAISearchResult[]): {
+export function createDeepResearchResponse(
+  data: DeepResearchResult | DeepResearchResult[]
+): {
   content: Array<{ type: "text"; text: string }>;
 } {
+  const payload = Array.isArray(data) ? { results: data } : data;
   return {
     content: [
       {
         type: "text",
-        text: JSON.stringify({ results }),
-      },
-    ],
-  };
-}
-
-/**
- * Create OpenAI document response
- */
-export function createOpenAIDocumentResponse(result: OpenAIDocumentResult): {
-  content: Array<{ type: "text"; text: string }>;
-} {
-  return {
-    content: [
-      {
-        type: "text",
-        text: JSON.stringify(result),
+        text: JSON.stringify(payload),
       },
     ],
   };

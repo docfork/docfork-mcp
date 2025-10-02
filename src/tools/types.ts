@@ -1,3 +1,8 @@
+// Unified tool configuration for consistent naming
+export interface ToolConfigNames {
+  searchToolName: string;
+  readToolName: string;
+}
 /**
  * Section item in search results
  */
@@ -52,25 +57,20 @@ export type ToolHandler = (args: { [x: string]: any }) => Promise<{
 }>;
 
 /**
- * OpenAI response format for search results
+ * OpenAI Deep Research compatible result format
+ * Used for both search results and document content
  */
-export interface OpenAISearchResult {
-  id: string;
-  title: string;
-  text: string; // Required by OpenAI spec - snippet/preview text
-}
-
-/**
- * OpenAI response format for document fetch
- */
-export interface OpenAIDocumentResult {
+export interface DeepResearchResult {
   id: string;
   title: string;
   text: string;
-  url: string;
-  metadata: {
-    source: string;
-    fetched_at: string;
+  url?: string;
+  metadata?: {
+    source?: string;
+    fetched_at?: string;
+    library_identifier?: string;
+    version_info?: string;
+    [key: string]: any;
   };
 }
 

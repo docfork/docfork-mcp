@@ -27,6 +27,5 @@ export async function searchDocs(
   }
 
   const result = await response.json();
-  console.log(result);
   return result as SearchDocsResponse;
 }

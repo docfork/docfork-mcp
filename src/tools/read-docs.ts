@@ -1,26 +1,16 @@
 import { z } from "zod";
 import { readDocs } from "../api/read-docs.js";
-import { ToolConfig, ToolHandler } from "./types.js";
+import {
+  ToolConfig,
+  ToolHandler,
+  ToolConfigNames,
+  DeepResearchResult,
+} from "./types.js";
 import { createParameterError, createErrorResponse } from "./utils.js";
-
-// Tool configuration based on client type
-type ReadToolConfig = {
-  searchToolName: string;
-  readToolName: string;
-};
-
-const OPENAI_TOOL_CONFIG: ReadToolConfig = {
-  searchToolName: "search",
-  readToolName: "fetch",
-};
-
-const DEFAULT_TOOL_CONFIG: ReadToolConfig = {
-  searchToolName: "search-docs",
-  readToolName: "read-docs",
-};
+import { OPENAI_TOOL_CONFIG, DEFAULT_TOOL_CONFIG } from "./index.js";
 
 // Function to get tool config based on client
-function getToolConfig(mcpClient: string = "unknown"): ReadToolConfig {
+function getToolConfig(mcpClient: string = "unknown"): ToolConfigNames {
   return mcpClient === "openai-mcp" ? OPENAI_TOOL_CONFIG : DEFAULT_TOOL_CONFIG;
 }
 
@@ -49,15 +39,6 @@ export function createReadToolConfig(
   };
 }
 
-// Deep Research shape for OpenAI compatibility
-type DeepResearchShape = {
-  id: string;
-  title: string;
-  text: string;
-  url: string;
-  metadata?: any;
-};
-
 // read function
 export async function doRead(url: string, mcpClient: string = "unknown") {
   const config = getToolConfig(mcpClient);
@@ -72,7 +53,7 @@ export async function doRead(url: string, mcpClient: string = "unknown") {
 
     // Return different formats based on client type
     if (mcpClient === "openai-mcp") {
-      const result: DeepResearchShape = {
+      const result: DeepResearchResult = {
         id: url,
         title: `Documentation from ${library_identifier} ${version_info}`,
         text,

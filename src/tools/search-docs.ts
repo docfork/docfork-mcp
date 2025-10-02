@@ -1,26 +1,17 @@
 import { z } from "zod";
 import { searchDocs } from "../api/search-docs.js";
-import { ToolConfig, ToolHandler, SearchSection } from "./types.js";
+import {
+  ToolConfig,
+  ToolHandler,
+  SearchSection,
+  ToolConfigNames,
+  DeepResearchResult,
+} from "./types.js";
 import { createParameterError, createErrorResponse } from "./utils.js";
-
-// Tool configuration based on client type
-type SearchToolConfig = {
-  searchToolName: string;
-  readToolName: string;
-};
-
-const OPENAI_TOOL_CONFIG: SearchToolConfig = {
-  searchToolName: "search",
-  readToolName: "fetch",
-};
-
-const DEFAULT_TOOL_CONFIG: SearchToolConfig = {
-  searchToolName: "search-docs",
-  readToolName: "read-docs",
-};
+import { DEFAULT_TOOL_CONFIG, OPENAI_TOOL_CONFIG } from "./index.js";
 
 // Function to get tool config based on client
-function getToolConfig(mcpClient: string = "unknown"): SearchToolConfig {
+function getToolConfig(mcpClient: string = "unknown"): ToolConfigNames {
   return mcpClient === "openai-mcp" ? OPENAI_TOOL_CONFIG : DEFAULT_TOOL_CONFIG;
 }
 
@@ -61,8 +52,8 @@ export function createSearchToolConfig(
   };
 }
 
-// Transform section to OpenAI Deep Research shape
-function toDeepResearchShape(section: SearchSection) {
+// Transform section to Deep Research format
+function toDeepResearchResult(section: SearchSection): DeepResearchResult {
   return {
     id: section.url,
     title: section.title,
@@ -103,7 +94,7 @@ export async function doSearch(
           {
             type: "text" as const,
             text: JSON.stringify({
-              results: data.sections.map(toDeepResearchShape),
+              results: data.sections.map(toDeepResearchResult),
             }),
           },
         ],
