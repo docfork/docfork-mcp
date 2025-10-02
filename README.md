@@ -4,7 +4,6 @@
 
 [![Website](https://img.shields.io/badge/Website-docfork.com-%23088DCC)](https://docfork.com) [![smithery badge](https://smithery.ai/badge/@docfork/mcp)](https://smithery.ai/server/@docfork/mcp) [![NPM Version](https://img.shields.io/npm/v/docfork?color=red)](https://www.npmjs.com/package/docfork) [![MIT licensed](https://img.shields.io/npm/l/docfork)](./LICENSE)
 
-
 [![Install MCP Server](https://cursor.com/deeplink/mcp-install-light.svg)](https://cursor.com/en/install-mcp?name=docfork&config=eyJ1cmwiOiJodHRwczovL21jcC5kb2Nmb3JrLmNvbS9tY3AifQ%3D%3D) [<img alt="Install in VS Code (npx)" src="https://img.shields.io/badge/Install%20in%20VS%20Code-0098FF?style=for-the-badge&logo=visualstudiocode&logoColor=white">](https://insiders.vscode.dev/redirect?url=vscode%3Amcp%2Finstall%3F%7B%22name%22%3A%22docfork%22%2C%22command%22%3A%22npx%22%2C%22args%22%3A%5B%22-y%22%2C%22docfork%40latest%22%5D%7D)
 
 ## ❌ The Problem: Expired Knowledge
@@ -864,15 +863,29 @@ See [Local and Remote MCPs for Perplexity](https://www.perplexity.ai/help-center
 
 ## 🔨 Available Tools
 
-Docfork MCP provides the following tool that LLMs can use:
+Docfork MCP provides different tools depending on the client type:
 
-- `get-library-docs`: Retrieves up-to-date documentation and code examples for any library with intelligent search capabilities.
-  - `libraryName` (optional): General library name for hybrid search (e.g., "shadcn UI components", "react", "next.js")
-  - `libraryId` (optional): Exact repository identifier for precise matching (e.g., "shadcn-ui/ui", "vercel/next.js", "facebook/react")
-  - `topic` (required): Focus the docs on a specific topic (e.g., "sidebar", "button styling", "routing", "authentication")
-  - `tokens` (optional, default 10000): Maximum number of tokens of documentation to retrieve. Values less than the configured `DEFAULT_MINIMUM_TOKENS` value are automatically increased to that value.
+### MCP Clients (Cursor, Claude Code, Claude Desktop, VS Code, etc.)
 
-**Note**: Either `libraryName` or `libraryId` must be provided. The tool uses exact matching when `libraryId` is provided and hybrid search when `libraryName` is used.
+- `search-docs`: Search for documentation across the web, GitHub, and other sources.
+  - `query` (required): Query for documentation. Include language/framework/library names.
+  - `tokens` (optional): Token budget control for response size.
+
+- `read-docs`: Read the content of a documentation URL as markdown/text.
+  - `url` (required): The URL of the webpage to read (typically from `search-docs` results).
+
+### OpenAI ChatGPT Connectors
+
+For OpenAI ChatGPT integration, Docfork provides OpenAI MCP specification-compliant tools:
+
+- `search`: Search for documents using semantic search. Returns a list of relevant search results.
+  - `query` (required): Search query string. Natural language queries work best for semantic search.
+
+- `fetch`: Retrieve complete document content by ID for detailed analysis and citation.
+  - `id` (required): URL or unique identifier for the document to fetch.
+
+> **Note:**  
+> The OpenAI tools (`search` and `fetch`) automatically format their responses for ChatGPT connectors and are compatible with deep research workflows.
 
 ## 💡 Tips
 
@@ -978,8 +991,8 @@ MCP_TRANSPORT=streamable-http PORT=3000 npx -y docfork@latest
 {
   "mcpServers": {
     "docfork": {
-      "command": "npx",
-      "args": ["tsx", "/path/to/folder/docfork/src/index.ts"]
+      "command": "node",
+      "args": ["/path/to/folder/docfork/dist/index.js"]
     }
   }
 }
@@ -991,7 +1004,7 @@ MCP_TRANSPORT=streamable-http PORT=3000 npx -y docfork@latest
 <summary><b>Testing with MCP Inspector</b></summary>
 
 ```bash
-npx -y @modelcontextprotocol/inspector npx docfork
+npm run inspect
 ```
 
 </details>

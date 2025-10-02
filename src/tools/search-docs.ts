@@ -37,21 +37,27 @@ export function createSearchToolConfig(
     description: isOpenAI
       ? "Search for documents using semantic search. Returns a list of relevant search results."
       : `Search for documentation across the web, GitHub, and other sources. Use '${config.readToolName}' to read a URL.`,
-    inputSchema: {
-      query: z
-        .string()
-        .describe(
-          isOpenAI
-            ? "Search query string. Natural language queries work best for semantic search."
-            : "Query for documentation. Include language/framework/library names."
-        ),
-      tokens: z
-        .string()
-        .optional()
-        .describe(
-          "Token budget control: 'dynamic' for system-determined optimal size, or number (100-10000) for hard limit"
-        ),
-    },
+    inputSchema: isOpenAI
+      ? {
+          query: z
+            .string()
+            .describe(
+              "Search query string. Natural language queries work best for semantic search."
+            ),
+        }
+      : {
+          query: z
+            .string()
+            .describe(
+              "Query for documentation. Include language/framework/library names."
+            ),
+          tokens: z
+            .string()
+            .optional()
+            .describe(
+              "Token budget control: 'dynamic' for system-determined optimal size, or number (100-10000) for hard limit"
+            ),
+        },
   };
 }
 
@@ -96,7 +102,9 @@ export async function doSearch(
         content: [
           {
             type: "text" as const,
-            text: JSON.stringify(data.sections.map(toDeepResearchShape)),
+            text: JSON.stringify({
+              results: data.sections.map(toDeepResearchShape),
+            }),
           },
         ],
       };

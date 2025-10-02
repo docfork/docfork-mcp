@@ -1,10 +1,7 @@
 import { z } from "zod";
 import { readDocs } from "../api/read-docs.js";
 import { ToolConfig, ToolHandler } from "./types.js";
-import {
-  createParameterError,
-  createErrorResponse,
-} from "./utils.js";
+import { createParameterError, createErrorResponse } from "./utils.js";
 
 // Tool configuration based on client type
 type ReadToolConfig = {
@@ -71,8 +68,7 @@ export async function doRead(url: string, mcpClient: string = "unknown") {
   }
 
   try {
-    const { text, library_identifier, version_info } =
-      await readDocs(url);
+    const { text, library_identifier, version_info } = await readDocs(url);
 
     // Return different formats based on client type
     if (mcpClient === "openai-mcp") {
@@ -84,6 +80,8 @@ export async function doRead(url: string, mcpClient: string = "unknown") {
         metadata: {
           source: "docfork",
           fetched_at: new Date().toISOString(),
+          library_identifier,
+          version_info,
         },
       };
 
