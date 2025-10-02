@@ -1,10 +1,15 @@
 import { BASE_URL } from "./index.js";
-import { SearchDocsItem } from "../tools/types.js";
+import { SearchDocsResponse } from "../tools/types.js";
 
-export async function searchDocs(query: string): Promise<SearchDocsItem[] | string> {
-
+export async function searchDocs(
+  query: string,
+  tokens?: string
+): Promise<SearchDocsResponse> {
   const url = new URL(`${BASE_URL}/search`);
   url.searchParams.set("query", query);
+  if (tokens) {
+    url.searchParams.set("tokens", tokens);
+  }
 
   const response = await fetch(url.toString(), {
     method: "GET",
@@ -21,10 +26,7 @@ export async function searchDocs(query: string): Promise<SearchDocsItem[] | stri
     );
   }
 
-  const ct = response.headers.get("content-type") || "";
-  if (!ct.includes("application/json")) {
-    return await response.text();
-  }
-
-  return (await response.json()) as SearchDocsItem[];
+  const result = await response.json();
+  console.log(result);
+  return result as SearchDocsResponse;
 }

@@ -6,10 +6,11 @@
   "type": "module",
   "main": "dist/index.js",
   "scripts": {
-    "dev": "node --loader ts-node/esm src/index.ts",
+    "watch": "tsc --watch",
+    "inspect": "npx @modelcontextprotocol/inspector node dist/index.js",
+    "dev": "concurrently \"npm run watch\" \"npm run inspect\"",
     "build": "tsc && chmod 755 dist/index.js",
     "start": "MCP_TRANSPORT=streamable-http node dist/index.js",
-    "inspector": "npx @modelcontextprotocol/inspector node dist/index.js",
     "lint": "eslint \"**/*.{js,ts,tsx}\" --fix",
     "format": "prettier --write \"**/*.{js,ts,tsx,json,md}\"",
     "test": "echo \"No tests specified\" && exit 0"
@@ -48,6 +49,7 @@
     "@types/node": "^24.2.1",
     "@typescript-eslint/eslint-plugin": "^8.39.0",
     "@typescript-eslint/parser": "^8.39.0",
+    "concurrently": "^9.2.1",
     "eslint": "^9.33.0",
     "eslint-plugin-prettier": "^5.5.4",
     "globals": "^16.3.0",

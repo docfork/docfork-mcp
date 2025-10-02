@@ -9,9 +9,9 @@ import {
 } from "@modelcontextprotocol/sdk/types.js";
 import { ServerConfig } from "./middleware.js";
 import {
-  searchDocsToolConfig,
+  createSearchToolConfig,
   searchDocsHandler,
-  readDocsToolConfig,
+  createReadToolConfig,
   readDocsHandler,
 } from "../tools/index.js";
 
@@ -19,6 +19,10 @@ import {
  * Create a new MCP server instance
  */
 export function createServerInstance(config: ServerConfig): Server {
+  // Create tool configurations
+  const searchDocsToolConfig = createSearchToolConfig();
+  const readDocsToolConfig = createReadToolConfig();
+
   const server = new Server(
     {
       name: config.name,
@@ -46,6 +50,12 @@ export function createServerInstance(config: ServerConfig): Server {
             query: {
               type: "string",
               description: searchDocsToolConfig.inputSchema.query.description,
+            },
+            tokens: {
+              type: "string",
+              description:
+                searchDocsToolConfig.inputSchema.tokens?.description ||
+                "Token budget control",
             },
           },
           required: ["query"],

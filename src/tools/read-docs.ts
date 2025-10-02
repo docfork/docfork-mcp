@@ -1,77 +1,116 @@
 import { z } from "zod";
 import { readDocs } from "../api/read-docs.js";
-import { ToolConfig, ToolHandler, OpenAIDocumentResult } from "./types.js";
+import { ToolConfig, ToolHandler } from "./types.js";
 import {
-  isOpenAIMode,
-  validateOpenAIMode,
   createParameterError,
   createErrorResponse,
-  createOpenAIDocumentResponse,
-  extractHostname,
 } from "./utils.js";
 
-// Validate environment on module load
-validateOpenAIMode();
-
-const OPENAI_MODE = isOpenAIMode();
-
-export const readDocsToolConfig: ToolConfig = {
-  name: OPENAI_MODE ? "fetch" : "docfork-read-docs",
-  title: OPENAI_MODE ? "Fetch Document" : "Read Documentation URL",
-  description: OPENAI_MODE
-    ? "Retrieve complete document content by ID for detailed analysis and citation."
-    : "Read the content of a documentation URL as markdown/text. Pass URLs from 'docfork-search-docs'.",
-  inputSchema: OPENAI_MODE
-    ? {
-        id: z.string().describe("Unique identifier for the document to fetch."),
-      }
-    : {
-        url: z.string().describe("The URL of the webpage to read."),
-      },
+// Tool configuration based on client type
+type ReadToolConfig = {
+  searchToolName: string;
+  readToolName: string;
 };
 
-export const readDocsHandler: ToolHandler = async (args: {
-  url?: string;
-  id?: string;
-}) => {
-  if (OPENAI_MODE) {
-    // OpenAI mode: expect 'id' parameter which should be a URL from search results
-    const documentId = args.id;
-    if (!documentId || typeof documentId !== "string") {
-      return createParameterError("fetch", "id");
-    }
+const OPENAI_TOOL_CONFIG: ReadToolConfig = {
+  searchToolName: "search",
+  readToolName: "fetch",
+};
 
-    try {
-      const text = await readDocs(documentId);
+const DEFAULT_TOOL_CONFIG: ReadToolConfig = {
+  searchToolName: "search-docs",
+  readToolName: "read-docs",
+};
 
-      const result: OpenAIDocumentResult = {
-        id: documentId,
-        title: `Documentation from ${extractHostname(documentId)}`,
+// Function to get tool config based on client
+function getToolConfig(mcpClient: string = "unknown"): ReadToolConfig {
+  return mcpClient === "openai-mcp" ? OPENAI_TOOL_CONFIG : DEFAULT_TOOL_CONFIG;
+}
+
+// Function to create read tool configuration
+export function createReadToolConfig(
+  mcpClient: string = "unknown"
+): ToolConfig {
+  const config = getToolConfig(mcpClient);
+  const isOpenAI = mcpClient === "openai-mcp";
+
+  return {
+    name: config.readToolName,
+    title: isOpenAI ? "Fetch Document" : "Read Documentation URL",
+    description: isOpenAI
+      ? "Retrieve complete document content by ID for detailed analysis and citation."
+      : `Read the content of a documentation URL as markdown/text. Pass URLs from '${config.searchToolName}'.`,
+    inputSchema: {
+      [isOpenAI ? "id" : "url"]: z
+        .string()
+        .describe(
+          isOpenAI
+            ? "URL or unique identifier for the document to fetch."
+            : "The URL of the webpage to read."
+        ),
+    },
+  };
+}
+
+// Deep Research shape for OpenAI compatibility
+type DeepResearchShape = {
+  id: string;
+  title: string;
+  text: string;
+  url: string;
+  metadata?: any;
+};
+
+// read function
+export async function doRead(url: string, mcpClient: string = "unknown") {
+  const config = getToolConfig(mcpClient);
+
+  if (!url || typeof url !== "string") {
+    const paramName = mcpClient === "openai-mcp" ? "id" : "url";
+    return createParameterError(config.readToolName, paramName);
+  }
+
+  try {
+    const { text, library_identifier, version_info } =
+      await readDocs(url);
+
+    // Return different formats based on client type
+    if (mcpClient === "openai-mcp") {
+      const result: DeepResearchShape = {
+        id: url,
+        title: `Documentation from ${library_identifier} ${version_info}`,
         text,
-        url: documentId,
+        url,
         metadata: {
           source: "docfork",
           fetched_at: new Date().toISOString(),
         },
       };
-      return createOpenAIDocumentResponse(result);
-    } catch (error) {
-      const msg = error instanceof Error ? error.message : String(error);
-      return createErrorResponse("fetch", msg);
-    }
-  } else {
-    // Standard MCP mode: expect 'url' parameter
-    const targetUrl = args.url;
-    if (!targetUrl || typeof targetUrl !== "string") {
-      return createParameterError("read-docs", "url");
-    }
 
-    try {
-      const text = await readDocs(targetUrl);
-      return { content: [{ type: "text", text }] };
-    } catch (error) {
-      const msg = error instanceof Error ? error.message : String(error);
-      return createErrorResponse("read-docs", msg);
+      return {
+        content: [
+          {
+            type: "text" as const,
+            text: JSON.stringify(result),
+          },
+        ],
+      };
+    } else {
+      return {
+        content: [{ type: "text" as const, text }],
+      };
     }
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : String(error);
+    return createErrorResponse(config.readToolName, msg);
   }
+}
+
+// Handler for backward compatibility
+export const readDocsHandler: ToolHandler = async (args: {
+  url?: string;
+  id?: string;
+}) => {
+  const inputValue = args.id || args.url || "";
+  return doRead(inputValue, "unknown");
 };

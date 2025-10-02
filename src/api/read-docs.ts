@@ -1,14 +1,15 @@
 import { BASE_URL } from "./index.js";
+import { ReadDocsResponse } from "../tools/types.js";
 
-export async function readDocs(urlToRead: string): Promise<string> {
+export async function readDocs(urlToRead: string): Promise<ReadDocsResponse> {
   const url = new URL(`${BASE_URL}/read`);
   url.searchParams.set("url", urlToRead);
 
   const response = await fetch(url.toString(), {
     method: "GET",
     headers: {
-      "Content-Type": "application/json",
       "User-Agent": "docfork-mcp",
+      accept: "application/json",
     },
   });
 
@@ -19,6 +20,7 @@ export async function readDocs(urlToRead: string): Promise<string> {
     );
   }
 
-  // Always return text content
-  return await response.text();
+  // Parse JSON response and return text field
+  const data = await response.json();
+  return data;
 }

@@ -1,20 +1,28 @@
 /**
- * Item returned by the searchDocs tool
+ * Section item in search results
  */
-export interface SearchDocsItem {
-  libraryId: string; // unique identifier for the library
+export interface SearchSection {
+  url: string;
   title: string;
   description: string;
+  score?: number;
 }
 
 /**
- * DeepResearch shape for OpenAI compatibility
+ * Response from the searchDocs API
  */
-export interface DeepResearchShape {
-  id: string;
-  title: string;
+export interface SearchDocsResponse {
+  sections: SearchSection[];
+  truncated?: boolean;
+}
+
+/**
+ * Response from the readDocs API
+ */
+export interface ReadDocsResponse {
   text: string;
-  url: string;
+  library_identifier: string;
+  version_info: string;
 }
 
 /**
@@ -50,7 +58,6 @@ export interface OpenAISearchResult {
   id: string;
   title: string;
   text: string; // Required by OpenAI spec - snippet/preview text
-  url: string;
 }
 
 /**

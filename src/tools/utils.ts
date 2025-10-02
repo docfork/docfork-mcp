@@ -3,7 +3,6 @@ import {
   OpenAISearchResult,
   OpenAIDocumentResult,
 } from "./types.js";
-import { BASE_URL } from "../api/index.js";
 
 /**
  * Check if OpenAI mode is enabled
@@ -82,24 +81,4 @@ export function createOpenAIDocumentResponse(result: OpenAIDocumentResult): {
       },
     ],
   };
-}
-
-/**
- * Generate a proper library URL using BASE_URL
- */
-export function generateLibraryUrl(libraryId: string): string {
-  // Extract the base domain from BASE_URL and construct library URL
-  const baseUrl = new URL(BASE_URL);
-  return `https://${baseUrl.hostname}/library/${libraryId}`;
-}
-
-/**
- * Extract hostname from URL for title generation
- */
-export function extractHostname(url: string): string {
-  try {
-    return new URL(url).hostname;
-  } catch {
-    return "unknown";
-  }
 }
