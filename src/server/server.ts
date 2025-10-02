@@ -57,6 +57,12 @@ export function createServerInstance(config: ServerConfig): Server {
                 searchDocsToolConfig.inputSchema.tokens?.description ||
                 "Token budget control",
             },
+            libraryId: {
+              type: "string",
+              description:
+                searchDocsToolConfig.inputSchema.libraryId?.description ||
+                "Optional library ID to filter search results to a specific library",
+            },
           },
           required: ["query"],
         },
@@ -114,6 +120,18 @@ export function createServerInstance(config: ServerConfig): Server {
             name: "query",
             description:
               "Your question or topic you want documentation for (e.g., 'Next.js routing', 'React hooks', 'Tailwind CSS setup')",
+            required: true,
+          },
+        ],
+      },
+      {
+        name: "read_url",
+        description:
+          "Read the content of a documentation URL as markdown/text. Pass URLs from 'search_docs'.",
+        arguments: [
+          {
+            name: "url",
+            description: "The URL of the webpage to read.",
             required: true,
           },
         ],

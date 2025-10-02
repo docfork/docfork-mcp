@@ -11,6 +11,6 @@ export const OPENAI_TOOL_CONFIG: ToolConfigNames = {
 
 // Default MCP client uses descriptive, namespaced names
 export const DEFAULT_TOOL_CONFIG: ToolConfigNames = {
-  searchToolName: "docfork-search-docs",
-  readToolName: "docfork-read-docs",
+  searchToolName: "docfork_search_docs",
+  readToolName: "docfork_read_url",
 };

@@ -26,14 +26,14 @@ export function createReadToolConfig(
     title: isOpenAI ? "Fetch Document" : "Read Documentation URL",
     description: isOpenAI
       ? "Retrieve complete document content by ID for detailed analysis and citation."
-      : `Read the content of a documentation URL as markdown/text. Pass URLs from '${config.searchToolName}'.`,
+      : `Read the content of a documentation URL as markdown/text. Pass the entire exact URL from '${config.searchToolName}' results.`,
     inputSchema: {
       [isOpenAI ? "id" : "url"]: z
         .string()
         .describe(
           isOpenAI
             ? "URL or unique identifier for the document to fetch."
-            : "The URL of the webpage to read."
+            : "The complete URL of the webpage to read. Use the exact URL from search results."
         ),
     },
   };

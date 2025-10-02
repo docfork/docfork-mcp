@@ -9,8 +9,7 @@ export interface ToolConfigNames {
 export interface SearchSection {
   url: string;
   title: string;
-  description: string;
-  score?: number;
+  content: string;
 }
 
 /**

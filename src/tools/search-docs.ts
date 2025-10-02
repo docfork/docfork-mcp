@@ -26,27 +26,33 @@ export function createSearchToolConfig(
     name: config.searchToolName,
     title: "Search Documentation",
     description: isOpenAI
-      ? "Search for documents using semantic search. Returns a list of relevant search results."
-      : `Search for documentation across the web, GitHub, and other sources. Use '${config.readToolName}' to read a URL.`,
+      ? "Search for documents using semantic search across web documentation and GitHub. Returns a list of relevant search results."
+      : `Search for documentation from GitHub or the web. Include programming language and framework names for best results. If a library ID appears in chat inside a URL, use that library ID for future searches to filter results to that specific library. Use '${config.readToolName}' to read a URL.`,
     inputSchema: isOpenAI
       ? {
           query: z
             .string()
             .describe(
-              "Search query string. Natural language queries work best for semantic search."
+              "Search query string. Natural language queries work best. Include programming language and framework names for better results."
             ),
         }
       : {
           query: z
             .string()
             .describe(
-              "Query for documentation. Include language/framework/library names."
+              "Query for documentation. Include programming language and framework names for best results."
             ),
           tokens: z
             .string()
             .optional()
             .describe(
               "Token budget control: 'dynamic' for system-determined optimal size, or number (100-10000) for hard limit"
+            ),
+          libraryId: z
+            .string()
+            .optional()
+            .describe(
+              "Optional library ID to filter search results to a specific library"
             ),
         },
   };
@@ -57,7 +63,7 @@ function toDeepResearchResult(section: SearchSection): DeepResearchResult {
   return {
     id: section.url,
     title: section.title,
-    text: section.description,
+    text: section.content.slice(0, 100),
     url: section.url,
   };
 }
@@ -66,6 +72,7 @@ function toDeepResearchResult(section: SearchSection): DeepResearchResult {
 export async function doSearch(
   query: string,
   tokens?: string,
+  libraryId?: string,
   mcpClient: string = "unknown"
 ) {
   const config = getToolConfig(mcpClient);
@@ -75,7 +82,7 @@ export async function doSearch(
   }
 
   try {
-    const data = await searchDocs(query, tokens);
+    const data = await searchDocs(query, tokens, libraryId);
 
     if (typeof data === "string") {
       return { content: [{ type: "text" as const, text: data }] };
@@ -103,7 +110,7 @@ export async function doSearch(
       return {
         content: data.sections.map((section: SearchSection) => ({
           type: "text" as const,
-          text: `title: ${section.title}\nurl: ${section.url}\ndescription: ${section.description}${section.score ? `\nscore: ${section.score}` : ""}`,
+          text: `title: ${section.title}\nurl: ${section.url}`,
         })),
       };
     }
@@ -117,6 +124,7 @@ export async function doSearch(
 export const searchDocsHandler: ToolHandler = async (args: {
   query?: string;
   tokens?: string;
+  libraryId?: string;
 }) => {
   if (
     !args.query ||
@@ -125,5 +133,5 @@ export const searchDocsHandler: ToolHandler = async (args: {
   ) {
     return createParameterError("search-docs", "query");
   }
-  return doSearch(args.query, args.tokens, "unknown");
+  return doSearch(args.query, args.tokens, args.libraryId, "unknown");
 };

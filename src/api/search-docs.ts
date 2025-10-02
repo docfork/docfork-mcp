@@ -3,12 +3,16 @@ import { SearchDocsResponse } from "../tools/types.js";
 
 export async function searchDocs(
   query: string,
-  tokens?: string
+  tokens?: string,
+  libraryId?: string
 ): Promise<SearchDocsResponse> {
   const url = new URL(`${BASE_URL}/search`);
   url.searchParams.set("query", query);
   if (tokens) {
     url.searchParams.set("tokens", tokens);
+  }
+  if (libraryId) {
+    url.searchParams.set("libraryId", libraryId);
   }
 
   const response = await fetch(url.toString(), {
