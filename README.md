@@ -1,6 +1,6 @@
 ![Cover](public/cover.png)
 
-# Docfork MCP - Up-to-date Docs for Devs and AI Agents in a Single Tool Call
+# Docfork MCP - Up-to-date Docs for Devs and AI Agents.
 
 [![Website](https://img.shields.io/badge/Website-docfork.com-%23088DCC)](https://docfork.com) [![smithery badge](https://smithery.ai/badge/@docfork/mcp)](https://smithery.ai/server/@docfork/mcp) [![NPM Version](https://img.shields.io/npm/v/docfork?color=red)](https://www.npmjs.com/package/docfork) [![MIT licensed](https://img.shields.io/npm/l/docfork)](./LICENSE)
 
