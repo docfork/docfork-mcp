@@ -1,6 +1,6 @@
 {
   "name": "docfork",
-  "version": "0.7.2",
+  "version": "0.8.0",
   "description": "MCP server for Docfork",
   "mcpName": "com.docfork/docfork-mcp",
   "type": "module",
