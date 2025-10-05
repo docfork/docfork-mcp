@@ -1,20 +1,80 @@
 import { createServer } from "http";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
-import { SSEServerTransport } from "@modelcontextprotocol/sdk/server/sse.js";
 import { parse } from "url";
 import { randomUUID } from "node:crypto";
 import { isInitializeRequest } from "@modelcontextprotocol/sdk/types.js";
 import { createServerInstance } from "../server/server.js";
-import { ServerConfig } from "../server/config.js";
-import { getClientIp, parseRequestBody } from "./utils.js";
-import escape from "escape-html";
+import { ServerConfig } from "../server/middleware.js";
+import { Server } from "@modelcontextprotocol/sdk/server/index.js";
+import { IncomingMessage } from "node:http";
 
-// Store transports by session ID
-const streamableTransports: Record<string, StreamableHTTPServerTransport> = {};
-const sseTransports: Record<string, SSEServerTransport> = {};
+// Session management - persistent storage by session ID
+const transports: Record<string, StreamableHTTPServerTransport> = {};
+const servers: Record<string, Server> = {};
+const sessionClientInfo: Record<string, { name?: string; userAgent?: string }> =
+  {};
 
 /**
- * Start the server with HTTP-based transports (streamable-http or sse)
+ * Get information about active sessions (for debugging/monitoring)
+ */
+function getSessionInfo() {
+  return {
+    activeSessions: Object.keys(transports).length,
+    sessionIds: Object.keys(transports),
+    clientInfo: { ...sessionClientInfo },
+  };
+}
+
+/**
+ * Parse request body as JSON
+ */
+function parseRequestBody(req: IncomingMessage): Promise<any> {
+  return new Promise((resolve, reject) => {
+    let body = "";
+    req.on("data", (chunk) => {
+      body += chunk.toString();
+    });
+    req.on("end", () => {
+      try {
+        if (body) {
+          resolve(JSON.parse(body));
+        } else {
+          resolve({});
+        }
+      } catch (error) {
+        console.error("Error parsing request body:", error);
+        reject(new Error("Invalid JSON in request body"));
+      }
+    });
+    req.on("error", (error) => {
+      reject(error);
+    });
+  });
+}
+
+/**
+ * Clean up a specific session by ID
+ */
+export function cleanupSession(sessionId: string): boolean {
+  if (!transports[sessionId]) {
+    return false;
+  }
+
+  const transport = transports[sessionId];
+  delete transports[sessionId];
+  delete servers[sessionId];
+  delete sessionClientInfo[sessionId];
+
+  // Close transport if it has a close method
+  if (transport && typeof transport.close === "function") {
+    transport.close();
+  }
+
+  return true;
+}
+
+/**
+ * Start the server with HTTP-based transports (streamable-http)
  */
 export async function startHttpServer(config: ServerConfig): Promise<void> {
   // Get initial port from config
@@ -42,13 +102,10 @@ export async function startHttpServer(config: ServerConfig): Promise<void> {
     }
 
     try {
-      // Extract client IP address for tracking
-      const clientIp = getClientIp(req);
-
       if (url === "/mcp") {
-        // Parse request body for POST requests
-        let requestBody = {};
         if (req.method === "POST") {
+          // Parse request body for POST requests
+          let requestBody = {};
           try {
             requestBody = await parseRequestBody(req);
           } catch (error) {
@@ -65,111 +122,91 @@ export async function startHttpServer(config: ServerConfig): Promise<void> {
             );
             return;
           }
-        }
 
-        // Check for existing session ID
-        const sessionId = req.headers["mcp-session-id"] as string | undefined;
-        let transport: StreamableHTTPServerTransport;
+          // Check for existing session ID
+          const sessionId = req.headers["mcp-session-id"] as string | undefined;
+          let transport: StreamableHTTPServerTransport;
 
-        if (sessionId && streamableTransports[sessionId]) {
-          // Reuse existing transport
-          transport = streamableTransports[sessionId];
-        } else if (!sessionId && isInitializeRequest(requestBody)) {
-          // New initialization request
-          transport = new StreamableHTTPServerTransport({
-            sessionIdGenerator: () => randomUUID(),
-            onsessioninitialized: (sessionId) => {
-              // Store the transport by session ID
-              streamableTransports[sessionId] = transport;
-            },
-          });
+          if (sessionId && transports[sessionId]) {
+            // Reuse existing transport and server
+            transport = transports[sessionId];
+          } else if (!sessionId && isInitializeRequest(requestBody)) {
+            // New initialization request - create new session
+            const newSessionId = randomUUID();
 
-          // Clean up transport when closed
-          transport.onclose = () => {
-            if (transport.sessionId) {
-              delete streamableTransports[transport.sessionId];
-            }
-          };
+            transport = new StreamableHTTPServerTransport({
+              sessionIdGenerator: () => newSessionId,
+            });
 
-          // Create new server instance and connect
-          const server = createServerInstance(config);
-          await server.connect(transport);
+            // Create new server instance
+            const server = createServerInstance(config);
+
+            // Store session data
+            transports[newSessionId] = transport;
+            servers[newSessionId] = server;
+            sessionClientInfo[newSessionId] = {
+              name: (requestBody as any)?.params?.clientInfo?.name,
+              userAgent: req.headers["user-agent"],
+            };
+
+            // Clean up session when transport closes
+            transport.onclose = () => {
+              delete transports[newSessionId];
+              delete servers[newSessionId];
+              delete sessionClientInfo[newSessionId];
+            };
+
+            // Connect server to transport
+            await server.connect(transport);
+          } else {
+            // Invalid request - missing session ID or not an initialize request
+            res.writeHead(400, { "Content-Type": "application/json" });
+            res.end(
+              JSON.stringify({
+                jsonrpc: "2.0",
+                error: {
+                  code: -32000,
+                  message: sessionId
+                    ? "Session not found"
+                    : "Bad Request: No valid session ID provided",
+                },
+                id: null,
+              })
+            );
+            return;
+          }
+
+          // Handle the request
+          await transport.handleRequest(req, res, requestBody);
+        } else if (req.method === "DELETE") {
+          // Handle session termination
+          const sessionId = req.headers["mcp-session-id"] as string | undefined;
+          if (!sessionId) {
+            res.writeHead(400, { "Content-Type": "text/plain" });
+            res.end("Missing session ID");
+            return;
+          }
+
+          const success = cleanupSession(sessionId);
+          if (!success) {
+            res.writeHead(404, { "Content-Type": "text/plain" });
+            res.end("Session not found");
+            return;
+          }
+
+          res.writeHead(200, { "Content-Type": "text/plain" });
+          res.end("Session terminated");
         } else {
-          // Invalid request
-          res.writeHead(400, { "Content-Type": "application/json" });
-          res.end(
-            JSON.stringify({
-              jsonrpc: "2.0",
-              error: {
-                code: -32000,
-                message: "Bad Request: No valid session ID provided",
-              },
-              id: null,
-            })
-          );
-          return;
+          res.writeHead(405, { "Content-Type": "text/plain" });
+          res.end("Method not allowed");
         }
-
-        // Handle the request
-        await transport.handleRequest(req, res, requestBody);
-      } else if (url === "/mcp" && req.method === "GET") {
-        // Handle GET requests for server-to-client notifications via SSE
-        const sessionId = req.headers["mcp-session-id"] as string | undefined;
-        if (!sessionId || !streamableTransports[sessionId]) {
-          res.writeHead(400, { "Content-Type": "text/plain" });
-          res.end("Invalid or missing session ID");
-          return;
-        }
-
-        const transport = streamableTransports[sessionId];
-        await transport.handleRequest(req, res);
-      } else if (url === "/mcp" && req.method === "DELETE") {
-        // Handle DELETE requests for session termination
-        const sessionId = req.headers["mcp-session-id"] as string | undefined;
-        if (!sessionId || !streamableTransports[sessionId]) {
-          res.writeHead(400, { "Content-Type": "text/plain" });
-          res.end("Invalid or missing session ID");
-          return;
-        }
-
-        const transport = streamableTransports[sessionId];
-        await transport.handleRequest(req, res);
-      } else if (url === "/sse" && req.method === "GET") {
-        // Create new SSE transport for GET request
-        const sseTransport = new SSEServerTransport("/messages", res);
-        // Store the transport by session ID
-        sseTransports[sseTransport.sessionId] = sseTransport;
-        // Clean up transport when connection closes
-        res.on("close", () => {
-          delete sseTransports[sseTransport.sessionId];
-        });
-        // Create new server instance for this SSE connection
-        const sseServer = createServerInstance(config);
-        await sseServer.connect(sseTransport);
-      } else if (url === "/messages" && req.method === "POST") {
-        // Get session ID from query parameters
-        const parsedUrl = parse(req.url || "", true);
-        const sessionId = parsedUrl.query.sessionId as string;
-
-        if (!sessionId) {
-          res.writeHead(400);
-          res.end("Missing sessionId parameter");
-          return;
-        }
-
-        // Get existing transport for this session
-        const sseTransport = sseTransports[sessionId];
-        if (!sseTransport) {
-          res.writeHead(400);
-          res.end(`No transport found for sessionId: ${escape(sessionId)}`);
-          return;
-        }
-
-        // Handle the POST message with the existing transport
-        await sseTransport.handlePostMessage(req, res);
       } else if (url === "/ping") {
         res.writeHead(200, { "Content-Type": "text/plain" });
         res.end("pong");
+      } else if (url === "/sessions" && req.method === "GET") {
+        // Return session information for monitoring
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(JSON.stringify(getSessionInfo(), null, 2));
       } else {
         res.writeHead(404);
         res.end("Not found");
@@ -183,29 +220,57 @@ export async function startHttpServer(config: ServerConfig): Promise<void> {
     }
   });
 
-  // Function to attempt server listen with port fallback
-  const startServer = (port: number, maxAttempts = 10) => {
-    httpServer.once("error", (err: NodeJS.ErrnoException) => {
-      if (err.code === "EADDRINUSE" && port < initialPort + maxAttempts) {
-        console.warn(`Port ${port} is in use, trying port ${port + 1}...`);
-        startServer(port + 1, maxAttempts);
-      } else {
-        console.error(`Failed to start server: ${err.message}`);
-        process.exit(1);
+  // Function to find available port and start server
+  const findAvailablePort = async (
+    startPort: number,
+    maxAttempts = 10
+  ): Promise<number> => {
+    for (let port = startPort; port < startPort + maxAttempts; port++) {
+      try {
+        await new Promise<void>((resolve, reject) => {
+          const testServer = createServer();
+          testServer.once("error", (err: NodeJS.ErrnoException) => {
+            if (err.code === "EADDRINUSE") {
+              reject(err);
+            } else {
+              reject(err);
+            }
+          });
+          testServer.listen(port, () => {
+            testServer.close(() => resolve());
+          });
+        });
+        return port; // Port is available
+      } catch (err: any) {
+        if (err.code === "EADDRINUSE") {
+          console.warn(`Port ${port} is in use, trying port ${port + 1}...`);
+          continue;
+        } else {
+          throw err;
+        }
       }
-    });
-
-    httpServer.listen(port, () => {
-      actualPort = port;
-      console.error(
-        `Docfork Documentation MCP Server running on ${config.transport.toUpperCase()}:`
-      );
-      console.error(`  • Streamable HTTP: http://localhost:${actualPort}/mcp`);
-      console.error(`  • Legacy SSE: http://localhost:${actualPort}/sse`);
-      console.error(`  • Health check: http://localhost:${actualPort}/ping`);
-    });
+    }
+    throw new Error(
+      `No available ports found in range ${startPort}-${startPort + maxAttempts - 1}`
+    );
   };
 
-  // Start the server with initial port
-  startServer(initialPort);
+  // Find available port first, then start the server once
+  const availablePort = await findAvailablePort(initialPort);
+  actualPort = availablePort;
+
+  await new Promise<void>((resolve, reject) => {
+    httpServer.once("error", reject);
+    httpServer.listen(availablePort, () => {
+      console.error(
+        `Docfork MCP Server running on ${config.transport.toUpperCase()}:`
+      );
+      console.error(`  • HTTP endpoint: http://localhost:${actualPort}/mcp`);
+      console.error(`  • Health check: http://localhost:${actualPort}/ping`);
+      console.error(
+        `  • Session info: http://localhost:${actualPort}/sessions`
+      );
+      resolve();
+    });
+  });
 }

@@ -22,6 +22,9 @@ jobs:
   publish-npm:
     needs: build
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write # Required for MCP Registry OIDC authentication
+      contents: read
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
@@ -41,6 +44,7 @@ jobs:
       - name: Set package version
         run: |
           echo $(jq --arg v "${{ env.VERSION }}" '(.version) = $v' package.json) > package.json
+          echo $(jq --arg v "${{ env.VERSION }}" '.version = $v | .packages[0].version = $v' server.json) > server.json
 
       - name: Update version in source file
         run: |
@@ -53,9 +57,19 @@ jobs:
         run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{secrets.npm_token}}
-      
+
       - name: Publish to npm (pre-release)
         if: ${{ github.event.release.prerelease }}
         run: npm publish --access public --tag=beta
         env:
           NODE_AUTH_TOKEN: ${{secrets.npm_token}}
+
+      - name: Install MCP Publisher
+        run: |
+          curl -L "https://github.com/modelcontextprotocol/registry/releases/download/latest/mcp-publisher_$(uname -s | tr '[:upper:]' '[:lower:]')_$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/').tar.gz" | tar xz mcp-publisher
+
+      - name: Login to MCP Registry
+        run: ./mcp-publisher login github-oidc
+
+      - name: Publish to MCP Registry
+        run: ./mcp-publisher publish

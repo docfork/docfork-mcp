@@ -1,27 +1,16 @@
-import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import {
-  getLibraryDocsToolConfig,
-  getLibraryDocsHandler,
-} from "./get-library-docs.js";
+// Export individual tool configs and handlers
+export { createSearchToolConfig, searchDocsHandler } from "./search-docs.js";
+export { createReadToolConfig, readDocsHandler } from "./read-docs.js";
+import { ToolConfigNames } from "./types.js";
 
-/**
- * Register all tools with the MCP server
- */
-export function registerTools(server: McpServer) {
-  // Register the get-library-docs tool
-  server.registerTool(
-    getLibraryDocsToolConfig.name,
-    {
-      title: getLibraryDocsToolConfig.title,
-      description: getLibraryDocsToolConfig.description,
-      inputSchema: getLibraryDocsToolConfig.inputSchema,
-    },
-    getLibraryDocsHandler
-  );
-}
+// OpenAI MCP client uses shorter, simpler names
+export const OPENAI_TOOL_CONFIG: ToolConfigNames = {
+  searchToolName: "search",
+  readToolName: "fetch",
+};
 
-// Export individual tool configs for external use if needed
-export {
-  getLibraryDocsToolConfig,
-  getLibraryDocsHandler,
-} from "./get-library-docs.js";
+// Default MCP client uses descriptive, namespaced names
+export const DEFAULT_TOOL_CONFIG: ToolConfigNames = {
+  searchToolName: "docfork_search_docs",
+  readToolName: "docfork_read_url",
+};

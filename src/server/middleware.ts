@@ -1,7 +1,14 @@
 import dotenv from "dotenv";
 
 // Load environment variables from .env file if present
-dotenv.config();
+// Completely suppress dotenv output to prevent stdout pollution in MCP stdio transport
+const originalWrite = process.stdout.write;
+process.stdout.write = () => true; // Temporarily suppress stdout
+try {
+  dotenv.config();
+} finally {
+  process.stdout.write = originalWrite; // Restore stdout
+}
 
 export interface ServerConfig {
   name: string;
@@ -9,7 +16,7 @@ export interface ServerConfig {
   version: string;
   defaultMinimumTokens: number;
   port: number;
-  transport: "stdio" | "streamable-http" | "sse";
+  transport: "stdio" | "streamable-http";
 }
 
 export function getServerConfig(): ServerConfig {
