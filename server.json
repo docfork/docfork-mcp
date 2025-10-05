@@ -16,7 +16,7 @@
   ],
   "packages": [
     {
-      "registryType": "npm",
+      "registry_type": "npm",
       "identifier": "docfork",
       "version": "1.0.0",
       "transport": {
