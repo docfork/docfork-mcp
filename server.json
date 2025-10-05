@@ -7,7 +7,7 @@
     "url": "https://github.com/docfork/docfork-mcp",
     "source": "github"
   },
-  "version": "0.8.0",
+  "version": "1.0.0",
   "remotes": [
     {
       "type": "streamable-http",
@@ -18,7 +18,7 @@
     {
       "registryType": "npm",
       "identifier": "docfork",
-      "version": "0.8.0",
+      "version": "1.0.0",
       "transport": {
         "type": "stdio"
       }
