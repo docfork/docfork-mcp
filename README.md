@@ -44,7 +44,7 @@ To install Docfork MCP Server for any client automatically via [Smithery](https:
 npx -y @smithery/cli@latest install @docfork/mcp --client <CLIENT_NAME> --key <YOUR_SMITHERY_KEY>
 ```
 
-You can find your Smithery key in the [Smithery.ai webpage](https://smithery.ai/server/@docfork/mcp).
+You can find your Smithery key in the [Smithery.ai webpage](https://smithery.ai/protocol).
 
 </details>
 
