@@ -1,6 +1,6 @@
 {
   "name": "docfork",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Up-to-date documentation to 9,000+ libraries for devs and AI agents.",
   "mcpName": "com.docfork/docfork-mcp",
   "type": "module",
