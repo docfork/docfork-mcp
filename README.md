@@ -867,11 +867,11 @@ Docfork MCP provides different tools depending on the client type:
 
 ### MCP Clients (Cursor, Claude Code, Claude Desktop, VS Code, etc.)
 
-- `search-docs`: Search for documentation across the web, GitHub, and other sources.
+- `docfork_search_docs`: Search for documentation across the web, GitHub, and other sources.
   - `query` (required): Query for documentation. Include language/framework/library names.
   - `tokens` (optional): Token budget control for response size.
 
-- `read-docs`: Read the content of a documentation URL as markdown/text.
+- `docfork_read_docs`: Read the content of a documentation URL as markdown/text.
   - `url` (required): The URL of the webpage to read (typically from `search-docs` results).
 
 ### OpenAI ChatGPT Connectors
