@@ -872,7 +872,7 @@ Docfork MCP provides different tools depending on the client type:
   - `tokens` (optional): Token budget control for response size.
 
 - `docfork_read_docs`: Read the content of a documentation URL as markdown/text.
-  - `url` (required): The URL of the webpage to read (typically from `search-docs` results).
+  - `url` (required): The URL of the webpage to read (typically from `docfork_search_docs` results).
 
 ### OpenAI ChatGPT Connectors
 
