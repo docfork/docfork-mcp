@@ -1,6 +1,6 @@
 {
   "name": "docfork",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Up-to-date documentation to 9,000+ libraries for devs and AI agents.",
   "mcpName": "com.docfork/docfork-mcp",
   "type": "module",
@@ -37,25 +37,25 @@
   },
   "homepage": "https://github.com/docfork/docfork-mcp#readme",
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.17.2",
-    "dotenv": "^17.2.1",
+    "@modelcontextprotocol/inspector": "^0.17.5",
+    "@modelcontextprotocol/sdk": "^1.24.3",
+    "dotenv": "^17.2.3",
     "escape-html": "^1.0.3",
-    "zod": "^3.23.8"
+    "zod": "^4.1.13"
   },
   "devDependencies": {
-    "@eslint/js": "^9.33.0",
-    "@types/dotenv": "^8.2.3",
+    "@eslint/js": "^9.39.1",
     "@types/escape-html": "^1.0.4",
-    "@types/node": "^24.2.1",
-    "@typescript-eslint/eslint-plugin": "^8.39.0",
-    "@typescript-eslint/parser": "^8.39.0",
+    "@types/node": "^25.0.1",
+    "@typescript-eslint/eslint-plugin": "^8.49.0",
+    "@typescript-eslint/parser": "^8.49.0",
     "concurrently": "^9.2.1",
-    "eslint": "^9.33.0",
+    "eslint": "^9.39.1",
     "eslint-plugin-prettier": "^5.5.4",
-    "globals": "^16.3.0",
-    "prettier": "^3.6.2",
+    "globals": "^16.5.0",
+    "prettier": "^3.7.4",
     "ts-node": "^10.9.2",
-    "typescript": "^5.9.2",
-    "typescript-eslint": "^8.39.0"
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.49.0"
   }
 }
