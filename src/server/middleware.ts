@@ -5,7 +5,7 @@ import dotenv from "dotenv";
 const originalWrite = process.stdout.write;
 process.stdout.write = () => true; // Temporarily suppress stdout
 try {
-  dotenv.config();
+  dotenv.config({ quiet: true });
 } finally {
   process.stdout.write = originalWrite; // Restore stdout
 }

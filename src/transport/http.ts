@@ -109,7 +109,7 @@ export async function startHttpServer(config: ServerConfig): Promise<void> {
             let requestBody = {};
             try {
               requestBody = await parseRequestBody(req);
-            } catch (error) {
+            } catch {
               res.writeHead(400, { "Content-Type": "application/json" });
               res.end(
                 JSON.stringify({
@@ -252,7 +252,7 @@ export async function startHttpServer(config: ServerConfig): Promise<void> {
         try {
           await new Promise<void>((resolve, reject) => {
             const testServer = createServer();
-            testServer.once("error", (err: NodeJS.ErrnoException) => {
+            testServer.once("error", (err: Error & { code?: string }) => {
               if (err.code === "EADDRINUSE") {
                 reject(err);
               } else {
