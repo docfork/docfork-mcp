@@ -23,7 +23,6 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     permissions:
-      id-token: write # Required for MCP Registry OIDC authentication
       contents: read
     steps:
       - name: Checkout Repo
@@ -63,24 +62,3 @@ jobs:
         run: npm publish --access public --tag=beta
         env:
           NODE_AUTH_TOKEN: ${{secrets.npm_token}}
-
-      - name: Install MCP Publisher
-        run: |
-          # Try Homebrew first (most reliable), fallback to direct download
-          if command -v brew >/dev/null 2>&1; then
-            brew install mcp-publisher
-          else
-            # Fallback to direct download with proper release detection
-            LATEST_RELEASE=$(curl -s https://api.github.com/repos/modelcontextprotocol/registry/releases/latest | grep "tag_name" | cut -d '"' -f 4)
-            OS=$(uname -s | tr '[:upper:]' '[:lower:]')
-            ARCH=$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/')
-            curl -L "https://github.com/modelcontextprotocol/registry/releases/download/${LATEST_RELEASE}/mcp-publisher_${OS}_${ARCH}.tar.gz" | tar xz
-            chmod +x mcp-publisher
-            sudo mv mcp-publisher /usr/local/bin/
-          fi
-
-      - name: Login to MCP Registry
-        run: mcp-publisher login github-oidc
-
-      - name: Publish to MCP Registry
-        run: mcp-publisher publish
