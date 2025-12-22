@@ -113,6 +113,16 @@ export async function startHttpServer(config: ServerConfig): Promise<void> {
       try {
         if (url === "/mcp") {
           if (req.method === "POST") {
+            // Ensure Accept header includes required content types for MCP
+            // Some clients (like Smithery scanner) may not send proper Accept headers
+            if (
+              !req.headers.accept ||
+              !req.headers.accept.includes("text/event-stream")
+            ) {
+              req.headers.accept = "application/json, text/event-stream";
+              console.error("Added Accept headers for client compatibility");
+            }
+
             // Parse request body for POST requests
             let requestBody = {};
             try {
