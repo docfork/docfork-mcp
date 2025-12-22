@@ -85,6 +85,11 @@ export async function startHttpServer(config: ServerConfig): Promise<void> {
 
     const httpServer = createServer(async (req, res) => {
       const url = parse(req.url || "").pathname;
+      const requestStart = Date.now();
+
+      // Set a reasonable timeout for requests (10 seconds)
+      req.setTimeout(10000);
+      res.setTimeout(10000);
 
       // Set CORS headers for all responses
       res.setHeader("Access-Control-Allow-Origin", "*");
@@ -94,6 +99,9 @@ export async function startHttpServer(config: ServerConfig): Promise<void> {
         "Content-Type, MCP-Session-Id, mcp-session-id, MCP-Protocol-Version"
       );
       res.setHeader("Access-Control-Expose-Headers", "MCP-Session-Id");
+
+      // Log incoming requests
+      console.error(`[${new Date().toISOString()}] ${req.method} ${url}`);
 
       // Handle preflight OPTIONS requests
       if (req.method === "OPTIONS") {
@@ -132,18 +140,23 @@ export async function startHttpServer(config: ServerConfig): Promise<void> {
 
             if (sessionId && transports[sessionId]) {
               // Reuse existing transport and server
+              console.error(`Reusing session: ${sessionId}`);
               transport = transports[sessionId];
             } else if (!sessionId && isInitializeRequest(requestBody)) {
               // New initialization request - create new session
+              console.error("Creating new MCP session...");
               try {
                 const newSessionId = randomUUID();
+                console.error(`Generated session ID: ${newSessionId}`);
 
                 transport = new StreamableHTTPServerTransport({
                   sessionIdGenerator: () => newSessionId,
                 });
+                console.error("Transport created");
 
                 // Create new server instance
                 const server = createServerInstance(config);
+                console.error("Server instance created");
 
                 // Store session data
                 transports[newSessionId] = transport;
@@ -155,13 +168,16 @@ export async function startHttpServer(config: ServerConfig): Promise<void> {
 
                 // Clean up session when transport closes
                 transport.onclose = () => {
+                  console.error(`Session closed: ${newSessionId}`);
                   delete transports[newSessionId];
                   delete servers[newSessionId];
                   delete sessionClientInfo[newSessionId];
                 };
 
                 // Connect server to transport
+                console.error("Connecting server to transport...");
                 await server.connect(transport);
+                console.error("Server connected successfully");
               } catch (error) {
                 console.error("Error initializing session:", error);
                 res.writeHead(500, { "Content-Type": "application/json" });
@@ -198,7 +214,9 @@ export async function startHttpServer(config: ServerConfig): Promise<void> {
             }
 
             // Handle the request
+            console.error("Handling request via transport...");
             await transport.handleRequest(req, res, requestBody);
+            console.error("Request handled successfully");
           } else if (req.method === "GET") {
             // Handle GET request for SSE stream
             const sessionId = req.headers["mcp-session-id"] as
@@ -263,12 +281,24 @@ export async function startHttpServer(config: ServerConfig): Promise<void> {
           res.writeHead(404);
           res.end("Not found");
         }
+
+        // Log response time
+        const duration = Date.now() - requestStart;
+        console.error(
+          `[${new Date().toISOString()}] ${req.method} ${url} - ${res.statusCode} (${duration}ms)`
+        );
       } catch (error) {
         console.error("Error handling request:", error);
         if (!res.headersSent) {
           res.writeHead(500);
           res.end("Internal Server Error");
         }
+
+        // Log error response time
+        const duration = Date.now() - requestStart;
+        console.error(
+          `[${new Date().toISOString()}] ${req.method} ${url} - ERROR (${duration}ms)`
+        );
       }
     });
 
