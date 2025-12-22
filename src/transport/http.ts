@@ -199,6 +199,26 @@ export async function startHttpServer(config: ServerConfig): Promise<void> {
 
             // Handle the request
             await transport.handleRequest(req, res, requestBody);
+          } else if (req.method === "GET") {
+            // Handle GET request for SSE stream
+            const sessionId = req.headers["mcp-session-id"] as
+              | string
+              | undefined;
+
+            if (!sessionId || !transports[sessionId]) {
+              // No valid session - return 405 to indicate this endpoint doesn't support
+              // GET without a session (per MCP spec, server MAY return 405)
+              res.writeHead(405, {
+                "Content-Type": "text/plain",
+                Allow: "POST, DELETE, OPTIONS",
+              });
+              res.end("Method not allowed");
+              return;
+            }
+
+            // Valid session exists - handle SSE stream via transport
+            const transport = transports[sessionId];
+            await transport.handleRequest(req, res);
           } else if (req.method === "DELETE") {
             // Handle session termination
             const sessionId = req.headers["mcp-session-id"] as
