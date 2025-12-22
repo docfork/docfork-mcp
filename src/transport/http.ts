@@ -117,7 +117,11 @@ export async function startHttpServer(config: ServerConfig): Promise<void> {
             let requestBody = {};
             try {
               requestBody = await parseRequestBody(req);
-            } catch {
+              console.error(
+                `Request body parsed: ${JSON.stringify(requestBody).substring(0, 200)}`
+              );
+            } catch (error) {
+              console.error(`Failed to parse request body: ${error}`);
               res.writeHead(400, { "Content-Type": "application/json" });
               res.end(
                 JSON.stringify({
@@ -137,6 +141,11 @@ export async function startHttpServer(config: ServerConfig): Promise<void> {
               | string
               | undefined;
             let transport: StreamableHTTPServerTransport;
+
+            console.error(`Session ID from header: ${sessionId || "none"}`);
+            console.error(
+              `Is initialize request: ${isInitializeRequest(requestBody)}`
+            );
 
             if (sessionId && transports[sessionId]) {
               // Reuse existing transport and server
@@ -197,6 +206,9 @@ export async function startHttpServer(config: ServerConfig): Promise<void> {
               }
             } else {
               // Invalid request - missing session ID or not an initialize request
+              console.error(
+                `Rejecting request - sessionId: ${sessionId}, hasSession: ${sessionId ? !!transports[sessionId] : false}, isInit: ${isInitializeRequest(requestBody)}`
+              );
               res.writeHead(400, { "Content-Type": "application/json" });
               res.end(
                 JSON.stringify({
