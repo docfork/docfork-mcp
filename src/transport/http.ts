@@ -86,6 +86,10 @@ export async function startHttpServer(config: ServerConfig): Promise<void> {
     const httpServer = createServer(async (req, res) => {
       const url = parse(req.url || "").pathname;
 
+      // Set request timeouts to prevent hanging connections
+      req.setTimeout(10000);
+      res.setTimeout(10000);
+
       // Set CORS headers for all responses
       res.setHeader("Access-Control-Allow-Origin", "*");
       res.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS,DELETE");
@@ -105,6 +109,15 @@ export async function startHttpServer(config: ServerConfig): Promise<void> {
       try {
         if (url === "/mcp") {
           if (req.method === "POST") {
+            // Ensure Accept header includes required content types for MCP
+            // Some clients may not send proper Accept headers
+            if (
+              !req.headers.accept ||
+              !req.headers.accept.includes("text/event-stream")
+            ) {
+              req.headers.accept = "application/json, text/event-stream";
+            }
+
             // Parse request body for POST requests
             let requestBody = {};
             try {
@@ -250,6 +263,32 @@ export async function startHttpServer(config: ServerConfig): Promise<void> {
           // Return session information for monitoring
           res.writeHead(200, { "Content-Type": "application/json" });
           res.end(JSON.stringify(getSessionInfo(), null, 2));
+        } else if (url === "/.well-known/mcp-config" && req.method === "GET") {
+          // Return MCP configuration schema for server discovery
+          const configSchema = {
+            type: "object",
+            description: "No configuration required",
+            properties: {},
+          };
+          res.writeHead(200, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ configSchema }, null, 2));
+        } else if (
+          (url === "/.well-known/mcp/server-card.json" ||
+            url === "/.well-known/mcp/mcp/server-card.json") &&
+          req.method === "GET"
+        ) {
+          // Return MCP Server Card for discovery
+          const serverCard = {
+            name: config.name,
+            version: config.version,
+            description: config.description,
+            capabilities: {
+              tools: true,
+              prompts: true,
+            },
+          };
+          res.writeHead(200, { "Content-Type": "application/json" });
+          res.end(JSON.stringify(serverCard, null, 2));
         } else {
           res.writeHead(404);
           res.end("Not found");
