@@ -299,6 +299,23 @@ export async function startHttpServer(config: ServerConfig): Promise<void> {
           };
           res.writeHead(200, { "Content-Type": "application/json" });
           res.end(JSON.stringify({ configSchema }, null, 2));
+        } else if (
+          (url === "/.well-known/mcp/server-card.json" ||
+            url === "/.well-known/mcp/mcp/server-card.json") &&
+          req.method === "GET"
+        ) {
+          // Return MCP Server Card for discovery
+          const serverCard = {
+            name: config.name,
+            version: config.version,
+            description: config.description,
+            capabilities: {
+              tools: true,
+              prompts: true,
+            },
+          };
+          res.writeHead(200, { "Content-Type": "application/json" });
+          res.end(JSON.stringify(serverCard, null, 2));
         } else {
           res.writeHead(404);
           res.end("Not found");
