@@ -313,14 +313,17 @@ export async function startHttpServer(config: ServerConfig): Promise<void> {
 
     await new Promise<void>((resolve, reject) => {
       httpServer.once("error", reject);
-      httpServer.listen(availablePort, () => {
+      httpServer.listen(availablePort, "0.0.0.0", () => {
         console.error(
           `Docfork MCP Server running on ${config.transport.toUpperCase()}:`
         );
-        console.error(`  • HTTP endpoint: http://localhost:${actualPort}/mcp`);
-        console.error(`  • Health check: http://localhost:${actualPort}/ping`);
+        console.error(`  • HTTP endpoint: http://0.0.0.0:${actualPort}/mcp`);
+        console.error(`  • Health check: http://0.0.0.0:${actualPort}/ping`);
         console.error(
-          `  • Session info: http://localhost:${actualPort}/sessions`
+          `  • Session info: http://0.0.0.0:${actualPort}/sessions`
+        );
+        console.error(
+          `  • Well-known config: http://0.0.0.0:${actualPort}/.well-known/mcp-config`
         );
         resolve();
       });
