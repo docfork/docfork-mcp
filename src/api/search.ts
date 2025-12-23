@@ -1,18 +1,30 @@
 import { BASE_URL } from "./index.js";
-import { SearchDocsResponse } from "../tools/types.js";
+
+// section item in search results
+interface SearchSection {
+  url: string;
+  title: string;
+  content: string;
+}
+
+// response from the search API
+interface SearchDocsResponse {
+  sections: SearchSection[];
+  truncated?: boolean;
+}
 
 export async function searchDocs(
   query: string,
-  tokens?: string,
-  libraryId?: string
+  docforkIdentifier?: string,
+  tokens?: string
 ): Promise<SearchDocsResponse> {
   const url = new URL(`${BASE_URL}/search`);
   url.searchParams.set("query", query);
+  if (docforkIdentifier) {
+    url.searchParams.set("libraryId", docforkIdentifier);
+  }
   if (tokens) {
     url.searchParams.set("tokens", tokens);
-  }
-  if (libraryId) {
-    url.searchParams.set("libraryId", libraryId);
   }
 
   const response = await fetch(url.toString(), {
