@@ -1,7 +1,12 @@
 import { BASE_URL } from "./index.js";
-import { ReadDocsResponse } from "../tools/types.js";
 
-export async function readDocs(urlToRead: string): Promise<ReadDocsResponse> {
+interface ReadUrlResponse {
+  text: string;
+  library_identifier: string;
+  version_info: string;
+}
+
+export async function readUrl(urlToRead: string): Promise<ReadUrlResponse> {
   const url = new URL(`${BASE_URL}/read`);
   url.searchParams.set("url", urlToRead);
 
@@ -22,5 +27,5 @@ export async function readDocs(urlToRead: string): Promise<ReadDocsResponse> {
 
   // Parse JSON response and return text field
   const data = await response.json();
-  return data;
+  return data as ReadUrlResponse;
 }

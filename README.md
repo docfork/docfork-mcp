@@ -1,6 +1,6 @@
 ![Cover](public/cover.png)
 
-# Docfork MCP - Up-to-date Docs for Devs and AI Agents.
+# Docfork MCP - Up-to-date Documentation for AI Agents.
 
 [![smithery badge](https://smithery.ai/badge/@docfork/mcp)](https://smithery.ai/server/@docfork/mcp) [![Website](https://img.shields.io/badge/Website-docfork.com-%23088DCC)](https://docfork.com) [![NPM Version](https://img.shields.io/npm/v/docfork?color=red)](https://www.npmjs.com/package/docfork) [![MIT licensed](https://img.shields.io/npm/l/docfork)](./LICENSE)
 
@@ -869,9 +869,10 @@ Docfork MCP provides different tools depending on the client type:
 
 - `docfork_search_docs`: Search for documentation across the web, GitHub, and other sources.
   - `query` (required): Query for documentation. Include language/framework/library names.
-  - `tokens` (optional): Token budget control for response size.
+  - `docforkIdentifier` (optional): Library identifier in author/repo format (e.g., 'facebook/react', 'vercel/next.js'). Use this to search INSIDE a specific library's documentation for focused, accurate results. Extract from URLs in search results and include in subsequent searches about that library.
+  - `tokens` (optional): Token budget control: 'dynamic' or number (100-10000).
 
-- `docfork_read_docs`: Read the content of a documentation URL as markdown/text.
+- `docfork_read_url`: Read the content of a documentation URL as markdown/text.
   - `url` (required): The URL of the webpage to read (typically from `docfork_search_docs` results).
 
 ### OpenAI ChatGPT Connectors

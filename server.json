@@ -5,8 +5,7 @@
   "icons": [
     {
       "src": "https://mcp.docfork.com/icon.svg",
-      "mimeType": "image/svg+xml",
-      "sizes": ["48x48", "96x96", "any"]
+      "mimeType": "image/svg+xml"
     }
   ],
   "repository": {
