@@ -11,6 +11,7 @@
     "dev": "concurrently \"npm run watch\" \"npm run inspect\"",
     "build": "tsc && chmod 755 dist/index.js",
     "start": "MCP_TRANSPORT=streamable-http node dist/index.js",
+    "start:stdio": "MCP_TRANSPORT=stdio node dist/index.js",
     "lint": "eslint \"**/*.{js,ts,tsx}\" --fix",
     "format": "prettier --write \"**/*.{js,ts,tsx,json,md}\"",
     "test": "echo \"No tests specified\" && exit 0"
@@ -49,7 +50,6 @@
     "@typescript-eslint/parser": "^8.49.0",
     "concurrently": "^9.2.1",
     "eslint": "^9.39.1",
-    "eslint-plugin-prettier": "^5.5.4",
     "globals": "^16.5.0",
     "prettier": "^3.7.4",
     "typescript": "^5.9.3"
