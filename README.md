@@ -944,19 +944,25 @@ The Docfork MCP server supports the following environment variables:
 
 - `DEFAULT_MINIMUM_TOKENS`: Set the minimum token count for documentation retrieval (default: 10000)
 
-### For HTTP/SSE Transport Only
+### Transport Configuration
 
-The following environment variables are only relevant when running the server as an HTTP/SSE service (not for standard `npx` usage):
+- `MCP_TRANSPORT`: Set the transport type for MCP communication (default: `stdio`)
+  - `stdio` (default): Standard input/output transport for local subprocess communication—simple and reliable with no port management
+  - `streamable-http`: HTTP-based transport with SSE support for multiple client connections, server-initiated messages, and session management
+- `PORT`: Set the base port number for HTTP transport (default: `3000`)
+  - Only used when `MCP_TRANSPORT` is `streamable-http`
+  - If the specified port is unavailable, the server automatically finds the next available port (tries up to 10 consecutive ports)
 
-- `MCP_TRANSPORT`: Set the transport type for MCP communication (default: `stdio`, options: `streamable-http`, `stdio`, `sse`)
-- `PORT`: Set the port number for HTTP/SSE transport (default: `3000`, only used when MCP_TRANSPORT is `streamable-http` or `sse`)
+#### When to Use Streamable HTTP
+
+Use `MCP_TRANSPORT=streamable-http` for remote/hosted servers or when you need multiple client connections, server-initiated messages, or session management. For more details, see the [modelcontextprotocol.io transport documentation](https://modelcontextprotocol.io/specification/latest/basic/transports).
 
 </details>
 
 <details>
 <summary><b>Example Configurations</b></summary>
 
-**Standard node server configuration (most common):**
+**Standard configuration with default transport (stdio):**
 
 ```json
 {
@@ -972,15 +978,53 @@ The following environment variables are only relevant when running the server as
 }
 ```
 
-**HTTP/SSE server configuration (for custom deployments):**
+**Using streamable-http transport (for advanced features):**
+
+For remote servers or when you need multiple connections and server-initiated messages:
+
+```json
+{
+  "mcpServers": {
+    "docfork": {
+      "command": "npx",
+      "args": ["-y", "docfork@latest"],
+      "env": {
+        "MCP_TRANSPORT": "streamable-http"
+      }
+    }
+  }
+}
+```
+
+**Custom port configuration (for streamable-http):**
+
+```json
+{
+  "mcpServers": {
+    "docfork": {
+      "command": "npx",
+      "args": ["-y", "docfork@latest"],
+      "env": {
+        "MCP_TRANSPORT": "streamable-http",
+        "PORT": "3000"
+      }
+    }
+  }
+}
+```
+
+Note: If the specified port is already in use, the server automatically finds the next available port.
+
+**Self-hosted HTTP server:**
 
 These environment variables are used when you're running your own instance of the Docfork server, not when connecting to remote servers. For remote server connections, use the URL-based configurations shown earlier in this README (e.g., `"url": "https://mcp.docfork.com/mcp"`).
 
-If you're self-hosting and want to run the server with HTTP/SSE transport:
-
 ```bash
-# Set environment variables and run
+# run with streamable-http transport (opt-in)
 MCP_TRANSPORT=streamable-http PORT=3000 npx -y docfork@latest
+
+# run with stdio (default)
+npx -y docfork@latest
 ```
 
 </details>
@@ -1061,6 +1105,53 @@ Use the `--experimental-fetch` flag to bypass TLS-related problems:
     "docfork": {
       "command": "npx",
       "args": ["-y", "--node-options=--experimental-fetch", "docfork"]
+    }
+  }
+}
+```
+
+</details>
+
+<details>
+<summary><b>Port Already In Use (EADDRINUSE)</b></summary>
+
+If you see an error like `Error: listen EADDRINUSE: address already in use :::3000`, this means you have `MCP_TRANSPORT=streamable-http` configured:
+
+**Option 1: Use default stdio transport (recommended)**
+
+Remove the `MCP_TRANSPORT` environment variable to use the default stdio transport, which avoids port conflicts:
+
+```json
+{
+  "mcpServers": {
+    "docfork": {
+      "command": "npx",
+      "args": ["-y", "docfork"]
+    }
+  }
+}
+```
+
+**Option 2: Automatic port allocation**
+
+The server automatically finds an available port if the default port is in use. You'll see a message like:
+
+```
+Port 3000 is already in use, using port 3001 instead
+```
+
+**Option 3: Configure a custom port**
+
+```json
+{
+  "mcpServers": {
+    "docfork": {
+      "command": "npx",
+      "args": ["-y", "docfork"],
+      "env": {
+        "MCP_TRANSPORT": "streamable-http",
+        "PORT": "3500"
+      }
     }
   }
 }

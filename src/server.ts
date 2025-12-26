@@ -1,4 +1,4 @@
-import { createServer, IncomingMessage, ServerResponse } from "http";
+import { createServer, IncomingMessage, ServerResponse, Server } from "http";
 import { randomUUID } from "crypto";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
@@ -221,13 +221,19 @@ async function handleMcpDelete(
 
 /**
  * Start the HTTP server with the given server factories
+ * automatically finds an available port if the requested port is in use
  */
 export async function startHttpServer(
   port: number,
   standardServerFactory: () => McpServer,
   openaiServerFactory: () => McpServer
 ): Promise<void> {
-  const httpServer = createServer(async (req, res) => {
+  const maxAttempts = 10;
+  let finalPort = port;
+  let httpServer: Server | null = null;
+
+  // create request handler function (reused for all port attempts)
+  const requestHandler = async (req: IncomingMessage, res: ServerResponse) => {
     const url = (req.url || "/").split("?")[0];
 
     // Set CORS headers for all responses
@@ -290,18 +296,66 @@ export async function startHttpServer(
         res.end("Internal Server Error");
       }
     }
-  });
+  };
 
-  await new Promise<void>((resolve, reject) => {
-    httpServer.once("error", reject);
-    httpServer.listen(port, () => {
-      console.error(`Docfork MCP Server running on HTTP:`);
-      console.error(`  • HTTP endpoint: http://localhost:${port}/mcp`);
-      console.error(`  • Health check: http://localhost:${port}/ping`);
-      console.error(`  • Session info: http://localhost:${port}/sessions`);
-      resolve();
-    });
-  });
+  // try to find an available port
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    const testPort = port + attempt;
+    httpServer = createServer(requestHandler);
+
+    try {
+      await new Promise<void>((resolve, reject) => {
+        httpServer!.once("error", (err: NodeJS.ErrnoException) => {
+          if (err.code === "EADDRINUSE") {
+            // port is in use, try next port
+            reject(new Error("EADDRINUSE"));
+          } else {
+            // other error, reject immediately
+            reject(err);
+          }
+        });
+        httpServer!.listen(testPort, () => {
+          finalPort = testPort;
+          if (finalPort !== port) {
+            console.error(
+              `Port ${port} is already in use, using port ${finalPort} instead`
+            );
+          }
+          console.error(`Docfork MCP Server running on HTTP:`);
+          console.error(
+            `  • HTTP endpoint: http://localhost:${finalPort}/mcp`
+          );
+          console.error(
+            `  • Health check: http://localhost:${finalPort}/ping`
+          );
+          console.error(
+            `  • Session info: http://localhost:${finalPort}/sessions`
+          );
+          resolve();
+        });
+      });
+
+      // successfully started on this port
+      break;
+    } catch (error: any) {
+      if (error.message === "EADDRINUSE" && attempt < maxAttempts - 1) {
+        // close the server and try next port
+        httpServer?.close();
+        httpServer = null;
+        continue;
+      } else {
+        // unexpected error or ran out of attempts
+        httpServer?.close();
+        throw error;
+      }
+    }
+  }
+
+  if (!httpServer) {
+    throw new Error(
+      `Unable to find available port in range ${port}-${port + maxAttempts - 1}`
+    );
+  }
 
   // Handle graceful shutdown
   const shutdown = async () => {

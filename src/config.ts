@@ -43,6 +43,6 @@ export function getServerConfig(): ServerConfig {
     defaultMinimumTokens: parseEnvInt("DEFAULT_MINIMUM_TOKENS", 10000),
     port: parseEnvInt("PORT", 3000),
     transport: (process.env.MCP_TRANSPORT ||
-      "streamable-http") as ServerConfig["transport"],
+      "stdio") as ServerConfig["transport"],
   };
 }
