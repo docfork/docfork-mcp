@@ -1,4 +1,4 @@
-import { BASE_URL } from "./index.js";
+import { API_URL } from "./index.js";
 
 // section item in search results
 interface SearchSection {
@@ -18,7 +18,7 @@ export async function searchDocs(
   docforkIdentifier?: string,
   tokens?: string
 ): Promise<SearchDocsResponse> {
-  const url = new URL(`${BASE_URL}/search`);
+  const url = new URL(`${API_URL}/search`);
   url.searchParams.set("query", query);
   if (docforkIdentifier) {
     url.searchParams.set("libraryId", docforkIdentifier);

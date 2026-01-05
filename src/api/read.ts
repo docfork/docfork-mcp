@@ -1,4 +1,4 @@
-import { BASE_URL } from "./index.js";
+import { API_URL } from "./index.js";
 
 interface ReadUrlResponse {
   text: string;
@@ -7,7 +7,7 @@ interface ReadUrlResponse {
 }
 
 export async function readUrl(urlToRead: string): Promise<ReadUrlResponse> {
-  const url = new URL(`${BASE_URL}/read`);
+  const url = new URL(`${API_URL}/read`);
   url.searchParams.set("url", urlToRead);
 
   const response = await fetch(url.toString(), {
