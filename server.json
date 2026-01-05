@@ -12,7 +12,7 @@
     "url": "https://github.com/docfork/docfork-mcp",
     "source": "github"
   },
-  "version": "1.2.0",
+  "version": "1.2.2",
   "remotes": [
     {
       "type": "streamable-http",
