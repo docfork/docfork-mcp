@@ -1,7 +1,7 @@
 {
   "name": "docfork",
   "version": "1.2.2",
-  "description": "Up-to-date documentation to 9,000+ libraries for devs and AI agents.",
+  "description": "Up-to-date code documentation for AI agents.",
   "mcpName": "com.docfork/docfork-mcp",
   "type": "module",
   "main": "dist/index.js",
