@@ -1,4 +1,6 @@
 import { API_URL } from "./index.js";
+import { generateHeaders } from "./headers.js";
+import { DocforkAuthConfig } from "../config.js";
 
 // section item in search results
 interface SearchSection {
@@ -16,7 +18,8 @@ interface SearchDocsResponse {
 export async function searchDocs(
   query: string,
   docforkIdentifier?: string,
-  tokens?: string
+  tokens?: string,
+  auth?: DocforkAuthConfig
 ): Promise<SearchDocsResponse> {
   const url = new URL(`${API_URL}/search`);
   url.searchParams.set("query", query);
@@ -27,12 +30,11 @@ export async function searchDocs(
     url.searchParams.set("tokens", tokens);
   }
 
+  const headers = generateHeaders(auth);
+
   const response = await fetch(url.toString(), {
     method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      "User-Agent": "docfork-mcp",
-    },
+    headers,
   });
 
   if (!response.ok) {
