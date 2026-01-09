@@ -1,0 +1,11 @@
+{
+  "name": "docfork-mcp",
+  "version": "1.2.2",
+  "mcpServers": {
+    "docfork": {
+      "command": "node",
+      "args": ["${extensionPath}${/}dist${/}index.js"],
+      "cwd": "${extensionPath}"
+    }
+  }
+}
