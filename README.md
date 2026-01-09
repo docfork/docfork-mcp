@@ -55,19 +55,25 @@ Go to: `Settings` -> `Cursor Settings` -> `Tools & Integrations` -> `Add a custo
 
 Pasting the following config into your Cursor `~/.cursor/mcp.json` file is the recommended approach. You can also install in a specific project by creating `.cursor/mcp.json` in your project folder. See [Cursor MCP docs](https://docs.cursor.com/context/model-context-protocol) for more info.
 
-#### Cursor Remote Server Connection
+#### Cursor Remote Server Connection (Recommended)
 
-[![Install MCP Server](https://cursor.com/deeplink/mcp-install-light.svg)](https://cursor.com/en/install-mcp?name=docfork&config=eyJ1cmwiOiJodHRwczovL21jcC5kb2Nmb3JrLmNvbS9tY3AifQ%3D%3D)
+[![Install MCP Server](https://cursor.com/deeplink/mcp-install-light.svg)](https://cursor.com/en/install-mcp?name=docfork&config=eyJ1cmwiOiJodHRwczovL21jcC5kb2Nmb3JrLmNvbS9tY3AiLCJoZWFkZXJzIjp7IkRPQ0ZPUktfQVBJX0tFWSI6IllPVVJfQVBJX0tFWSJ9fQ%3D%3D)
 
 ```json
 {
   "mcpServers": {
     "docfork": {
-      "url": "https://mcp.docfork.com/mcp"
+      "url": "https://mcp.docfork.com/mcp",
+      "headers": {
+        "DOCFORK_API_KEY": "YOUR_API_KEY",
+        "DOCFORK_CABINET": "my-project"
+      }
     }
   }
 }
 ```
+
+> **Note:** Replace `YOUR_API_KEY` with your Docfork API key. The API key is optional for basic usage with rate limits. `DOCFORK_CABINET` is also optional for project scoping.
 
 #### Cursor Local Server Connection
 
@@ -78,7 +84,7 @@ Pasting the following config into your Cursor `~/.cursor/mcp.json` file is the r
   "mcpServers": {
     "docfork": {
       "command": "npx",
-      "args": ["-y", "docfork"]
+      "args": ["-y", "docfork", "--api-key", "YOUR_API_KEY"]
     }
   }
 }
@@ -166,17 +172,23 @@ Add this to your Claude Desktop `claude_desktop_config.json` file. See [Claude D
 
 Add this to your Windsurf MCP config. See [Windsurf MCP docs](https://docs.windsurf.com/windsurf/mcp) for more info.
 
-#### Windsurf Remote Server Connection
+#### Windsurf Remote Server Connection (Recommended)
 
 ```json
 {
   "mcpServers": {
     "docfork": {
-      "serverUrl": "https://mcp.docfork.com/sse"
+      "serverUrl": "https://mcp.docfork.com/sse",
+      "headers": {
+        "DOCFORK_API_KEY": "YOUR_API_KEY",
+        "DOCFORK_CABINET": "my-project"
+      }
     }
   }
 }
 ```
+
+> **Note:** Replace `YOUR_API_KEY` with your Docfork API key. The API key is optional for basic usage with rate limits. `DOCFORK_CABINET` is also optional for project scoping.
 
 #### Windsurf Local Server Connection
 
@@ -185,7 +197,7 @@ Add this to your Windsurf MCP config. See [Windsurf MCP docs](https://docs.winds
   "mcpServers": {
     "docfork": {
       "command": "npx",
-      "args": ["-y", "docfork"]
+      "args": ["-y", "docfork", "--api-key", "YOUR_API_KEY"]
     }
   }
 }
@@ -200,18 +212,24 @@ Add this to your Windsurf MCP config. See [Windsurf MCP docs](https://docs.winds
 
 Add this to your VS Code MCP config. See [VS Code MCP docs](https://code.visualstudio.com/docs/copilot/chat/mcp-servers) for more info.
 
-#### VS Code Remote Server Connection
+#### VS Code Remote Server Connection (Recommended)
 
 ```json
 {
   "mcpServers": {
     "docfork": {
       "type": "http",
-      "url": "https://mcp.docfork.com/mcp"
+      "url": "https://mcp.docfork.com/mcp",
+      "headers": {
+        "DOCFORK_API_KEY": "YOUR_API_KEY",
+        "DOCFORK_CABINET": "my-project"
+      }
     }
   }
 }
 ```
+
+> **Note:** Replace `YOUR_API_KEY` with your Docfork API key. The API key is optional for basic usage with rate limits. `DOCFORK_CABINET` is also optional for project scoping.
 
 #### VS Code Local Server Connection
 
@@ -221,7 +239,7 @@ Add this to your VS Code MCP config. See [VS Code MCP docs](https://code.visuals
     "docfork": {
       "type": "stdio",
       "command": "npx",
-      "args": ["-y", "docfork"]
+      "args": ["-y", "docfork", "--api-key", "YOUR_API_KEY"]
     }
   }
 }
@@ -956,6 +974,100 @@ The Docfork MCP server supports the following environment variables:
 #### When to Use Streamable HTTP
 
 Use `MCP_TRANSPORT=streamable-http` for remote/hosted servers or when you need multiple client connections, server-initiated messages, or session management. For more details, see the [modelcontextprotocol.io transport documentation](https://modelcontextprotocol.io/specification/latest/basic/transports).
+
+### Authentication Configuration
+
+Docfork MCP supports optional API key authentication and cabinet (project) scoping. Authentication follows a **priority hierarchy** (strongest to weakest):
+
+1. **CLI Arguments** (`--api-key`, `--cabinet`) - Highest priority
+2. **Environment Variables** (`DOCFORK_API_KEY`, `DOCFORK_CABINET`) - Medium priority
+3. **HTTP Headers** (`Authorization: Bearer`, `DOCFORK_API_KEY`, `DOCFORK_CABINET`) - Lowest priority (HTTP transport only)
+
+#### API Key
+
+The API key can be provided via:
+
+- **HTTP header (Recommended for remote servers):** `DOCFORK_API_KEY: your_key` or `Authorization: Bearer your_key`
+- CLI argument: `npx docfork --api-key dfk_abc123`
+- Environment variable: `DOCFORK_API_KEY=dfk_abc123`
+
+#### Cabinet (Project Scoping)
+
+The cabinet parameter allows you to scope searches to a specific project/cabinet. **Cabinet requires an API key** - if you specify a cabinet without an API key, the server will return an error.
+
+Cabinet can be provided via:
+
+- **HTTP header (Recommended for remote servers):** `DOCFORK_CABINET: my-project` or `X-Docfork-Cabinet: my-project`
+- CLI argument: `npx docfork --cabinet my-project`
+- Environment variable: `DOCFORK_CABINET=my-project`
+
+#### Configuration Examples
+
+**Via HTTP Headers (Recommended for Remote Server):**
+
+```json
+{
+  "mcpServers": {
+    "docfork": {
+      "url": "https://mcp.docfork.com/mcp",
+      "headers": {
+        "DOCFORK_API_KEY": "dfk_abc123",
+        "X-Docfork-Cabinet": "my-project"
+      }
+    }
+  }
+}
+```
+
+**Via Environment Variables (Local Server):**
+
+```json
+{
+  "mcpServers": {
+    "docfork": {
+      "command": "npx",
+      "args": ["-y", "docfork"],
+      "env": {
+        "DOCFORK_API_KEY": "dfk_abc123",
+        "DOCFORK_CABINET": "my-project"
+      }
+    }
+  }
+}
+```
+
+**Via CLI Arguments:**
+
+```bash
+npx docfork --api-key dfk_abc123 --cabinet my-project
+```
+
+**Via HTTP Headers (Raw):**
+
+```http
+POST /mcp HTTP/1.1
+DOCFORK_API_KEY: dfk_abc123
+DOCFORK_CABINET: my-project
+```
+
+Or using standard HTTP Authorization headers:
+
+```http
+POST /mcp HTTP/1.1
+Authorization: Bearer dfk_abc123
+X-Docfork-Cabinet: my-project
+```
+
+**Priority Example:**
+
+If you set both environment variable and CLI argument:
+
+```bash
+export DOCFORK_API_KEY="env_key"
+npx docfork --api-key cli_key
+```
+
+The CLI argument (`cli_key`) takes precedence over the environment variable (`env_key`).
 
 </details>
 

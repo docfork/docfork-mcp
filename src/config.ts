@@ -86,6 +86,7 @@ export function getServerConfig(): ServerConfig {
 export interface DocforkAuthConfig {
   apiKey?: string;
   cabinet?: string;
+  clientIp?: string;
   transport: "stdio" | "http";
 }
 

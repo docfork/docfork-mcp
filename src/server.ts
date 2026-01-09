@@ -71,6 +71,40 @@ function sendJsonError(
 }
 
 /**
+ * Extract client IP address from request headers.
+ * Handles X-Forwarded-For header for proxied requests.
+ */
+function getClientIp(req: IncomingMessage): string | undefined {
+  const forwardedFor =
+    req.headers["x-forwarded-for"] || req.headers["X-Forwarded-For"];
+
+  if (forwardedFor) {
+    const ips = Array.isArray(forwardedFor) ? forwardedFor[0] : forwardedFor;
+    const ipList = ips.split(",").map((ip) => ip.trim());
+
+    // Filter out private IPs to get real client IP
+    for (const ip of ipList) {
+      const plainIp = ip.replace(/^::ffff:/, "");
+      if (
+        !plainIp.startsWith("10.") &&
+        !plainIp.startsWith("192.168.") &&
+        !/^172\.(1[6-9]|2[0-9]|3[0-1])\./.test(plainIp)
+      ) {
+        return plainIp;
+      }
+    }
+    // If all IPs are private, return first one
+    return ipList[0]?.replace(/^::ffff:/, "");
+  }
+
+  // Fallback to socket remote address
+  if (req.socket?.remoteAddress) {
+    return req.socket.remoteAddress.replace(/^::ffff:/, "");
+  }
+  return undefined;
+}
+
+/**
  * Extract auth headers from HTTP request and resolve auth config
  */
 function extractAuthConfigFromRequest(req: IncomingMessage): DocforkAuthConfig {
@@ -96,7 +130,11 @@ async function handleMcpPost(
   // Extract and resolve auth config from request headers
   let authConfig: DocforkAuthConfig;
   try {
-    authConfig = extractAuthConfigFromRequest(req);
+    authConfig = {
+      ...extractAuthConfigFromRequest(req),
+      clientIp: getClientIp(req),
+      transport: "http",
+    };
   } catch (error: any) {
     // validation error (e.g., cabinet without api key)
     sendJsonError(res, 400, -32602, error.message || "Invalid configuration");
