@@ -1,12 +1,14 @@
 ![Cover](public/cover.png)
 
-# Docfork MCP - Up-to-date Documentation for AI Agents.
-
-[![smithery badge](https://smithery.ai/badge/@docfork/mcp)](https://smithery.ai/server/@docfork/mcp) [![Website](https://img.shields.io/badge/Website-docfork.com-%23088DCC)](https://docfork.com) [![NPM Version](https://img.shields.io/npm/v/docfork?color=red)](https://www.npmjs.com/package/docfork) [![MIT licensed](https://img.shields.io/npm/l/docfork)](./LICENSE)
-
 [![Install MCP Server](https://cursor.com/deeplink/mcp-install-light.svg)](https://cursor.com/en/install-mcp?name=docfork&config=eyJ1cmwiOiJodHRwczovL21jcC5kb2Nmb3JrLmNvbS9tY3AifQ%3D%3D) [<img alt="Install in VS Code (http)" src="https://img.shields.io/badge/Install%20in%20VS%20Code-0098FF?style=for-the-badge&logo=visualstudiocode&logoColor=white">](https://insiders.vscode.dev/redirect?url=vscode%3Amcp%2Finstall%3F%7B%22name%22%3A%22docfork%22%2C%22type%22%3A%22http%22%2C%22url%22%3A%22http%3A%2F%2Fmcp.docfork.com%2Fmcp%22%7D)
 
+# Docfork MCP - Up-to-date Docs for AI Agents.
+
+[![Website](https://img.shields.io/badge/Website-docfork.com-%23088DCC)](https://docfork.com) [![smithery badge](https://smithery.ai/badge/@docfork/mcp)](https://smithery.ai/server/@docfork/mcp) [![NPM Version](https://img.shields.io/npm/v/docfork?color=red)](https://www.npmjs.com/package/docfork) [![MIT licensed](https://img.shields.io/npm/l/docfork)](./LICENSE)
+
 ## ❌ The Problem: Expired Knowledge
+
+AI models rely on outdated or generic information about the libraries you use. You get:
 
 - Out of date code examples & stale data from year-old model training
 - Hallucinated syntax & APIs
@@ -18,9 +20,9 @@
 - Accurate descriptions and code examples
 - Sub-second retrieval results (500ms @ p95) in your AI code editor
 
-Docfork MCP pulls @latest documentation and code examples straight from the source - and adds them right into your context.
+**Docfork MCP pulls @latest documentation** and code examples straight from the source - and adds them right into your context.
 
-Just tell Cursor to **`use docfork`**:
+Just tell Cursor to **`use docfork`** (or set up a rule to auto-invoke):
 
 ```txt
 Create a basic Next.js app with the App Router. use docfork
@@ -28,32 +30,15 @@ Create a basic Next.js app with the App Router. use docfork
 
 ## 🛠️ Installation
 
-### 📋 Requirements
-
-- Node.js ≥ v18
-- Cursor/Windsurf/Claude Desktop (any MCP client)
-
-<details>
-<summary><b>Installing via Smithery</b></summary>
-
-### Installing via Smithery
-
-To install Docfork MCP Server for any client automatically via [Smithery](https://smithery.ai/server/@docfork/mcp):
-
-```bash
-npx -y @smithery/cli@latest install @docfork/mcp --client <CLIENT_NAME> --key <YOUR_SMITHERY_KEY>
-```
-
-You can find your Smithery key in the [Smithery.ai webpage](https://smithery.ai/server/@docfork/mcp).
-
-</details>
+> [!NOTE]
+> **API Key Recommended**: Get a free API key at [app.docfork.com](https://app.docfork.com/) for higher rate limits.
 
 <details>
 <summary><b>Install in Cursor</b></summary>
   
 Go to: `Settings` -> `Cursor Settings` -> `Tools & Integrations` -> `Add a custom MCP server`
 
-Pasting the following config into your Cursor `~/.cursor/mcp.json` file is the recommended approach. You can also install in a specific project by creating `.cursor/mcp.json` in your project folder. See [Cursor MCP docs](https://docs.cursor.com/context/model-context-protocol) for more info.
+Pasting the following config into your Cursor `~/.cursor/mcp.json` file is the recommended approach. You can also install in a specific project by creating `.cursor/mcp.json` in your project folder. See [Cursor MCP docs](https://cursor.com/docs/context/mcp#using-mcpjson) for more info.
 
 #### Cursor Remote Server Connection (Recommended)
 
@@ -66,14 +51,15 @@ Pasting the following config into your Cursor `~/.cursor/mcp.json` file is the r
       "url": "https://mcp.docfork.com/mcp",
       "headers": {
         "DOCFORK_API_KEY": "YOUR_API_KEY",
-        "DOCFORK_CABINET": "my-project"
+        "DOCFORK_CABINET": "general"
       }
     }
   }
 }
 ```
 
-> **Note:** Replace `YOUR_API_KEY` with your Docfork API key. The API key is optional for basic usage with rate limits. `DOCFORK_CABINET` is also optional for project scoping.
+> [!NOTE]
+> Replace `YOUR_API_KEY` with your Docfork API key. `DOCFORK_CABINET` is set to "general" by default for project scoping.
 
 #### Cursor Local Server Connection
 
@@ -89,6 +75,81 @@ Pasting the following config into your Cursor `~/.cursor/mcp.json` file is the r
   }
 }
 ```
+
+</details>
+
+<details>
+<summary><b>Install in Claude Code</b></summary>
+
+### Install in Claude Code
+
+Run this command. See [Claude Code MCP docs](https://docs.anthropic.com/en/docs/agents-and-tools/claude-code/tutorials#set-up-model-context-protocol-mcp) for more info.
+
+#### Claude Code Remote Server Connection
+
+```sh
+claude mcp add --transport sse docfork https://mcp.docfork.com/sse --header "DOCFORK_API_KEY: YOUR_API_KEY" --header "DOCFORK_CABINET: general"
+```
+
+#### Claude Code Local Server Connection
+
+```sh
+claude mcp add docfork -- npx -y docfork --api-key YOUR_API_KEY
+```
+
+</details>
+
+<details>
+<summary><b>Install in Opencode</b></summary>
+
+Add this to your Opencode configuration file. See [Opencode MCP docs](https://opencode.ai/docs/mcp-servers) docs for more info.
+
+#### Opencode Remote Server Connection
+
+```json
+{
+  "mcp": {
+    "docfork": {
+      "type": "remote",
+      "url": "https://mcp.docfork.com/mcp",
+      "headers": {
+        "DOCFORK_API_KEY": "YOUR_API_KEY",
+        "DOCFORK_CABINET": "general"
+      },
+      "enabled": true
+    }
+  }
+}
+```
+
+#### Opencode Local Server Connection
+
+```json
+{
+  "mcp": {
+    "docfork": {
+      "type": "local",
+      "command": ["npx", "-y", "docfork", "--api-key", "YOUR_API_KEY"],
+      "enabled": true
+    }
+  }
+}
+```
+
+</details>
+
+<details>
+<summary><b>Installing via Smithery</b></summary>
+
+### Installing via Smithery
+
+To install Docfork MCP Server for any client automatically via [Smithery](https://smithery.ai/server/@docfork/mcp):
+
+```bash
+npx -y @smithery/cli@latest install @docfork/mcp --client <CLIENT_NAME> --key <YOUR_SMITHERY_KEY>
+```
+
+You can find your Smithery key in the [Smithery.ai webpage](https://smithery.ai/server/@docfork/mcp).
 
 </details>
 
@@ -125,27 +186,6 @@ Pasting the following config into your Cursor `~/.cursor/mcp.json` file is the r
 </details>
 
 <details>
-<summary><b>Install in Claude Code</b></summary>
-
-### Install in Claude Code
-
-Run this command. See [Claude Code MCP docs](https://docs.anthropic.com/en/docs/agents-and-tools/claude-code/tutorials#set-up-model-context-protocol-mcp) for more info.
-
-#### Claude Code Remote Server Connection
-
-```sh
-claude mcp add --transport sse docfork https://mcp.docfork.com/sse
-```
-
-#### Claude Code Local Server Connection
-
-```sh
-claude mcp add docfork -- npx -y docfork
-```
-
-</details>
-
-<details>
 <summary><b>Install in Claude Desktop</b></summary>
 
 ### Install in Claude Desktop
@@ -157,7 +197,7 @@ Add this to your Claude Desktop `claude_desktop_config.json` file. See [Claude D
   "mcpServers": {
     "docfork": {
       "command": "npx",
-      "args": ["-y", "docfork"]
+      "args": ["-y", "docfork", "--api-key", "YOUR_API_KEY"]
     }
   }
 }
@@ -181,14 +221,15 @@ Add this to your Windsurf MCP config. See [Windsurf MCP docs](https://docs.winds
       "serverUrl": "https://mcp.docfork.com/sse",
       "headers": {
         "DOCFORK_API_KEY": "YOUR_API_KEY",
-        "DOCFORK_CABINET": "my-project"
+        "DOCFORK_CABINET": "general"
       }
     }
   }
 }
 ```
 
-> **Note:** Replace `YOUR_API_KEY` with your Docfork API key. The API key is optional for basic usage with rate limits. `DOCFORK_CABINET` is also optional for project scoping.
+> [!NOTE]
+> Replace `YOUR_API_KEY` with your Docfork API key. `DOCFORK_CABINET` is set to "general" by default for project scoping.
 
 #### Windsurf Local Server Connection
 
@@ -222,14 +263,15 @@ Add this to your VS Code MCP config. See [VS Code MCP docs](https://code.visuals
       "url": "https://mcp.docfork.com/mcp",
       "headers": {
         "DOCFORK_API_KEY": "YOUR_API_KEY",
-        "DOCFORK_CABINET": "my-project"
+        "DOCFORK_CABINET": "general"
       }
     }
   }
 }
 ```
 
-> **Note:** Replace `YOUR_API_KEY` with your Docfork API key. The API key is optional for basic usage with rate limits. `DOCFORK_CABINET` is also optional for project scoping.
+> [!NOTE]
+> Replace `YOUR_API_KEY` with your Docfork API key. `DOCFORK_CABINET` is set to "general" by default for project scoping.
 
 #### VS Code Local Server Connection
 
@@ -727,39 +769,6 @@ See [Warp Model Context Protocol Documentation](https://docs.warp.dev/knowledge-
 </details>
 
 <details>
-<summary><b>Install in Opencode</b></summary>
-
-Add this to your Opencode configuration file. See [Opencode MCP docs](https://opencode.ai/docs/mcp-servers) docs for more info.
-
-#### Opencode Remote Server Connection
-
-```json
-"mcp": {
-  "docfork": {
-    "type": "remote",
-    "url": "https://mcp.docfork.com/mcp",
-    "enabled": true
-  }
-}
-```
-
-#### Opencode Local Server Connection
-
-```json
-{
-  "mcp": {
-    "docfork": {
-      "type": "local",
-      "command": ["npx", "-y", "docfork"],
-      "enabled": true
-    }
-  }
-}
-```
-
-</details>
-
-<details>
 
 <summary><b>Install in Copilot Coding Agent</b></summary>
 
@@ -879,6 +888,44 @@ See [Local and Remote MCPs for Perplexity](https://www.perplexity.ai/help-center
 7. Click `Save`.
 </details>
 
+## 💡 Helpful Tips
+
+### Add a Rule
+
+To avoid typing `use docfork` in every prompt, add a rule to your MCP client to automatically invoke Docfork for code-related questions:
+
+- **Cursor**: `Cursor Settings > Rules`
+- **Claude Code**: `CLAUDE.md`
+- Or the equivalent in your MCP client
+
+**Example rule:**
+
+```txt
+Always use Docfork MCP when I need library/API documentation, code generation, setup or configuration steps without me having to explicitly ask.
+```
+
+From then on you'll get Docfork's docs in any related conversation without typing anything extra. You can add your use cases to the match part.
+
+### Use Library Identifier
+
+If you already know exactly which library you want to use, add its Docfork identifier (in `author/repo` format) to your prompt. That way, Docfork MCP server can skip the library-matching step and directly retrieve documentation for that specific library. Extract the identifier from URLs in search results and use it in subsequent queries:
+
+```txt
+Implement basic authentication with Supabase. use docfork library supabase/supabase-js
+```
+
+The library identifier format (`author/repo`) tells Docfork exactly which library's documentation to load, making your queries faster and more accurate.
+
+### Use Specific Library Names
+
+When you know exactly which library you want to use, be specific in your prompts. This helps Docfork find the right documentation faster and more accurately:
+
+```txt
+create a Next.js middleware for rate limiting. use docfork
+```
+
+The more specific you are about the library and what you want to accomplish, the better documentation you'll receive.
+
 ## 🔨 Available Tools
 
 Docfork MCP provides different tools depending on the client type:
@@ -903,43 +950,8 @@ For OpenAI ChatGPT integration, Docfork provides OpenAI MCP specification-compli
 - `fetch`: Retrieve complete document content by ID for detailed analysis and citation.
   - `id` (required): URL or unique identifier for the document to fetch.
 
-> **Note:**  
+> [!NOTE]
 > The OpenAI tools (`search` and `fetch`) automatically format their responses for ChatGPT connectors and are compatible with deep research workflows.
-
-## 💡 Tips
-
-### Add a Rule
-
-If you don't want to add `use docfork` to every prompt, you can define a simple rule from your `Cursor Settings > Rules` section in Cursor (or the equivalent in your MCP client) to auto-invoke Docfork on any code question:
-
-```markdown
----
-alwaysApply: true
----
-
-when the user requests code examples, setup or configuration steps, or library/API documentation
-use docfork.
-```
-
-From then on you'll get Docfork's docs in any related conversation without typing anything extra. You can add your use cases to the match part.
-
-### Use Specific Library Names
-
-When you know exactly which library you want to use, be specific in your prompts. This helps Docfork find the right documentation faster and more accurately:
-
-```txt
-implement basic authentication with supabase. use docfork
-```
-
-```txt
-create a Next.js middleware for rate limiting. use docfork
-```
-
-```txt
-configure Tailwind CSS with custom typography. use docfork
-```
-
-The more specific you are about the library and what you want to accomplish, the better documentation you'll receive.
 
 ## Development
 
@@ -993,13 +1005,16 @@ The API key can be provided via:
 
 #### Cabinet (Project Scoping)
 
-The cabinet parameter allows you to scope searches to a specific project/cabinet. **Cabinet requires an API key** - if you specify a cabinet without an API key, the server will return an error.
+> [!WARNING]
+> **Cabinet requires an API key**: If you specify a cabinet without an API key, the server will return an error.
+
+The cabinet parameter allows you to scope searches to a specific project/cabinet.
 
 Cabinet can be provided via:
 
-- **HTTP header (Recommended for remote servers):** `DOCFORK_CABINET: my-project` or `X-Docfork-Cabinet: my-project`
-- CLI argument: `npx docfork --cabinet my-project`
-- Environment variable: `DOCFORK_CABINET=my-project`
+- **HTTP header (Recommended for remote servers):** `DOCFORK_CABINET: general` or `X-Docfork-Cabinet: general`
+- CLI argument: `npx docfork --cabinet general`
+- Environment variable: `DOCFORK_CABINET=general`
 
 #### Configuration Examples
 
@@ -1012,7 +1027,7 @@ Cabinet can be provided via:
       "url": "https://mcp.docfork.com/mcp",
       "headers": {
         "DOCFORK_API_KEY": "dfk_abc123",
-        "X-Docfork-Cabinet": "my-project"
+        "X-Docfork-Cabinet": "general"
       }
     }
   }
@@ -1026,10 +1041,9 @@ Cabinet can be provided via:
   "mcpServers": {
     "docfork": {
       "command": "npx",
-      "args": ["-y", "docfork"],
+      "args": ["-y", "docfork", "--api-key", "dfk_abc123"],
       "env": {
-        "DOCFORK_API_KEY": "dfk_abc123",
-        "DOCFORK_CABINET": "my-project"
+        "DOCFORK_CABINET": "general"
       }
     }
   }
@@ -1039,7 +1053,7 @@ Cabinet can be provided via:
 **Via CLI Arguments:**
 
 ```bash
-npx docfork --api-key dfk_abc123 --cabinet my-project
+npx docfork --api-key dfk_abc123 --cabinet general
 ```
 
 **Via HTTP Headers (Raw):**
@@ -1047,7 +1061,7 @@ npx docfork --api-key dfk_abc123 --cabinet my-project
 ```http
 POST /mcp HTTP/1.1
 DOCFORK_API_KEY: dfk_abc123
-DOCFORK_CABINET: my-project
+DOCFORK_CABINET: general
 ```
 
 Or using standard HTTP Authorization headers:
@@ -1055,7 +1069,7 @@ Or using standard HTTP Authorization headers:
 ```http
 POST /mcp HTTP/1.1
 Authorization: Bearer dfk_abc123
-X-Docfork-Cabinet: my-project
+X-Docfork-Cabinet: general
 ```
 
 **Priority Example:**
@@ -1081,7 +1095,7 @@ The CLI argument (`cli_key`) takes precedence over the environment variable (`en
   "mcpServers": {
     "docfork": {
       "command": "npx",
-      "args": ["-y", "docfork@latest"],
+      "args": ["-y", "docfork@latest", "--api-key", "YOUR_API_KEY"],
       "env": {
         "DEFAULT_MINIMUM_TOKENS": "10000"
       }
@@ -1099,7 +1113,7 @@ For remote servers or when you need multiple connections and server-initiated me
   "mcpServers": {
     "docfork": {
       "command": "npx",
-      "args": ["-y", "docfork@latest"],
+      "args": ["-y", "docfork@latest", "--api-key", "YOUR_API_KEY"],
       "env": {
         "MCP_TRANSPORT": "streamable-http"
       }
@@ -1285,7 +1299,7 @@ Port 3000 is already in use, using port 3001 instead
 
 Docfork is an open, community-driven catalogue. Although we review submissions, we make no warranties—express or implied—about the accuracy, completeness, or security of any linked documentation or code. Projects listed here are created and maintained by their respective authors, not by Docfork.
 
-If you spot content that is suspicious, inappropriate, or potentially harmful, please contact us.
+If you spot content that is suspicious, inappropriate, or potentially harmful, please contact us at [support@docfork.com](mailto:support@docfork.com).
 
 By using Docfork, you agree to do so at your own discretion and risk.
 
