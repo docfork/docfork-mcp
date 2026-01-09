@@ -5,8 +5,7 @@
   "mcpServers": {
     "docfork": {
       "command": "node",
-      "args": ["${extensionPath}${/}dist${/}index.js"],
-      "cwd": "${extensionPath}"
+      "args": ["-y", "docfork", "--api-key", "${DOCFORK_API_KEY}"]
     }
   }
 }
