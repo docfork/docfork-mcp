@@ -15,7 +15,12 @@ import {
 } from "@modelcontextprotocol/sdk/types.js";
 import { searchDocs, readUrl } from "./api/index.js";
 import { z } from "zod";
-import { getServerConfig } from "./config.js";
+import {
+  getServerConfig,
+  resolveAuthConfig,
+  setGlobalAuthConfig,
+  getAuthConfig,
+} from "./config.js";
 import { startHttpServer, startStdioServer } from "./server.js";
 import { getServer as getOpenAIServer } from "./openai.js";
 
@@ -59,10 +64,12 @@ export const getServer = () => {
       },
     },
     async ({ query, tokens, docforkIdentifier }): Promise<CallToolResult> => {
+      const authConfig = getAuthConfig();
       const response = await searchDocs(
         query as string,
         docforkIdentifier as string | undefined,
-        tokens as string | undefined
+        tokens as string | undefined,
+        authConfig
       );
 
       return {
@@ -91,7 +98,8 @@ export const getServer = () => {
     },
     async (args): Promise<CallToolResult> => {
       const inputValue = args.url as string;
-      const response = await readUrl(inputValue);
+      const authConfig = getAuthConfig();
+      const response = await readUrl(inputValue, authConfig);
       return {
         content: [
           {
@@ -253,9 +261,18 @@ async function main() {
   const config = getServerConfig();
 
   if (config.transport === "stdio") {
+    // resolve auth config from CLI args and env vars only (no headers for stdio)
+    try {
+      const authConfig = resolveAuthConfig();
+      setGlobalAuthConfig(authConfig);
+    } catch (error: any) {
+      console.error(`Configuration error: ${error.message}`);
+      process.exit(1);
+    }
     await startStdioServer(getServer);
   } else {
     // HTTP transport with client detection
+    // auth config will be resolved per-request from headers and stored in AsyncLocalStorage
     await startHttpServer(config.port, getServer, getOpenAIServer);
   }
 }
