@@ -1,7 +1,7 @@
-# This workflow will run tests using node and then publish a package to npm when a release is published
-# For more information see: https://docs.github.com/en/actions/publishing-packages/publishing-nodejs-packages
+# This workflow publishes the package to npm and creates Gemini CLI extension archives
+# when a GitHub release is published
 
-name: Node.js Package
+name: Release
 
 on:
   release:
@@ -19,11 +19,11 @@ jobs:
       - run: npm run build
       - run: npm test
 
-  publish-npm:
+  publish:
     needs: build
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
@@ -51,6 +51,26 @@ jobs:
 
       - name: Build
         run: npm run build
+
+      - name: Update gemini-extension.json version
+        run: |
+          echo $(jq --arg v "${{ env.VERSION }}" '.version = $v' gemini-extension.json) > gemini-extension.json
+
+      - name: Create extension archive
+        run: |
+          mkdir -p release
+          tar -czf release/docfork-mcp.tar.gz \
+            gemini-extension.json \
+            dist/ \
+            package.json
+
+      - name: Attach extension archive to release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: release/docfork-mcp.tar.gz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Publish to npm (stable)
         if: ${{ !github.event.release.prerelease }}
         run: npm publish --access public
