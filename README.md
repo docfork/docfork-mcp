@@ -24,7 +24,7 @@ Standard AI models (Claude 4.5, GPT-5.1) have a knowledge cutoff. They don't kno
 
 ### 1. Get your Free API Key
 
-Go to **[app.docfork.com](https://app.docfork.com/)**.
+Go to **[app.docfork.com](https://app.docfork.com/sign-up)**.
 
 - **Free Tier:** 1,000 requests/month org-wide (2x industry standard).
 - **Team:** 5 free seats included.
@@ -140,7 +140,7 @@ Unlike other tools that search the "entire internet" and return bloated results,
 
 Cabinets are curated, private indexes specific to your project stack.
 
-1. Create a Cabinet in your **[Dashboard](https://app.docfork.com)**.
+1. Create a Cabinet in your **[Dashboard](https://app.docfork.com/sign-up)**.
 2. Add the libraries you need.
 3. Add the `DOCFORK_CABINET` header to your MCP config.
 
