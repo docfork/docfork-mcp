@@ -1,4 +1,6 @@
 import { API_URL } from "./index.js";
+import { generateHeaders } from "./headers.js";
+import { DocforkAuthConfig } from "../config.js";
 
 interface ReadUrlResponse {
   text: string;
@@ -6,16 +8,18 @@ interface ReadUrlResponse {
   version_info: string;
 }
 
-export async function readUrl(urlToRead: string): Promise<ReadUrlResponse> {
+export async function readUrl(
+  urlToRead: string,
+  auth?: DocforkAuthConfig
+): Promise<ReadUrlResponse> {
   const url = new URL(`${API_URL}/read`);
   url.searchParams.set("url", urlToRead);
 
+  const headers = generateHeaders(auth);
+
   const response = await fetch(url.toString(), {
     method: "GET",
-    headers: {
-      "User-Agent": "docfork-mcp",
-      accept: "application/json",
-    },
+    headers,
   });
 
   if (!response.ok) {

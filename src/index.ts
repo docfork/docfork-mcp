@@ -8,14 +8,15 @@
  */
 
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import {
-  CallToolResult,
-  GetPromptResult,
-  ReadResourceResult,
-} from "@modelcontextprotocol/sdk/types.js";
+import { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
 import { searchDocs, readUrl } from "./api/index.js";
 import { z } from "zod";
-import { getServerConfig } from "./config.js";
+import {
+  getServerConfig,
+  resolveAuthConfig,
+  setGlobalAuthConfig,
+  getAuthConfig,
+} from "./config.js";
 import { startHttpServer, startStdioServer } from "./server.js";
 import { getServer as getOpenAIServer } from "./openai.js";
 
@@ -59,10 +60,12 @@ export const getServer = () => {
       },
     },
     async ({ query, tokens, docforkIdentifier }): Promise<CallToolResult> => {
+      const authConfig = getAuthConfig();
       const response = await searchDocs(
         query as string,
         docforkIdentifier as string | undefined,
-        tokens as string | undefined
+        tokens as string | undefined,
+        authConfig
       );
 
       return {
@@ -91,147 +94,13 @@ export const getServer = () => {
     },
     async (args): Promise<CallToolResult> => {
       const inputValue = args.url as string;
-      const response = await readUrl(inputValue);
+      const authConfig = getAuthConfig();
+      const response = await readUrl(inputValue, authConfig);
       return {
         content: [
           {
             type: "text" as const,
             text: response.text,
-          },
-        ],
-      };
-    }
-  );
-
-  // search docs resource
-  server.registerResource(
-    "search_docs",
-    "docfork://tools/search_docs",
-    {
-      title: "Search Documentation Tool",
-      description: "Guide for using the docfork_search_docs tool",
-      mimeType: "text/markdown",
-    },
-    async (uri): Promise<ReadResourceResult> => {
-      const toolExplanation = `# docfork_search_docs
-
-Search documentation from GitHub or the web.
-
-## Parameters
-- **query** (required): Search query with language/framework names
-- **docforkIdentifier** (critical for targeted searches): Library in author/repo format (e.g., 'facebook/react'). Use this to search INSIDE a specific library's documentation. Extract from URLs in search results.
-- **tokens** (optional): 'dynamic' or number (100-10000)
-
-## Example
-\`\`\`
-query: "React hooks useState"
-docforkIdentifier: "facebook/react"  // For targeted search inside React docs
-\`\`\`
-
-Use \`docfork_read_url\` to read URLs from results.`;
-
-      return {
-        contents: [
-          { uri: uri.href, mimeType: "text/markdown", text: toolExplanation },
-        ],
-      };
-    }
-  );
-
-  // read url resource
-  server.registerResource(
-    "read_url",
-    "docfork://tools/read_url",
-    {
-      title: "Read URL Tool",
-      description: "Essential tool for reading full documentation content",
-      mimeType: "text/markdown",
-    },
-    async (uri): Promise<ReadResourceResult> => {
-      const toolExplanation = `# docfork_read_url
-
-**Essential for getting complete documentation content.**
-
-Fetches the full markdown content of documentation pages. Use this after docfork_search_docs to get detailed information.
-
-## Parameters
-- **url** (required): Full URL from docfork_search_docs results
-
-## Example
-\`\`\`
-url: "https://react.dev/reference/react/useState"
-\`\`\``;
-
-      return {
-        contents: [
-          { uri: uri.href, mimeType: "text/markdown", text: toolExplanation },
-        ],
-      };
-    }
-  );
-
-  // search docs prompt
-  server.registerPrompt(
-    "search_docs",
-    {
-      title: "Search Documentation",
-      description: "Search documentation from GitHub or the web",
-      argsSchema: {
-        query: z.string().describe("Search query"),
-        docforkIdentifier: z
-          .string()
-          .optional()
-          .describe(
-            "Library in author/repo format for targeted searches INSIDE that library's documentation (e.g., 'facebook/react')"
-          ),
-        tokens: z
-          .string()
-          .optional()
-          .describe("Token budget: 'dynamic' or number"),
-      },
-    },
-    async ({ query, docforkIdentifier, tokens }): Promise<GetPromptResult> => {
-      let promptText = `${query}\n\nUse the 'docfork_search_docs' tool to search for documentation.`;
-      if (tokens || docforkIdentifier) {
-        promptText += `\n\nSearch parameters:`;
-        if (tokens) promptText += `\n- Token budget: ${tokens}`;
-        if (docforkIdentifier)
-          promptText += `\n- Library filter: ${docforkIdentifier}`;
-      }
-
-      return {
-        messages: [
-          {
-            role: "user" as const,
-            content: {
-              type: "text" as const,
-              text: promptText,
-            },
-          },
-        ],
-      };
-    }
-  );
-
-  // read url prompt
-  server.registerPrompt(
-    "read_url",
-    {
-      title: "Read Documentation URL",
-      description: "Fetch full documentation content from a URL",
-      argsSchema: {
-        url: z.string().describe("Documentation URL to read"),
-      },
-    },
-    async ({ url }): Promise<GetPromptResult> => {
-      return {
-        messages: [
-          {
-            role: "user" as const,
-            content: {
-              type: "text" as const,
-              text: `Use the 'docfork_read_url' tool to read the documentation at: ${url as string}`,
-            },
           },
         ],
       };
@@ -253,9 +122,18 @@ async function main() {
   const config = getServerConfig();
 
   if (config.transport === "stdio") {
+    // resolve auth config from CLI args and env vars only (no headers for stdio)
+    try {
+      const authConfig = resolveAuthConfig();
+      setGlobalAuthConfig(authConfig);
+    } catch (error: any) {
+      console.error(`Configuration error: ${error.message}`);
+      process.exit(1);
+    }
     await startStdioServer(getServer);
   } else {
     // HTTP transport with client detection
+    // auth config will be resolved per-request from headers and stored in AsyncLocalStorage
     await startHttpServer(config.port, getServer, getOpenAIServer);
   }
 }

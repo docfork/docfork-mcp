@@ -4,6 +4,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { isInitializeRequest } from "@modelcontextprotocol/sdk/types.js";
+import { DocforkAuthConfig, resolveAuthConfig, authContext } from "./config.js";
 
 // Map to store transports by session ID
 const transports: Record<string, StreamableHTTPServerTransport> = {};
@@ -70,6 +71,52 @@ function sendJsonError(
 }
 
 /**
+ * Extract client IP address from request headers.
+ * Handles X-Forwarded-For header for proxied requests.
+ */
+function getClientIp(req: IncomingMessage): string | undefined {
+  const forwardedFor =
+    req.headers["x-forwarded-for"] || req.headers["X-Forwarded-For"];
+
+  if (forwardedFor) {
+    const ips = Array.isArray(forwardedFor) ? forwardedFor[0] : forwardedFor;
+    const ipList = ips.split(",").map((ip) => ip.trim());
+
+    // Filter out private IPs to get real client IP
+    for (const ip of ipList) {
+      const plainIp = ip.replace(/^::ffff:/, "");
+      if (
+        !plainIp.startsWith("10.") &&
+        !plainIp.startsWith("192.168.") &&
+        !/^172\.(1[6-9]|2[0-9]|3[0-1])\./.test(plainIp)
+      ) {
+        return plainIp;
+      }
+    }
+    // If all IPs are private, return first one
+    return ipList[0]?.replace(/^::ffff:/, "");
+  }
+
+  // Fallback to socket remote address
+  if (req.socket?.remoteAddress) {
+    return req.socket.remoteAddress.replace(/^::ffff:/, "");
+  }
+  return undefined;
+}
+
+/**
+ * Extract auth headers from HTTP request and resolve auth config
+ */
+function extractAuthConfigFromRequest(req: IncomingMessage): DocforkAuthConfig {
+  // convert IncomingMessage headers to Record format for resolveAuthConfig
+  const headers: Record<string, string | string[] | undefined> = {};
+  for (const [key, value] of Object.entries(req.headers)) {
+    headers[key] = value;
+  }
+  return resolveAuthConfig(headers);
+}
+
+/**
  * Handle MCP POST requests
  */
 async function handleMcpPost(
@@ -79,6 +126,20 @@ async function handleMcpPost(
   openaiServerFactory: () => McpServer
 ): Promise<void> {
   const sessionId = req.headers["mcp-session-id"] as string | undefined;
+
+  // Extract and resolve auth config from request headers
+  let authConfig: DocforkAuthConfig;
+  try {
+    authConfig = {
+      ...extractAuthConfigFromRequest(req),
+      clientIp: getClientIp(req),
+      transport: "http",
+    };
+  } catch (error: any) {
+    // validation error (e.g., cabinet without api key)
+    sendJsonError(res, 400, -32602, error.message || "Invalid configuration");
+    return;
+  }
 
   // Ensure Accept header includes required content types for MCP
   if (!req.headers.accept?.includes("text/event-stream")) {
@@ -135,11 +196,14 @@ async function handleMcpPost(
         }
       };
 
-      // connect the transport to the MCP server BEFORE handling the request
-      // so responses can flow back through the same transport
-      const server = serverFactory();
-      await server.connect(transport);
-      await transport.handleRequest(req, res, requestBody);
+      // Run within AsyncLocalStorage context so auth flows automatically to tools
+      await authContext.run(authConfig, async () => {
+        // connect the transport to the MCP server BEFORE handling the request
+        // so responses can flow back through the same transport
+        const server = serverFactory();
+        await server.connect(transport);
+        await transport.handleRequest(req, res, requestBody);
+      });
       return;
     } else {
       // invalid request - no session ID and not an initialize request
@@ -156,7 +220,10 @@ async function handleMcpPost(
 
     // Handle request with existing transport - no need to reconnect
     // the existing transport is already connected to the server
-    await transport.handleRequest(req, res, requestBody);
+    // Run within AsyncLocalStorage context for this request
+    await authContext.run(authConfig, async () => {
+      await transport.handleRequest(req, res, requestBody);
+    });
   } catch (error) {
     console.error("Error handling MCP request:", error);
     if (!res.headersSent) {
@@ -236,16 +303,20 @@ export async function startHttpServer(
   const requestHandler = async (req: IncomingMessage, res: ServerResponse) => {
     const url = (req.url || "/").split("?")[0];
 
-    // Set CORS headers for all responses
+    // Set CORS headers for all responses (before any other processing)
     res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS,DELETE");
+    res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS, DELETE");
     res.setHeader(
       "Access-Control-Allow-Headers",
-      "Content-Type, MCP-Session-Id, mcp-session-id, MCP-Protocol-Version"
+      "Content-Type, Accept, Accept-Encoding, MCP-Session-Id, mcp-session-id, MCP-Protocol-Version, Authorization, X-Docfork-Cabinet, DOCFORK_API_KEY, DOCFORK_CABINET, Docfork-Api-Key, Docfork-Cabinet, docfork_api_key, docfork_cabinet, Last-Event-ID, x-custom-auth-headers, X-Custom-Auth-Headers"
     );
-    res.setHeader("Access-Control-Expose-Headers", "MCP-Session-Id");
+    res.setHeader(
+      "Access-Control-Expose-Headers",
+      "MCP-Session-Id, mcp-session-id"
+    );
+    res.setHeader("Access-Control-Max-Age", "86400"); // 24 hours
 
-    // Handle preflight OPTIONS requests
+    // Handle preflight OPTIONS requests early
     if (req.method === "OPTIONS") {
       res.writeHead(200);
       res.end();
@@ -322,12 +393,8 @@ export async function startHttpServer(
             );
           }
           console.error(`Docfork MCP Server running on HTTP:`);
-          console.error(
-            `  • HTTP endpoint: http://localhost:${finalPort}/mcp`
-          );
-          console.error(
-            `  • Health check: http://localhost:${finalPort}/ping`
-          );
+          console.error(`  • HTTP endpoint: http://localhost:${finalPort}/mcp`);
+          console.error(`  • Health check: http://localhost:${finalPort}/ping`);
           console.error(
             `  • Session info: http://localhost:${finalPort}/sessions`
           );

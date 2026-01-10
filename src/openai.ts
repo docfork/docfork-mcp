@@ -2,6 +2,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
 import { searchDocs, readUrl } from "./api/index.js";
 import { z } from "zod";
+import { getAuthConfig } from "./config.js";
 
 /**
  * Format search section to OpenAI Deep Research format
@@ -69,7 +70,13 @@ export const getServer = () => {
       }
 
       try {
-        const response = await searchDocs(query as string);
+        const authConfig = getAuthConfig();
+        const response = await searchDocs(
+          query as string,
+          undefined, // docforkIdentifier
+          undefined, // tokens
+          authConfig
+        );
 
         if (!response || !response.sections || response.sections.length === 0) {
           return {
@@ -140,7 +147,8 @@ export const getServer = () => {
       }
 
       try {
-        const response = await readUrl(id);
+        const authConfig = getAuthConfig();
+        const response = await readUrl(id, authConfig);
 
         // Return OpenAI Deep Research format: single text content with JSON-wrapped document
         const result = {
