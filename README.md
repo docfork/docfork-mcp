@@ -124,7 +124,7 @@ claude mcp add docfork -- npx -y docfork --api-key YOUR_API_KEY
 
 </details>
 
-**[See Installation for Other MCP Clients (VS Code, Windsurf, Claude Desktop, etc.) → ](https://docfork.com/docs/installation/all-clients)**
+**[See Installation for Other MCP Clients (VS Code, Windsurf, Claude Desktop, etc.) → ](https://docs.docfork.com/integrations/overview)**
 
 ### 3. Usage
 
@@ -197,18 +197,18 @@ Docfork provides two high-performancetools optimized for AI agents:
 
 ## 📖 Documentation
 
-Find specific guides and technical resources at **[docfork.com/docs](https://docfork.com/docs)**:
+Find specific guides and technical resources at **[docs.docfork.com](https://docs.docfork.com)**:
 
 ### Installation
 
-- **[Quick Start & Major IDEs](https://docfork.com/docs/installation)** – Setup for Cursor, VS Code, Windsurf, & Claude.
-- **[All Supported Clients](https://docfork.com/docs/installation/all-clients)** – Configuration reference for Zed, BoltAI, Docker, and 30+ others.
+- **[Quick Start & Major IDEs](https://docs.docfork.com/get-started/installation)** – Setup for Cursor, VS Code, Windsurf, & Claude.
+- **[All Supported Clients](https://docs.docfork.com/integrations/overview)** – Configuration reference for Zed, BoltAI, Docker, and 30+ others.
 
 ### Features & Guides
 
-- **[Cabinet Scoping](https://docfork.com/docs/features/cabinets)** - How to create project-specific documentation silos.
-- **[Prompting Strategy](https://docfork.com/docs/guides/prompting)** – Best practices and "Set & Forget" rules.
-- **[Troubleshooting](https://docfork.com/docs/troubleshooting)** – Fix common connection or auth issues.
+- **[Cabinet Scoping](https://docs.docfork.com/core/cabinets)** - How to create project-specific documentation silos.
+- **[Rules](https://docs.docfork.com/context/rules)** – Automate Docfork behavior using project-level rules.
+- **[Troubleshooting](https://docs.docfork.com/troubleshooting/common-fixes)** – Fix common connection or auth issues.
 
 ## 📰 Media & Resources
 
