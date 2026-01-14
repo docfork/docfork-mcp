@@ -1,8 +1,8 @@
 {
   "name": "docfork",
-  "version": "1.3.0",
+  "version": "1.3.2",
   "description": "Up-to-date code documentation for AI agents.",
-  "mcpName": "io.github.docfork/docfork-mcp",
+  "mcpName": "io.github.docfork/docfork",
   "type": "module",
   "main": "dist/index.js",
   "scripts": {
@@ -21,7 +21,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/docfork/docfork-mcp.git"
+    "url": "git+https://github.com/docfork/docfork.git"
   },
   "keywords": [
     "modelcontextprotocol",
@@ -37,9 +37,9 @@
     "dist"
   ],
   "bugs": {
-    "url": "https://github.com/docfork/docfork-mcp/issues"
+    "url": "https://github.com/docfork/docfork/issues"
   },
-  "homepage": "https://github.com/docfork/docfork-mcp#readme",
+  "homepage": "https://github.com/docfork/docfork#readme",
   "dependencies": {
     "@modelcontextprotocol/inspector": "0.18.0",
     "@modelcontextprotocol/sdk": "1.25.2",
