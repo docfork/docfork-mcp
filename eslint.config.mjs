@@ -25,15 +25,16 @@ export default [
     plugins: {
       "@typescript-eslint": typescriptEslint,
     },
-    languageOptions: {
-      parser: tsParser,
-      ecmaVersion: "latest",
-      sourceType: "module",
-      globals: {
-        ...globals.node,
-        ...globals.es2021,
+      languageOptions: {
+        parser: tsParser,
+        ecmaVersion: "latest",
+        sourceType: "module",
+        globals: {
+          ...globals.node,
+          ...globals.es2021,
+          NodeJS: "readonly",
+        },
       },
-    },
     rules: {
       // Include TypeScript recommended rules
       ...typescriptEslint.configs.recommended.rules,
@@ -48,7 +49,7 @@ export default [
       // General JavaScript/TypeScript rules
       "prefer-const": "error",
       "no-var": "error",
-      "no-console": "warn",
+      "no-console": "off", // mcp servers need console logging
       "no-debugger": "error",
     },
   },
@@ -67,7 +68,7 @@ export default [
     rules: {
       "prefer-const": "error",
       "no-var": "error",
-      "no-console": "warn",
+      "no-console": "off", // mcp servers need console logging
       "no-debugger": "error",
     },
   },

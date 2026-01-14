@@ -33,7 +33,7 @@ async function parseRequestBody(req: IncomingMessage): Promise<any> {
     req.on("end", () => {
       try {
         resolve(body ? JSON.parse(body) : {});
-      } catch (error) {
+      } catch {
         reject(new Error("Invalid JSON in request body"));
       }
     });
