@@ -59,9 +59,7 @@ function parseEnvInt(key: string, defaultValue: number): number {
 
   const parsed = parseInt(value, 10);
   if (isNaN(parsed) || parsed <= 0) {
-    console.warn(
-      `Warning: Invalid ${key} value "${value}". Using default: ${defaultValue}`
-    );
+    console.warn(`Warning: Invalid ${key} value "${value}". Using default: ${defaultValue}`);
     return defaultValue;
   }
   return parsed;
@@ -70,13 +68,11 @@ function parseEnvInt(key: string, defaultValue: number): number {
 export function getServerConfig(): ServerConfig {
   return {
     name: "Docfork",
-    description:
-      "Gets the latest documentation and code examples for any library.",
+    description: "Gets the latest documentation and code examples for any library.",
     version: "1.2.0",
     defaultMinimumTokens: parseEnvInt("DEFAULT_MINIMUM_TOKENS", 10000),
     port: parseEnvInt("PORT", 3000),
-    transport: (process.env.MCP_TRANSPORT ||
-      "stdio") as ServerConfig["transport"],
+    transport: (process.env.MCP_TRANSPORT || "stdio") as ServerConfig["transport"],
   };
 }
 
@@ -150,11 +146,7 @@ export function resolveAuthConfig(
   // Finally HTTP headers (only if requestHeaders provided)
   else if (requestHeaders) {
     // Read Authorization: Bearer <token> header
-    const authHeader = getHeader(
-      requestHeaders,
-      "authorization",
-      "Authorization"
-    );
+    const authHeader = getHeader(requestHeaders, "authorization", "Authorization");
     if (authHeader) {
       const authValue = Array.isArray(authHeader) ? authHeader[0] : authHeader;
       if (authValue.startsWith("Bearer ")) {

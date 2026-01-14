@@ -7,16 +7,15 @@ import { getAuthConfig } from "./config.js";
 /**
  * Format search section to OpenAI Deep Research format
  */
-function formatSearchResult(section: {
-  url: string;
+function formatSearchResult(section: { url: string; title: string; content: string }): {
+  id: string;
   title: string;
-  content: string;
-}): { id: string; title: string; text: string; url: string } {
+  text: string;
+  url: string;
+} {
   // Create a proper text snippet (200 chars as per OpenAI examples)
   const textSnippet =
-    section.content.length > 200
-      ? section.content.slice(0, 200) + "..."
-      : section.content;
+    section.content.length > 200 ? section.content.slice(0, 200) + "..." : section.content;
 
   return {
     id: section.url,
@@ -122,12 +121,9 @@ export const getServer = () => {
     "fetch",
     {
       title: "Fetch Document",
-      description:
-        "Retrieve complete document content by ID for detailed analysis and citation.",
+      description: "Retrieve complete document content by ID for detailed analysis and citation.",
       inputSchema: {
-        id: z
-          .string()
-          .describe("URL or unique identifier for the document to fetch."),
+        id: z.string().describe("URL or unique identifier for the document to fetch."),
       },
     },
     async (args): Promise<CallToolResult> => {

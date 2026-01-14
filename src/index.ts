@@ -44,19 +44,14 @@ export const getServer = () => {
       description:
         "Search documentation across GitHub repositories or the web. For targeted searches INSIDE a specific library's documentation, use the docforkIdentifier parameter (author/repo format). Extract from GitHub URLs (e.g., github.com/facebook/react → 'facebook/react') and include in ALL subsequent searches about that library for focused, accurate results.",
       inputSchema: {
-        query: z
-          .string()
-          .describe("Search query. Include language/framework names."),
+        query: z.string().describe("Search query. Include language/framework names."),
         docforkIdentifier: z
           .string()
           .optional()
           .describe(
             "CRITICAL for targeted library searches: Library identifier in author/repo format (e.g., 'facebook/react', 'vercel/next.js'). Use this to search INSIDE a specific library's documentation for focused, accurate results. Extract from URLs in docfork_search_docs results and ALWAYS include in all subsequent searches about that library."
           ),
-        tokens: z
-          .string()
-          .optional()
-          .describe("Token budget: 'dynamic' or number (100-10000)"),
+        tokens: z.string().optional().describe("Token budget: 'dynamic' or number (100-10000)"),
       },
     },
     async ({ query, tokens, docforkIdentifier }): Promise<CallToolResult> => {
@@ -87,9 +82,7 @@ export const getServer = () => {
       inputSchema: {
         url: z
           .string()
-          .describe(
-            "Full URL to read. Use exact URLs from docfork_search_docs results."
-          ),
+          .describe("Full URL to read. Use exact URLs from docfork_search_docs results."),
       },
     },
     async (args): Promise<CallToolResult> => {

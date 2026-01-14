@@ -24,9 +24,7 @@ export async function readUrl(
 
   if (!response.ok) {
     const text = await response.text();
-    throw new Error(
-      `${response.status} ${response.statusText}: ${text.slice(0, 500)}`
-    );
+    throw new Error(`${response.status} ${response.statusText}: ${text.slice(0, 500)}`);
   }
 
   // Parse JSON response and return text field

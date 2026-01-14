@@ -6,7 +6,6 @@
 
 [![Website](https://img.shields.io/badge/Website-docfork.com-%23F02A2B)](https://docfork.com) [![smithery badge](https://smithery.ai/badge/@docfork/mcp)](https://smithery.ai/server/@docfork/mcp) [![NPM Version](https://img.shields.io/npm/v/docfork?color=red)](https://www.npmjs.com/package/docfork) [![MIT licensed](https://img.shields.io/npm/l/docfork)](./LICENSE)
 
-
 ## ⚡ Why Docfork?
 
 Standard AI models (Claude 4.5, GPT-5.1) have a knowledge cutoff. They don't know about the framework changes released last week.

@@ -39,9 +39,7 @@ export async function searchDocs(
 
   if (!response.ok) {
     const text = await response.text();
-    throw new Error(
-      `${response.status} ${response.statusText}: ${text.slice(0, 500)}`
-    );
+    throw new Error(`${response.status} ${response.statusText}: ${text.slice(0, 500)}`);
   }
 
   const result = await response.json();

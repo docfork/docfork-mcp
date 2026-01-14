@@ -21,19 +21,13 @@ export function encryptClientIp(clientIp: string): string {
   }
 
   if (!validateEncryptionKey(ENCRYPTION_KEY)) {
-    console.error(
-      "Invalid encryption key format. Must be 64 hex characters. Sending plain IP."
-    );
+    console.error("Invalid encryption key format. Must be 64 hex characters. Sending plain IP.");
     return clientIp; // Fallback to unencrypted
   }
 
   try {
     const iv = randomBytes(16);
-    const cipher = createCipheriv(
-      ALGORITHM,
-      Buffer.from(ENCRYPTION_KEY, "hex"),
-      iv
-    );
+    const cipher = createCipheriv(ALGORITHM, Buffer.from(ENCRYPTION_KEY, "hex"), iv);
     let encrypted = cipher.update(clientIp, "utf8", "hex");
     encrypted += cipher.final("hex");
     return iv.toString("hex") + ":" + encrypted;

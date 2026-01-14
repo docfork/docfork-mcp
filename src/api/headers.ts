@@ -5,9 +5,7 @@ import { encryptClientIp } from "../lib/encryption.js";
  * Generate headers for Docfork API requests
  * Handles authentication, cabinet headers, and client IP forwarding
  */
-export function generateHeaders(
-  auth?: DocforkAuthConfig
-): Record<string, string> {
+export function generateHeaders(auth?: DocforkAuthConfig): Record<string, string> {
   const headers: Record<string, string> = {
     "User-Agent": "docfork-mcp",
     "Content-Type": "application/json",
