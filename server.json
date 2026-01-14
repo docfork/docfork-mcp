@@ -1,6 +1,6 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
-  "name": "com.docfork/docfork-mcp",
+  "name": "io.github.docfork/docfork-mcp",
   "description": "Up-to-date code documentation for AI agents.",
   "icons": [
     {
