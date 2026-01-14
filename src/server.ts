@@ -16,9 +16,7 @@ function detectClientType(requestBody: any, userAgent?: string): string {
   const clientInfo = requestBody?.params?.clientInfo;
   const name = clientInfo?.name?.toLowerCase() || "";
   const ua = userAgent?.toLowerCase() || "";
-  return name.includes("openai") || ua.includes("openai")
-    ? "openai-mcp"
-    : "unknown";
+  return name.includes("openai") || ua.includes("openai") ? "openai-mcp" : "unknown";
 }
 
 /**
@@ -75,8 +73,7 @@ function sendJsonError(
  * Handles X-Forwarded-For header for proxied requests.
  */
 function getClientIp(req: IncomingMessage): string | undefined {
-  const forwardedFor =
-    req.headers["x-forwarded-for"] || req.headers["X-Forwarded-For"];
+  const forwardedFor = req.headers["x-forwarded-for"] || req.headers["X-Forwarded-For"];
 
   if (forwardedFor) {
     const ips = Array.isArray(forwardedFor) ? forwardedFor[0] : forwardedFor;
@@ -166,16 +163,11 @@ async function handleMcpPost(
       const newSessionId = randomUUID();
 
       // Detect client type and select appropriate server factory
-      const clientType = detectClientType(
-        requestBody,
-        req.headers["user-agent"]
-      );
+      const clientType = detectClientType(requestBody, req.headers["user-agent"]);
       console.log(`Detected client type: ${clientType}`);
 
       const serverFactory =
-        clientType === "openai-mcp"
-          ? openaiServerFactory
-          : standardServerFactory;
+        clientType === "openai-mcp" ? openaiServerFactory : standardServerFactory;
 
       transport = new StreamableHTTPServerTransport({
         sessionIdGenerator: () => newSessionId,
@@ -189,9 +181,7 @@ async function handleMcpPost(
       transport.onclose = () => {
         const sid = transport.sessionId;
         if (sid && transports[sid]) {
-          console.log(
-            `Transport closed for session ${sid}, removing from transports map`
-          );
+          console.log(`Transport closed for session ${sid}, removing from transports map`);
           delete transports[sid];
         }
       };
@@ -211,9 +201,7 @@ async function handleMcpPost(
         res,
         400,
         -32000,
-        sessionId
-          ? "Session not found"
-          : "Bad Request: No valid session ID provided"
+        sessionId ? "Session not found" : "Bad Request: No valid session ID provided"
       );
       return;
     }
@@ -235,10 +223,7 @@ async function handleMcpPost(
 /**
  * Handle MCP GET requests for SSE streams
  */
-async function handleMcpGet(
-  req: IncomingMessage,
-  res: ServerResponse
-): Promise<void> {
+async function handleMcpGet(req: IncomingMessage, res: ServerResponse): Promise<void> {
   const sessionId = req.headers["mcp-session-id"] as string | undefined;
 
   if (!sessionId || !transports[sessionId]) {
@@ -261,10 +246,7 @@ async function handleMcpGet(
 /**
  * Handle MCP DELETE requests for session termination
  */
-async function handleMcpDelete(
-  req: IncomingMessage,
-  res: ServerResponse
-): Promise<void> {
+async function handleMcpDelete(req: IncomingMessage, res: ServerResponse): Promise<void> {
   const sessionId = req.headers["mcp-session-id"] as string | undefined;
 
   if (!sessionId || !transports[sessionId]) {
@@ -310,10 +292,7 @@ export async function startHttpServer(
       "Access-Control-Allow-Headers",
       "Content-Type, Accept, Accept-Encoding, MCP-Session-Id, mcp-session-id, MCP-Protocol-Version, Authorization, X-Docfork-Cabinet, DOCFORK_API_KEY, DOCFORK_CABINET, Docfork-Api-Key, Docfork-Cabinet, docfork_api_key, docfork_cabinet, Last-Event-ID, x-custom-auth-headers, X-Custom-Auth-Headers"
     );
-    res.setHeader(
-      "Access-Control-Expose-Headers",
-      "MCP-Session-Id, mcp-session-id"
-    );
+    res.setHeader("Access-Control-Expose-Headers", "MCP-Session-Id, mcp-session-id");
     res.setHeader("Access-Control-Max-Age", "86400"); // 24 hours
 
     // Handle preflight OPTIONS requests early
@@ -326,12 +305,7 @@ export async function startHttpServer(
     try {
       if (url === "/mcp") {
         if (req.method === "POST") {
-          await handleMcpPost(
-            req,
-            res,
-            standardServerFactory,
-            openaiServerFactory
-          );
+          await handleMcpPost(req, res, standardServerFactory, openaiServerFactory);
         } else if (req.method === "GET") {
           await handleMcpGet(req, res);
         } else if (req.method === "DELETE") {
@@ -388,16 +362,12 @@ export async function startHttpServer(
         httpServer!.listen(testPort, () => {
           finalPort = testPort;
           if (finalPort !== port) {
-            console.error(
-              `Port ${port} is already in use, using port ${finalPort} instead`
-            );
+            console.error(`Port ${port} is already in use, using port ${finalPort} instead`);
           }
           console.error(`Docfork MCP Server running on HTTP:`);
           console.error(`  • HTTP endpoint: http://localhost:${finalPort}/mcp`);
           console.error(`  • Health check: http://localhost:${finalPort}/ping`);
-          console.error(
-            `  • Session info: http://localhost:${finalPort}/sessions`
-          );
+          console.error(`  • Session info: http://localhost:${finalPort}/sessions`);
           resolve();
         });
       });
@@ -419,9 +389,7 @@ export async function startHttpServer(
   }
 
   if (!httpServer) {
-    throw new Error(
-      `Unable to find available port in range ${port}-${port + maxAttempts - 1}`
-    );
+    throw new Error(`Unable to find available port in range ${port}-${port + maxAttempts - 1}`);
   }
 
   // Handle graceful shutdown
@@ -449,9 +417,7 @@ export async function startHttpServer(
 /**
  * Start stdio transport with provided server factory
  */
-export async function startStdioServer(
-  serverFactory: () => McpServer
-): Promise<void> {
+export async function startStdioServer(serverFactory: () => McpServer): Promise<void> {
   const server = serverFactory();
   const transport = new StdioServerTransport();
   await server.connect(transport);
