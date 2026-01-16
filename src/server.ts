@@ -40,9 +40,28 @@ function isWellKnownMcpConfigPath(pathname: string): boolean {
  */
 function detectClientType(requestBody: any, userAgent?: string): string {
   const clientInfo = requestBody?.params?.clientInfo;
+  const payload: { clientInfo?: unknown } = {};
+
+  // add client info to payload e.g. {"name":"inspector-client","version":"0.18.0"}
+  if (clientInfo !== undefined) {
+    payload.clientInfo = clientInfo;
+  }
+  if (!payload.clientInfo) {
+    return "unknown";
+  }
+
+  try {
+    return JSON.stringify(payload);
+  } catch {
+    return String(payload.clientInfo ?? "unknown");
+  }
+}
+
+function isOpenAIClient(requestBody: any, userAgent?: string): boolean {
+  const clientInfo = requestBody?.params?.clientInfo;
   const name = clientInfo?.name?.toLowerCase() || "";
   const ua = userAgent?.toLowerCase() || "";
-  return name.includes("openai") || ua.includes("openai") ? "openai-mcp" : "unknown";
+  return name.includes("openai") || ua.includes("openai");
 }
 
 /**
@@ -190,10 +209,11 @@ async function handleMcpPost(
 
       // Detect client type and select appropriate server factory
       const clientType = detectClientType(requestBody, req.headers["user-agent"]);
-      console.log(`Detected client type: ${clientType}`);
+      console.log(`Client info: ${clientType}`);
 
-      const serverFactory =
-        clientType === "openai-mcp" ? openaiServerFactory : standardServerFactory;
+      const serverFactory = isOpenAIClient(requestBody, req.headers["user-agent"])
+        ? openaiServerFactory
+        : standardServerFactory;
 
       transport = new StreamableHTTPServerTransport({
         sessionIdGenerator: () => newSessionId,
@@ -251,33 +271,65 @@ async function handleMcpPost(
 /**
  * Handle MCP GET requests for SSE streams
  */
-async function handleMcpGet(req: IncomingMessage, res: ServerResponse): Promise<void> {
+async function handleMcpGet(
+  req: IncomingMessage,
+  res: ServerResponse,
+  standardServerFactory: () => McpServer,
+  openaiServerFactory: () => McpServer
+): Promise<void> {
   const sessionId = req.headers["mcp-session-id"] as string | undefined;
 
-  // servers may return 405 if they don't offer sse at this endpoint.
-  // if this server is running sessionful, require a valid session id to establish sse streams.
-  if (!sessionId) {
-    res.writeHead(405, { "Content-Type": "text/plain" });
-    res.end("Method not allowed");
+  if (sessionId) {
+    // unknown session ids should yield 404
+    if (!transports[sessionId]) {
+      res.writeHead(404, { "Content-Type": "text/plain" });
+      res.end("Session not found");
+      return;
+    }
+
+    // check for Last-Event-ID header for resumability
+    const lastEventId = req.headers["last-event-id"] as string | undefined;
+    if (lastEventId) {
+      console.log(`Client reconnecting with Last-Event-ID: ${lastEventId}`);
+    } else {
+      console.log(`Establishing new SSE stream for session ${sessionId}`);
+    }
+
+    await transports[sessionId].handleRequest(req, res);
     return;
   }
 
-  // unknown session ids should yield 404
-  if (!transports[sessionId]) {
-    res.writeHead(404, { "Content-Type": "text/plain" });
-    res.end("Session not found");
+  // stateless get for clients without sessions
+  let authConfig: DocforkAuthConfig;
+  try {
+    authConfig = {
+      ...extractAuthConfigFromRequest(req),
+      clientIp: getClientIp(req),
+      transport: "http",
+    };
+  } catch (error: any) {
+    sendJsonError(res, 400, -32602, error.message || "Invalid configuration");
     return;
   }
 
-  // check for Last-Event-ID header for resumability
-  const lastEventId = req.headers["last-event-id"] as string | undefined;
-  if (lastEventId) {
-    console.log(`Client reconnecting with Last-Event-ID: ${lastEventId}`);
-  } else {
-    console.log(`Establishing new SSE stream for session ${sessionId}`);
-  }
+  const clientType = detectClientType(undefined, req.headers["user-agent"]);
+  console.log(`Client info: ${clientType}`);
+  const serverFactory = isOpenAIClient(undefined, req.headers["user-agent"])
+    ? openaiServerFactory
+    : standardServerFactory;
+  const transport = new StreamableHTTPServerTransport({
+    enableJsonResponse: true,
+  });
 
-  await transports[sessionId].handleRequest(req, res);
+  res.on("close", () => {
+    transport.close();
+  });
+
+  await authContext.run(authConfig, async () => {
+    const server = serverFactory();
+    await server.connect(transport);
+    await transport.handleRequest(req, res);
+  });
 }
 
 /**
@@ -352,7 +404,7 @@ export async function startHttpServer(
         if (req.method === "POST") {
           await handleMcpPost(req, res, standardServerFactory, openaiServerFactory);
         } else if (req.method === "GET") {
-          await handleMcpGet(req, res);
+          await handleMcpGet(req, res, standardServerFactory, openaiServerFactory);
         } else if (req.method === "DELETE") {
           await handleMcpDelete(req, res);
         } else {
