@@ -69,7 +69,7 @@ export function getServerConfig(): ServerConfig {
   return {
     name: "Docfork",
     description: "Gets the latest documentation and code examples for any library.",
-    version: "1.2.0",
+    version: "1.3.4",
     defaultMinimumTokens: parseEnvInt("DEFAULT_MINIMUM_TOKENS", 10000),
     port: parseEnvInt("PORT", 3000),
     transport: (process.env.MCP_TRANSPORT || "stdio") as ServerConfig["transport"],
