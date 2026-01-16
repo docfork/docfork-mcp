@@ -16,7 +16,21 @@
   "remotes": [
     {
       "type": "streamable-http",
-      "url": "https://mcp.docfork.com/mcp"
+      "url": "https://mcp.docfork.com/mcp",
+      "headers": [
+        {
+          "name": "DOCFORK_API_KEY",
+          "description": "API key for authentication",
+          "isRequired": false,
+          "isSecret": true
+        },
+        {
+          "name": "DOCFORK_CABINET",
+          "description": "optional cabinet scope",
+          "isRequired": false,
+          "isSecret": false
+        }
+      ]
     }
   ],
   "packages": [
