@@ -38,7 +38,7 @@ function isWellKnownMcpConfigPath(pathname: string): boolean {
 /**
  * Detect client type from initialization request
  */
-function detectClientType(requestBody: any, userAgent?: string): string {
+function detectClientType(requestBody: any): string {
   const clientInfo = requestBody?.params?.clientInfo;
   const payload: { clientInfo?: unknown } = {};
 
@@ -208,7 +208,7 @@ async function handleMcpPost(
       const newSessionId = randomUUID();
 
       // Detect client type and select appropriate server factory
-      const clientType = detectClientType(requestBody, req.headers["user-agent"]);
+      const clientType = detectClientType(requestBody);
       console.log(`Client info: ${clientType}`);
 
       const serverFactory = isOpenAIClient(requestBody, req.headers["user-agent"])
@@ -312,7 +312,7 @@ async function handleMcpGet(
     return;
   }
 
-  const clientType = detectClientType(undefined, req.headers["user-agent"]);
+  const clientType = detectClientType(undefined);
   console.log(`Client info: ${clientType}`);
   const serverFactory = isOpenAIClient(undefined, req.headers["user-agent"])
     ? openaiServerFactory
