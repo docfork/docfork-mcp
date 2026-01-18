@@ -25,18 +25,6 @@ function parseBoolean(value: string | undefined, defaultValue: boolean): boolean
 }
 
 /**
- * parse comma-separated env list
- */
-function parseStringList(value: string | undefined): string[] | undefined {
-  if (!value) return undefined;
-  const parts = value
-    .split(",")
-    .map((s) => s.trim())
-    .filter(Boolean);
-  return parts.length ? parts : undefined;
-}
-
-/**
  * epoch seconds helper for jwt exp/nbf checks
  */
 function nowSeconds(): number {
