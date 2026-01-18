@@ -126,7 +126,7 @@ Implement a secure authentication flow using Better Auth and Supabase. use docfo
 Create a responsive dashboard layout with Tailwind CSS and shadcn/ui. use docfork
 ```
 
-### 4. Automate (Step 4)
+### 4. Add a rule to auto-invoke Docfork MCP
 
 Don't want to type `use docfork` every time? Add a rule to make your AI fetch docs automatically.
 
@@ -137,8 +137,6 @@ Once enabled, your AI will automatically fetch the latest docs when you ask ques
 ```txt
 Add a Prisma schema for a multi-tenant SaaS and generate the client.
 ```
-
----
 
 ## 🛡️ The Docfork Difference: Cabinets
 
