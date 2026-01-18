@@ -1,0 +1,65 @@
+---
+title: Welcome
+description: Docfork is the fastest way to get up-to-date docs for AI Agents.
+---
+
+import { Card, Cards } from "fumadocs-ui/components/card";
+import { Callout } from "fumadocs-ui/components/callout";
+
+**Docfork** bridges the gap between your AI's training data (which is months old) and the code you are writing today.
+
+## The Problem: Expired Knowledge
+
+AI coding assistants (Claude Sonnet 4.5, GPT-5) are powerful, but they suffer from a critical flaw: **The Knowledge Cutoff.**
+
+- **Outdated Code:** They suggest patterns from 2024 for frameworks released yesterday.
+- **Hallucinations:** They guess APIs that don't exist.
+- **Broken Builds:** You waste hours debugging "working" code that is actually deprecated.
+
+## The Solution: Live Context
+
+Docfork works as a **Model Context Protocol (MCP)** server that sits between your editor and the AI.
+
+1. **You Prompt:** `How do I use the new Next.js 15 'after()' API?`
+2. **We Fetch:** Docfork searches the official documentation in < 1 second.
+3. **AI Codes:** The documentation is injected into the context window, allowing the AI to write perfect, up-to-date code.
+
+## Key Features
+
+<Cards>
+  <Card
+    title="⚡️ Sub-second Latency"
+    description="Optimized for speed. Our p95 retrieval time is < 1 sec, ensuring your flow state is never broken."
+  />
+  <Card
+    title="🛡️ Cabinets"
+    description="Scope your context to your specific tech stack (e.g., 'Next.js + Supabase') to avoid hallucinations."
+    href="/core/cabinets"
+  />
+  <Card
+    title="📚 10,000+ Libraries"
+    description="From React to Rust, if it has public docs, we index it. If not, you can request it on GitHub."
+    href="/search"
+  />
+  <Card
+    title="🧠 AI Optimized"
+    description="We don't just dump HTML. We parse, chunk, and rank documentation specifically for LLM comprehension."
+  />
+</Cards>
+
+## Getting Started
+
+Ready to stop debugging hallucinations?
+
+<Cards>
+  <Card
+    title="Installation"
+    href="/get-started/installation"
+    description="Setup guides for Cursor, VS Code, and Claude."
+  />
+  <Card
+    title="Cabinets"
+    href="/core/cabinets"
+    description="Scope your search to your tech stack."
+  />
+</Cards>

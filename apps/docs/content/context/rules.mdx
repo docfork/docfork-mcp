@@ -1,0 +1,49 @@
+---
+title: Rules
+description: Automate Docfork behavior using project-level rules.
+---
+
+import { Callout } from "fumadocs-ui/components/callout";
+
+You shouldn't have to remember to type `use docfork`. By adding a **Rule** to your editor, you can force the AI to check documentation automatically before generating code.
+
+### Cursor
+
+Create a new file at `.cursor/rules/docfork-policy.md`:
+
+```markdown title=".cursor/rules/docfork-policy.md"
+---
+description: "Always use Docfork to retrieve up-to-date documentation for libraries and APIs."
+alwaysApply: true
+---
+
+You have access to the docfork MCP server. To ensure the code you write is accurate and up-to-date, you must follow these requirements:
+
+1. Auto-Invoke: Always use `docfork_search_docs` tool when asked for library implementation, API setup, or debugging.
+2. Context Strategy:
+   - Search: Call `docfork_search_docs` tool. Review the `content` snippets in the results.
+   - Read: Only call `docfork_read_url` tool if the search snippets are incomplete or you need the full file context for a complex implementation.
+   - Identity: Use the `docforkIdentifier` in follow-up searches to narrow results to a specific library.
+
+If you are unsure of a library's latest syntax, search with docfork first.
+```
+
+### Claude Code (CLI)
+
+Add this block to your `CLAUDE.md` file in the root of your repository:
+
+```markdown title="CLAUDE.md"
+## Tool Usage Rules
+
+- **Docfork MCP**: Always use the `docfork` tool when I ask about external libraries, API syntax, or configuration.
+- Prioritize Docfork results over your internal training data for frameworks I use.
+```
+
+### Windsurf / Other Agents
+
+If your editor supports a global system prompt or custom instructions, paste the **Context Strategy** text above into the main text area.
+
+<Callout type="info" title="Why use Rules?">
+  Rules turn Docfork from a "Search Engine" into an "Index." Without rules, the
+  AI guesses. With rules, the AI verifies.
+</Callout>

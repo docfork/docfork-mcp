@@ -1,0 +1,54 @@
+---
+title: Library Identifiers
+description: Improve search accuracy by targeting specific repositories.
+---
+
+import { Conversation, Message, Action } from "@/components/conversation";
+
+Docfork indexes libraries using a `owner/repo` identifier format. Using these identifiers in your prompts helps the Agent skip the "discovery" phase and query the exact documentation index immediately.
+
+## Syntax
+
+The identifier follows the GitHub-style format:
+
+```text
+owner/repo
+
+```
+
+## Usage in Prompts
+
+When you know the library you are using, append the identifier to your prompt.
+
+**Standard Prompt:**
+
+<Conversation>
+  <Message role="user">How do I use auth?</Message>
+  <Message role="agent">
+    <Action>calling `docfork_search_docs` with query: `auth`</Action>
+    Results may include Auth0, Clerk, NextAuth, or other authentication libraries.
+  </Message>
+</Conversation>
+
+**Targeted Prompt:**
+
+<Conversation>
+  <Message role="user">Implement auth using `better-auth/better-auth`.</Message>
+  <Message role="agent">
+    <Action>
+      calling `docfork_search_docs` with query: `auth` and docforkIdentifier:
+
+      <br />
+      `better-auth/better-auth`
+    </Action>
+    Results are focused exclusively on the Better Auth library.
+
+  </Message>
+</Conversation>
+
+## Finding Identifiers
+
+You can find the identifier for any supported library in two ways:
+
+1. **Search Results:** When you run `docfork_search_docs`, the JSON response includes a `library_identifier` field for every result.
+2. **The Catalog:** Browse our [Library Catalog](https://docfork.com/search) to find the exact ID for your dependencies.
