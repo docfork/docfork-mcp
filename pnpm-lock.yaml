@@ -51,8 +51,8 @@ importers:
         specifier: 14.2.4
         version: 14.2.4(@types/react@19.2.8)(fumadocs-core@16.4.6(@types/react@19.2.8)(lucide-react@0.562.0(react@19.2.3))(next@16.1.1(@babel/core@7.28.6)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(zod@4.3.5))(next@16.1.1(@babel/core@7.28.6)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(react@19.2.3)
       fumadocs-ui:
-        specifier: 16.4.6
-        version: 16.4.6(@types/react-dom@19.2.3(@types/react@19.2.8))(@types/react@19.2.8)(fumadocs-core@16.4.6(@types/react@19.2.8)(lucide-react@0.562.0(react@19.2.3))(next@16.1.1(@babel/core@7.28.6)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(zod@4.3.5))(next@16.1.1(@babel/core@7.28.6)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(tailwindcss@4.1.18)
+        specifier: 16.4.7
+        version: 16.4.7(@types/react-dom@19.2.3(@types/react@19.2.8))(@types/react@19.2.8)(fumadocs-core@16.4.6(@types/react@19.2.8)(lucide-react@0.562.0(react@19.2.3))(next@16.1.1(@babel/core@7.28.6)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(zod@4.3.5))(next@16.1.1(@babel/core@7.28.6)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(tailwindcss@4.1.18)
       lucide-react:
         specifier: ^0.562.0
         version: 0.562.0(react@19.2.3)
@@ -426,11 +426,11 @@ packages:
   '@formatjs/intl-localematcher@0.7.5':
     resolution: {integrity: sha512-7/nd90cn5CT7SVF71/ybUKAcnvBlr9nZlJJp8O8xIZHXFgYOC4SXExZlSdgHv2l6utjw1byidL06QzChvQMHwA==}
 
-  '@fumadocs/ui@16.4.6':
-    resolution: {integrity: sha512-/skIjySh9mVNMZBkc2kdGjajGQIorFUCTUp/QSSEtdMOVIdW7776YGLvV4CFxa8hf5FuRO4xrOi8vhQqnhqwVQ==}
+  '@fumadocs/ui@16.4.7':
+    resolution: {integrity: sha512-NnkMIN5BzBRh2OzA9rp2SgbGEkEwfCfq0sE4vq2n+GkIDIggicGYUNgSl2gtIBQsKYKP/a4/0wrkQKdq4eUJlw==}
     peerDependencies:
       '@types/react': '*'
-      fumadocs-core: 16.4.6
+      fumadocs-core: 16.4.7
       next: 16.x.x
       react: ^19.2.0
       react-dom: ^19.2.0
@@ -2374,11 +2374,11 @@ packages:
       vite:
         optional: true
 
-  fumadocs-ui@16.4.6:
-    resolution: {integrity: sha512-WQD+rj2AMd5umu8cB+Q2pMl/EnCXT1MAeSb4UoEZKuoiv6zOkUiBHFemNVliijuPD2dX+18HzJlgDEk4PMVDUQ==}
+  fumadocs-ui@16.4.7:
+    resolution: {integrity: sha512-ShEftF54mj89EW7Wll2wwGcH6bNTmPrPtUUmO+ThakK13skJmY7GSBH3Ft51TzQNLhN3kBKEQipIlJWc7LT5NQ==}
     peerDependencies:
       '@types/react': '*'
-      fumadocs-core: 16.4.6
+      fumadocs-core: 16.4.7
       next: 16.x.x
       react: ^19.2.0
       react-dom: ^19.2.0
@@ -4270,7 +4270,7 @@ snapshots:
       '@formatjs/fast-memoize': 3.0.3
       tslib: 2.8.1
 
-  '@fumadocs/ui@16.4.6(@types/react@19.2.8)(fumadocs-core@16.4.6(@types/react@19.2.8)(lucide-react@0.562.0(react@19.2.3))(next@16.1.1(@babel/core@7.28.6)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(zod@4.3.5))(next@16.1.1(@babel/core@7.28.6)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(tailwindcss@4.1.18)':
+  '@fumadocs/ui@16.4.7(@types/react@19.2.8)(fumadocs-core@16.4.6(@types/react@19.2.8)(lucide-react@0.562.0(react@19.2.3))(next@16.1.1(@babel/core@7.28.6)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(zod@4.3.5))(next@16.1.1(@babel/core@7.28.6)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(tailwindcss@4.1.18)':
     dependencies:
       fumadocs-core: 16.4.6(@types/react@19.2.8)(lucide-react@0.562.0(react@19.2.3))(next@16.1.1(@babel/core@7.28.6)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(zod@4.3.5)
       next-themes: 0.4.6(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
@@ -6736,9 +6736,9 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  fumadocs-ui@16.4.6(@types/react-dom@19.2.3(@types/react@19.2.8))(@types/react@19.2.8)(fumadocs-core@16.4.6(@types/react@19.2.8)(lucide-react@0.562.0(react@19.2.3))(next@16.1.1(@babel/core@7.28.6)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(zod@4.3.5))(next@16.1.1(@babel/core@7.28.6)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(tailwindcss@4.1.18):
+  fumadocs-ui@16.4.7(@types/react-dom@19.2.3(@types/react@19.2.8))(@types/react@19.2.8)(fumadocs-core@16.4.6(@types/react@19.2.8)(lucide-react@0.562.0(react@19.2.3))(next@16.1.1(@babel/core@7.28.6)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(zod@4.3.5))(next@16.1.1(@babel/core@7.28.6)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(tailwindcss@4.1.18):
     dependencies:
-      '@fumadocs/ui': 16.4.6(@types/react@19.2.8)(fumadocs-core@16.4.6(@types/react@19.2.8)(lucide-react@0.562.0(react@19.2.3))(next@16.1.1(@babel/core@7.28.6)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(zod@4.3.5))(next@16.1.1(@babel/core@7.28.6)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(tailwindcss@4.1.18)
+      '@fumadocs/ui': 16.4.7(@types/react@19.2.8)(fumadocs-core@16.4.6(@types/react@19.2.8)(lucide-react@0.562.0(react@19.2.3))(next@16.1.1(@babel/core@7.28.6)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(zod@4.3.5))(next@16.1.1(@babel/core@7.28.6)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(tailwindcss@4.1.18)
       '@radix-ui/react-accordion': 1.2.12(@types/react-dom@19.2.3(@types/react@19.2.8))(@types/react@19.2.8)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       '@radix-ui/react-collapsible': 1.1.12(@types/react-dom@19.2.3(@types/react@19.2.8))(@types/react@19.2.8)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       '@radix-ui/react-dialog': 1.1.15(@types/react-dom@19.2.3(@types/react@19.2.8))(@types/react@19.2.8)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
