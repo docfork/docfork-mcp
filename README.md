@@ -1,8 +1,16 @@
+<div align="center">
+
 [![Docfork cover](https://docfork.com/cover.png)](https://docfork.com)
 
-# Docfork MCP - Up-to-date Docs for AI Agents.
+# Docfork MCP 
 
-[![Website](https://img.shields.io/badge/Website-docfork.com-%23F02A2B.svg?style=for-the-badge&labelColor=000)](https://docfork.com) [![Install in Cursor](https://img.shields.io/badge/Install-Cursor-000000.svg?style=for-the-badge&logo=cursor&labelColor=000)](https://cursor.com/en/install-mcp?name=docfork&config=eyJ1cmwiOiJodHRwczovL21jcC5kb2Nmb3JrLmNvbS9tY3AifQ%3D%3D) [![Install in VS Code](https://img.shields.io/badge/Install-VS%20Code-0098FF.svg?style=for-the-badge&logo=visualstudiocode&labelColor=000)](https://insiders.vscode.dev/redirect?url=vscode%3Amcp%2Finstall%3F%7B%22name%22%3A%22docfork%22%2C%22type%22%3A%22http%22%2C%22url%22%3A%22http%3A%2F%2Fmcp.docfork.com%2Fmcp%22%7D) [![NPM version](https://img.shields.io/npm/v/docfork.svg?style=for-the-badge&labelColor=000000&color=blue)](https://www.npmjs.com/package/docfork) [![License](https://img.shields.io/npm/l/docfork.svg?style=for-the-badge&labelColor=000000&color=brightgreen)](./LICENSE)
+**Stop hallucinations, context bloat, and outdated APIs.**
+
+<a href="https://cursor.com/deeplink/mcp-install-dark.svg"><img src="https://cursor.com/deeplink/mcp-install-dark.svg" height="32" alt="Add to Cursor"/></a>&nbsp;&nbsp;<a href="https://app.docfork.com/signup"><img src="https://img.shields.io/badge/Get_Free_API_Key-F02A2B?style=for-the-badge&logo=fire&logoColor=white" height="32" alt="Get API Key"/></a>&nbsp;&nbsp;<a href="https://docfork.com"><img src="https://img.shields.io/badge/Read_The_Docs-181717?style=for-the-badge&logo=bookstack&logoColor=white" height="32" alt="Website"/></a>
+
+[![NPM Downloads](https://img.shields.io/npm/dw/docfork?style=flat-square&color=333&labelColor=181717)](https://www.npmjs.com/package/docfork) [![NPM Version](https://img.shields.io/npm/v/docfork?style=flat-square&color=333&labelColor=181717)](https://www.npmjs.com/package/docfork) [![License](https://img.shields.io/npm/l/docfork?style=flat-square&color=333&labelColor=181717)](./LICENSE)
+
+</div>
 
 ## ⚡ Why Docfork?
 
@@ -24,7 +32,7 @@ Standard AI models (Claude 4.5, GPT-5.1) have a knowledge cutoff. They don't kno
 
 ### 1. Get your Free API Key
 
-Go to **[app.docfork.com](https://app.docfork.com/sign-up)**.
+Go to **[app.docfork.com](https://app.docfork.com/signup)**.
 
 - **Free Tier:** 1,000 requests/month org-wide.
 - **Team:** 5 free seats included.
@@ -156,7 +164,7 @@ Unlike other tools that search the "entire internet" and return bloated results,
 
 Cabinets are curated, private indexes specific to your project stack.
 
-1. Create a Cabinet in your **[Dashboard](https://app.docfork.com/sign-up)**.
+1. Create a Cabinet in your **[Dashboard](https://app.docfork.com/signup)**.
 2. Add the libraries you need.
 3. Add the `DOCFORK_CABINET` header to your MCP config.
 
