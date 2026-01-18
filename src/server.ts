@@ -301,14 +301,14 @@ export async function startHttpServer(
             : standardServerFactory;
 
           const transport = new StreamableHTTPServerTransport({
-          // stateless: do not issue mcp-session-id
+            // stateless: do not issue mcp-session-id
             sessionIdGenerator: undefined,
-          // prefer single json response when possible
+            // prefer single json response when possible
             enableJsonResponse: true,
           });
 
           res.on("close", () => {
-          // ensure transport cleanup on client disconnect
+            // ensure transport cleanup on client disconnect
             transport.close();
           });
 
@@ -368,7 +368,10 @@ export async function startHttpServer(
             res.writeHead(upstream.status, { "Content-Type": "application/json" });
             res.end(
               JSON.stringify(
-                { error: "upstream_error", message: "Failed to fetch authorization server metadata" },
+                {
+                  error: "upstream_error",
+                  message: "Failed to fetch authorization server metadata",
+                },
                 null,
                 2
               )

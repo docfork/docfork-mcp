@@ -1,4 +1,3 @@
-
 [![Docfork cover](https://docfork.com/cover.png)](https://docfork.com)
 
 # Docfork MCP - Up-to-date Docs for AI Agents.

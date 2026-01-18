@@ -58,7 +58,7 @@ const JWKS_URL = `https://${AUTH_DOMAIN}/oauth2/jwks`;
 const ISSUER = `https://${AUTH_DOMAIN}`;
 
 // optional validation parameters (undefined = skip these checks)
-const AUDIENCE = undefined; 
+const AUDIENCE = undefined;
 const ALGORITHMS = undefined;
 const PUBLIC_KEY_PEM = undefined;
 
@@ -177,9 +177,5 @@ export async function validateJwt(
  * set to false if service can be reached without a trusted proxy
  */
 export function shouldTrustProxyHeaders(): boolean {
-  return parseBoolean(
-    process.env.DOCFORK_TRUST_PROXY || process.env.TRUST_PROXY,
-    true
-  );
+  return parseBoolean(process.env.DOCFORK_TRUST_PROXY || process.env.TRUST_PROXY, true);
 }
-
