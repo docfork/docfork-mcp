@@ -31,7 +31,7 @@ function formatSearchResult(section: { url: string; title: string; content: stri
 export const getServer = () => {
   const server = new McpServer({
     name: "Docfork",
-    version: "1.3.4",
+    version: "1.4.0",
     websiteUrl: "https://docfork.com",
     icons: [
       {
