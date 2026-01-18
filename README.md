@@ -1,10 +1,9 @@
-![Cover](https://docfork.com/cover.png)
 
-[![Install MCP Server](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/en/install-mcp?name=docfork&config=eyJ1cmwiOiJodHRwczovL21jcC5kb2Nmb3JrLmNvbS9tY3AifQ%3D%3D) [<img alt="Install in VS Code (http)" src="https://img.shields.io/badge/Install%20in%20VS%20Code-0098FF?style=for-the-badge&logo=visualstudiocode&logoColor=white">](https://insiders.vscode.dev/redirect?url=vscode%3Amcp%2Finstall%3F%7B%22name%22%3A%22docfork%22%2C%22type%22%3A%22http%22%2C%22url%22%3A%22http%3A%2F%2Fmcp.docfork.com%2Fmcp%22%7D)
+[![Docfork cover](https://docfork.com/cover.png)](https://docfork.com)
 
 # Docfork MCP - Up-to-date Docs for AI Agents.
 
-[![Website](https://img.shields.io/badge/Website-docfork.com-%23F02A2B)](https://docfork.com) [![smithery badge](https://smithery.ai/badge/@docfork/mcp)](https://smithery.ai/server/@docfork/mcp) [![NPM Version](https://img.shields.io/npm/v/docfork?color=red)](https://www.npmjs.com/package/docfork) [![MIT licensed](https://img.shields.io/npm/l/docfork)](./LICENSE)
+[![Website](https://img.shields.io/badge/Website-docfork.com-%23F02A2B.svg?style=for-the-badge&labelColor=000)](https://docfork.com) [![Install in Cursor](https://img.shields.io/badge/Install-Cursor-000000.svg?style=for-the-badge&logo=cursor&labelColor=000)](https://cursor.com/en/install-mcp?name=docfork&config=eyJ1cmwiOiJodHRwczovL21jcC5kb2Nmb3JrLmNvbS9tY3AifQ%3D%3D) [![Install in VS Code](https://img.shields.io/badge/Install-VS%20Code-0098FF.svg?style=for-the-badge&logo=visualstudiocode&labelColor=000)](https://insiders.vscode.dev/redirect?url=vscode%3Amcp%2Finstall%3F%7B%22name%22%3A%22docfork%22%2C%22type%22%3A%22http%22%2C%22url%22%3A%22http%3A%2F%2Fmcp.docfork.com%2Fmcp%22%7D) [![NPM version](https://img.shields.io/npm/v/docfork.svg?style=for-the-badge&labelColor=000000&color=blue)](https://www.npmjs.com/package/docfork) [![License](https://img.shields.io/npm/l/docfork.svg?style=for-the-badge&labelColor=000000&color=brightgreen)](./LICENSE)
 
 ## ⚡ Why Docfork?
 
@@ -28,7 +27,7 @@ Standard AI models (Claude 4.5, GPT-5.1) have a knowledge cutoff. They don't kno
 
 Go to **[app.docfork.com](https://app.docfork.com/sign-up)**.
 
-- **Free Tier:** 1,000 requests/month org-wide (2x industry standard).
+- **Free Tier:** 1,000 requests/month org-wide.
 - **Team:** 5 free seats included.
 - **Pro Tier & Private Docs**: Coming soon 🚀
 
@@ -127,6 +126,22 @@ claude mcp add docfork -- npx -y docfork --api-key YOUR_API_KEY
 </details>
 
 **[See Installation for Other MCP Clients (VS Code, Windsurf, Claude Desktop, etc.) → ](https://docs.docfork.com/integrations/overview)**
+
+<details>
+<summary><b>OAuth Authentication</b></summary>
+
+Docfork MCP server supports OAuth 2.0 authentication for MCP clients that implement the [MCP OAuth specification](https://modelcontextprotocol.io/specification/latest/basic/authorization).
+
+To use OAuth, change the endpoint from `/mcp` to `/mcp/oauth` in your client configuration:
+
+```diff
+- "url": "https://mcp.docfork.com/mcp"
++ "url": "https://mcp.docfork.com/mcp/oauth"
+```
+
+OAuth is only available for remote HTTP connections. For local MCP connections using stdio transport, use API key authentication instead.
+
+</details>
 
 ### 3. Usage
 
