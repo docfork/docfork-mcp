@@ -34,19 +34,21 @@ Standard AI models (Claude 4.5, GPT-5.1) have a knowledge cutoff. They don't kno
 
 Grab a free key at **[app.docfork.com](https://app.docfork.com/signup)**.
 
-- **Free Tier:** Generous limit for individual devs.
-- **Team:** 5 free seats included.
+- **Free Tier:** 1,000 requests/month (per organization).
+- **Team:** 5 free seats included per org.
 - **Pro Tier & Private Docs**: Coming soon 🚀
 
 ### 2. Install MCP
 
 <details open>
-<summary><b>Cursor (One-Click)</b></summary>
+<summary><b>Cursor</b></summary>
 
 **Option A: One-Click**
+
 [![Install MCP Server](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/en/install-mcp?name=docfork&config=eyJ1cmwiOiJodHRwczovL21jcC5kb2Nmb3JrLmNvbS9tY3AifQ%3D%3D)
 
 **Option B: Manual (Remote)**
+
 Add to `Cursor Settings` > `Tools & MCP`:
 
 ```json
