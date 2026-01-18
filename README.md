@@ -6,7 +6,7 @@
 
 **Stop hallucinations, context bloat, and outdated APIs.**
 
-<a href="https://cursor.com/deeplink/mcp-install-dark.svg"><img src="https://cursor.com/deeplink/mcp-install-dark.svg" height="32" alt="Add to Cursor"/></a>&nbsp;&nbsp;<a href="https://app.docfork.com/signup"><img src="https://img.shields.io/badge/Get_Free_API_Key-F02A2B?style=for-the-badge&logo=fire&logoColor=white" height="32" alt="Get API Key"/></a>&nbsp;&nbsp;<a href="https://docfork.com"><img src="https://img.shields.io/badge/Read_The_Docs-181717?style=for-the-badge&logo=bookstack&logoColor=white" height="32" alt="Website"/></a>
+<a href="https://cursor.com/deeplink/mcp-install-dark.svg"><img src="https://cursor.com/deeplink/mcp-install-dark.svg" height="32" alt="Add to Cursor"/></a>&nbsp;&nbsp;<a href="https://app.docfork.com/signup"><img src="https://img.shields.io/badge/Get_Free_API_Key-F02A2B?style=for-the-badge&logo=fire&logoColor=white" height="32" alt="Get API Key"/></a>&nbsp;&nbsp;<a href="https://docs.docfork.com"><img src="https://img.shields.io/badge/Read_The_Docs-181717?style=for-the-badge&logo=bookstack&logoColor=white" height="32" alt="Website"/></a>
 
 [![NPM Downloads](https://img.shields.io/npm/dw/docfork?style=flat-square&color=333&labelColor=181717)](https://www.npmjs.com/package/docfork) [![NPM Version](https://img.shields.io/npm/v/docfork?style=flat-square&color=333&labelColor=181717)](https://www.npmjs.com/package/docfork) [![License](https://img.shields.io/npm/l/docfork?style=flat-square&color=333&labelColor=181717)](./LICENSE)
 
