@@ -30,17 +30,20 @@ jobs:
             VERSION="${{ inputs.version }}"
             VERSION="${VERSION#v}"
           else
-            VERSION=$(node -p "require('./package.json').version")
+            VERSION=$(node -p "require('./packages/mcp/package.json').version")
           fi
           echo "VERSION=$VERSION" >> $GITHUB_ENV
           echo "Publishing version: $VERSION"
 
       - name: Update server.json version
         run: |
+          cd packages/mcp
           echo $(jq --arg v "${{ env.VERSION }}" '.version = $v | .packages[0].version = $v' server.json) > server.json
 
       - name: Validate server.json
-        run: npx mcp-registry-validator validate server.json
+        run: |
+          cd packages/mcp
+          npx mcp-registry-validator validate server.json
 
       - name: Install MCP Publisher
         run: |
@@ -50,4 +53,6 @@ jobs:
         run: ./mcp-publisher login github-oidc
 
       - name: Publish to registry
-        run: ./mcp-publisher publish
+        run: |
+          cd packages/mcp
+          ../../mcp-publisher publish
