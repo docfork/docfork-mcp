@@ -3,6 +3,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { DocforkAuthConfig, resolveAuthConfig, authContext } from "./config.js";
+import { isJwt, validateJwt, shouldTrustProxyHeaders } from "./lib/jwt.js";
 
 const maxRequestBodyBytes = 1_000_000;
 
@@ -30,6 +31,27 @@ function isMcpEndpointPath(pathname: string): boolean {
 function isWellKnownMcpConfigPath(pathname: string): boolean {
   const normalized = normalizePathname(pathname);
   return normalized === "/.well-known/mcp-config" || normalized.endsWith("/.well-known/mcp-config");
+}
+
+function isWellKnownOauthProtectedResourcePath(pathname: string): boolean {
+  const normalized = normalizePathname(pathname);
+  return (
+    normalized === "/.well-known/oauth-protected-resource" ||
+    normalized.endsWith("/.well-known/oauth-protected-resource")
+  );
+}
+
+function isWellKnownOauthAuthorizationServerPath(pathname: string): boolean {
+  const normalized = normalizePathname(pathname);
+  return (
+    normalized === "/.well-known/oauth-authorization-server" ||
+    normalized.endsWith("/.well-known/oauth-authorization-server")
+  );
+}
+
+function isMcpOauthEndpointPath(pathname: string): boolean {
+  const normalized = normalizePathname(pathname);
+  return normalized === "/mcp/oauth" || normalized.endsWith("/mcp/oauth");
 }
 
 /**
@@ -113,6 +135,13 @@ function sendJsonError(
  * Handles X-Forwarded-For header for proxied requests.
  */
 function getClientIp(req: IncomingMessage): string | undefined {
+  if (!shouldTrustProxyHeaders()) {
+    if (req.socket?.remoteAddress) {
+      return req.socket.remoteAddress.replace(/^::ffff:/, "");
+    }
+    return undefined;
+  }
+
   const forwardedFor = req.headers["x-forwarded-for"] || req.headers["X-Forwarded-For"];
 
   if (forwardedFor) {
@@ -189,12 +218,18 @@ export async function startHttpServer(
     }
 
     try {
-      if (isMcpEndpointPath(pathname)) {
+      if (isMcpEndpointPath(pathname) || isMcpOauthEndpointPath(pathname)) {
+        // /mcp stays anonymous, /mcp/oauth requires auth
+        const requireAuth = isMcpOauthEndpointPath(pathname);
         let authConfig: DocforkAuthConfig;
         try {
+          const userAgent =
+            typeof req.headers["user-agent"] === "string" ? req.headers["user-agent"] : undefined;
           authConfig = {
             ...extractAuthConfigFromRequest(req),
             clientIp: getClientIp(req),
+            // forward client user-agent to api for attribution and debugging
+            clientInfo: userAgent,
             transport: "http",
           };
         } catch (error: any) {
@@ -202,8 +237,45 @@ export async function startHttpServer(
           return;
         }
 
-        if (!req.headers.accept?.includes("text/event-stream")) {
-          req.headers.accept = "application/json, text/event-stream";
+        // oauth discovery hint
+        // helps oauth-capable clients discover oauth metadata endpoints
+        const RESOURCE_URL = "https://mcp.docfork.com";
+        const baseUrl = new URL(RESOURCE_URL).origin;
+        res.setHeader(
+          "WWW-Authenticate",
+          `Bearer resource_metadata="${baseUrl}/.well-known/oauth-protected-resource"`
+        );
+
+        // require auth for /mcp/oauth
+        if (requireAuth && !authConfig.apiKey) {
+          sendJsonError(
+            res,
+            401,
+            -32001,
+            "Authentication required. Please authenticate to use this MCP server."
+          );
+          return;
+        }
+
+        // jwt validation only for oauth-protected route
+        // note: current docfork auth uses docf_ api keys; jwt is for oauth tokens
+        if (requireAuth) {
+          if (authConfig.apiKey && isJwt(authConfig.apiKey)) {
+            const result = await validateJwt(authConfig.apiKey, { requireSignature: true });
+            if (!result.valid) {
+              sendJsonError(res, 401, -32001, result.error);
+              return;
+            }
+          }
+        }
+
+        // ensure accept header includes required content types for mcp
+        // note: some clients send only application/json; sdk requires text/event-stream too
+        const currentAccept = req.headers.accept || "";
+        if (!currentAccept.includes("text/event-stream")) {
+          req.headers.accept = currentAccept
+            ? `${currentAccept}, text/event-stream`
+            : "application/json, text/event-stream";
         }
 
         let requestBody: any | undefined;
@@ -229,11 +301,14 @@ export async function startHttpServer(
             : standardServerFactory;
 
           const transport = new StreamableHTTPServerTransport({
+          // stateless: do not issue mcp-session-id
             sessionIdGenerator: undefined,
+          // prefer single json response when possible
             enableJsonResponse: true,
           });
 
           res.on("close", () => {
+          // ensure transport cleanup on client disconnect
             transport.close();
           });
 
@@ -264,6 +339,55 @@ export async function startHttpServer(
         };
         res.writeHead(200, { "Content-Type": "application/json" });
         res.end(JSON.stringify({ configSchema }, null, 2));
+      } else if (isWellKnownOauthProtectedResourcePath(pathname) && req.method === "GET") {
+        // protected resource metadata (rfc 9728)
+        const RESOURCE_URL = "https://mcp.docfork.com";
+        const AUTH_SERVER_URL = "https://login.docfork.com";
+
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(
+          JSON.stringify(
+            {
+              resource: RESOURCE_URL,
+              authorization_servers: [AUTH_SERVER_URL],
+              scopes_supported: ["profile", "email"],
+              bearer_methods_supported: ["header"],
+            },
+            null,
+            2
+          )
+        );
+      } else if (isWellKnownOauthAuthorizationServerPath(pathname) && req.method === "GET") {
+        // authorization server metadata proxy
+        const AUTH_SERVER_URL = "https://login.docfork.com";
+
+        try {
+          // proxy instead of hosting oauth server here
+          const upstream = await fetch(`${AUTH_SERVER_URL}/.well-known/oauth-authorization-server`);
+          if (!upstream.ok) {
+            res.writeHead(upstream.status, { "Content-Type": "application/json" });
+            res.end(
+              JSON.stringify(
+                { error: "upstream_error", message: "Failed to fetch authorization server metadata" },
+                null,
+                2
+              )
+            );
+            return;
+          }
+          const metadata = await upstream.json();
+          res.writeHead(200, { "Content-Type": "application/json" });
+          res.end(JSON.stringify(metadata, null, 2));
+        } catch {
+          res.writeHead(502, { "Content-Type": "application/json" });
+          res.end(
+            JSON.stringify(
+              { error: "proxy_error", message: "Failed to proxy authorization server metadata" },
+              null,
+              2
+            )
+          );
+        }
       } else {
         res.writeHead(404, { "Content-Type": "application/json" });
         res.end(

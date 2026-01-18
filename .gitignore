@@ -6,3 +6,4 @@ key.pem
 .cursor/
 .docfork/
 .claude/
+.env*

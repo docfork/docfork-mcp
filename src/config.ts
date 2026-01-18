@@ -83,6 +83,7 @@ export interface DocforkAuthConfig {
   apiKey?: string;
   cabinet?: string;
   clientIp?: string;
+  clientInfo?: string;
   transport: "stdio" | "http";
 }
 
