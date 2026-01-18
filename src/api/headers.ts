@@ -12,6 +12,10 @@ export function generateHeaders(auth?: DocforkAuthConfig): Record<string, string
     accept: "application/json",
   };
 
+  if (auth?.clientInfo) {
+    headers["X-Docfork-Client-Info"] = auth.clientInfo;
+  }
+
   if (auth?.apiKey) {
     headers["Authorization"] = `Bearer ${auth.apiKey}`;
   }

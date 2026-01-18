@@ -25,23 +25,23 @@ export default [
     plugins: {
       "@typescript-eslint": typescriptEslint,
     },
-      languageOptions: {
-        parser: tsParser,
-        ecmaVersion: "latest",
-        sourceType: "module",
-        globals: {
-          ...globals.node,
-          ...globals.es2021,
-          NodeJS: "readonly",
-        },
+    languageOptions: {
+      parser: tsParser,
+      ecmaVersion: "latest",
+      sourceType: "module",
+      globals: {
+        ...globals.node,
+        ...globals.es2021,
+        NodeJS: "readonly",
       },
+    },
     rules: {
       // Include TypeScript recommended rules
       ...typescriptEslint.configs.recommended.rules,
 
       // Custom TypeScript rules
       "@typescript-eslint/no-unused-vars": "error",
-      "@typescript-eslint/no-explicit-any": "warn",
+      "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/explicit-function-return-type": "off",
       "@typescript-eslint/explicit-module-boundary-types": "off",
       "@typescript-eslint/no-inferrable-types": "off",
