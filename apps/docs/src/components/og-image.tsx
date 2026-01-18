@@ -4,11 +4,7 @@ interface DocforkOGProps {
   logoUrl: string;
 }
 
-export default function DocforkOG({
-  title,
-  description,
-  logoUrl,
-}: DocforkOGProps) {
+export default function DocforkOG({ title, description, logoUrl }: DocforkOGProps) {
   // truncate title if too long (max 2 lines)
   const truncateTitle = (text: string, maxLength: number = 50) => {
     if (text.length <= maxLength) return text;
@@ -131,8 +127,7 @@ export default function DocforkOG({
         style={{
           width: "20%",
           height: "100%",
-          background:
-            "linear-gradient(180deg, #ff8e8e 0%, #ff0000 40%, #b50000 100%)",
+          background: "linear-gradient(180deg, #ff8e8e 0%, #ff0000 40%, #b50000 100%)",
         }}
       />
     </div>

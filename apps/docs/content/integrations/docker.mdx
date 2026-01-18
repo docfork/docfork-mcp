@@ -5,7 +5,7 @@ description: Run Docfork MCP with Docker
 
 1. Create a `Dockerfile`:
 
-```dockerfile  theme={null}
+```dockerfile theme={null}
 FROM node:18-alpine
 WORKDIR /app
 RUN npm install -g docfork
@@ -14,13 +14,13 @@ CMD ["docfork"]
 
 2. Build the image:
 
-```bash  theme={null}
+```bash theme={null}
 docker build -t docfork .
 ```
 
 3. Configure your MCP client:
 
-```json  theme={null}
+```json theme={null}
 {
   "mcpServers": {
     "docfork": {

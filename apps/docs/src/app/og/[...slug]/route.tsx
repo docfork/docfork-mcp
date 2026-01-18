@@ -28,10 +28,7 @@ async function getPersistentImages(): Promise<PersistentImage[]> {
   return persistentImages;
 }
 
-export async function GET(
-  _req: Request,
-  { params }: RouteContext<"/og/[...slug]">
-) {
+export async function GET(_req: Request, { params }: RouteContext<"/og/[...slug]">) {
   const { slug } = await params;
   const page = source.getPage(slug.slice(0, -1));
   if (!page) notFound();
@@ -39,13 +36,11 @@ export async function GET(
   const images = await getPersistentImages();
 
   return new ImageResponse(
-    (
-      <DocforkOG
-        title={page.data.title}
-        description={page.data.description}
-        logoUrl="docfork-logo"
-      />
-    ),
+    <DocforkOG
+      title={page.data.title}
+      description={page.data.description}
+      logoUrl="docfork-logo"
+    />,
     {
       width: 1200,
       height: 630,

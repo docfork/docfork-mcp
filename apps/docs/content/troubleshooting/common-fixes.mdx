@@ -15,10 +15,9 @@ Before diving into specific issues, verify these basics:
 - Add your API key to the configuration if you hit rate limits
 
 <Callout title="Skip Node.js issues entirely" type="info">
-  Use the remote server connection instead of local npx. Most MCP clients
-  support connecting to `https://mcp.docfork.com/mcp` directly, which requires
-  no local Node.js installation. See [All MCP Clients](/integrations/overview)
-  for configuration examples.
+  Use the remote server connection instead of local npx. Most MCP clients support connecting to
+  `https://mcp.docfork.com/mcp` directly, which requires no local Node.js installation. See [All MCP
+  Clients](/integrations/overview) for configuration examples.
 </Callout>
 
 ## Common Fixes
@@ -122,9 +121,8 @@ Remove the `MCP_TRANSPORT` environment variable to use the default stdio transpo
 **Option 2: Automatic port allocation**
 
 <Callout title="Tip" type="info">
-  The server automatically finds an available port if the default port is in
-  use. You'll see a message like: ``` Port 3000 is already in use, using port
-  3001 instead ```
+  The server automatically finds an available port if the default port is in use. You'll see a
+  message like: ``` Port 3000 is already in use, using port 3001 instead ```
 </Callout>
 
 **Option 3: Configure a custom port**
@@ -172,7 +170,6 @@ If you're on an older version, update Node.js from [nodejs.org](https://nodejs.o
 Switch to the **Remote** connection (`https://mcp.docfork.com/mcp`). This offloads the processing to our cloud servers, which are optimized for sub-second retrieval.
 
 <Callout title="Still stuck?" type="error">
-  If you can't resolve the issue, contact us at
-  [support@docfork.com](mailto:support@docfork.com) or raise a [GitHub
-  issue](https://github.com/docfork/docs/issues).
+  If you can't resolve the issue, contact us at [support@docfork.com](mailto:support@docfork.com) or
+  raise a [GitHub issue](https://github.com/docfork/docs/issues).
 </Callout>

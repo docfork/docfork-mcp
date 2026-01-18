@@ -7,7 +7,7 @@ Use these alternatives to run the local Docfork MCP server with other runtimes.
 
 #### Bun
 
-```json  theme={null}
+```json theme={null}
 {
   "mcpServers": {
     "docfork": {
@@ -20,17 +20,12 @@ Use these alternatives to run the local Docfork MCP server with other runtimes.
 
 #### Deno
 
-```json  theme={null}
+```json theme={null}
 {
   "mcpServers": {
     "docfork": {
       "command": "deno",
-      "args": [
-        "run",
-        "--allow-env=NO_DEPRECATION,TRACE_DEPRECATION",
-        "--allow-net",
-        "npm:docfork"
-      ]
+      "args": ["run", "--allow-env=NO_DEPRECATION,TRACE_DEPRECATION", "--allow-net", "npm:docfork"]
     }
   }
 }

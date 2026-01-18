@@ -18,10 +18,7 @@ export function getPageImage(page: InferPageType<typeof source>) {
   };
 }
 
-export async function getLLMText(
-  page: InferPageType<typeof source>,
-  baseUrl?: string
-) {
+export async function getLLMText(page: InferPageType<typeof source>, baseUrl?: string) {
   const processed = await page.data.getText("processed");
 
   // remove import statements from markdown (handles various formats)
