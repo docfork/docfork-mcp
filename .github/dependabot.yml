@@ -14,12 +14,12 @@ updates:
       interval: monthly
     open-pull-requests-limit: 5
 
-  # docs app (fumadocs) - coming soon
-  # - package-ecosystem: npm
-  #   directory: /apps/docs
-  #   schedule:
-  #     interval: monthly
-  #   open-pull-requests-limit: 5
+  # docs app
+  - package-ecosystem: npm
+    directory: /apps/docs
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 5
 
   # docker (mcp package)
   - package-ecosystem: docker

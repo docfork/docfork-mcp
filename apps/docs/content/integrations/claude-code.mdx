@@ -1,0 +1,18 @@
+---
+title: Claude Code
+description: Install Docfork MCP in Claude Code
+---
+
+Run this command. See [Claude Code MCP docs](https://docs.anthropic.com/en/docs/claude-code/mcp) for more info.
+
+#### Local Server Connection
+
+```sh theme={null}
+claude mcp add docfork -- npx -y docfork --api-key YOUR_API_KEY
+```
+
+#### Remote Server Connection
+
+```sh theme={null}
+claude mcp add --transport http docfork https://mcp.docfork.com/mcp --header "DOCFORK_API_KEY: YOUR_API_KEY"
+```

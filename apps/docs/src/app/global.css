@@ -1,0 +1,53 @@
+@import 'tailwindcss';
+@import 'fumadocs-ui/css/neutral.css';
+@import 'fumadocs-ui/css/preset.css';
+
+/* add right border to sidebar in notebook layout */
+aside {
+  border-right: 1px solid var(--color-fd-border);
+}
+
+/* decrease max-width for main content in notebook layout */
+#nd-page > div,
+main > div[class*="max-w"] {
+  max-width: 48rem !important; /* adjust as needed: 40rem (640px), 48rem (768px), 56rem (896px), etc. */
+}
+
+/* custom oklch colors for nav-buttons */
+:root {
+  --docfork: oklch(0.616 0.2299 27.17);
+  --docfork-hover: oklch(0.66528 0.2299 27.17);
+}
+
+/* increase lightness of background in light mode only */
+:root:not(.dark) {
+  --color-fd-background: hsl(0, 0%, 100%);
+}
+
+@theme {
+  --color-docfork: var(--docfork);
+}
+
+.btn-primary {
+  background-color: var(--docfork);
+  color: var(--color-docfork-foreground);
+}
+
+/* nav-buttons specific styles */
+.bg-docfork {
+  background-color: var(--docfork);
+  color: oklch(0.98 0 0);
+}
+
+.bg-docfork:hover {
+  background-color: var(--docfork-hover);
+}
+
+.hover\:bg-docfork\/80:hover {
+  background-color: var(--docfork-hover);
+}
+
+/* header font weights */
+h1 , h2, h3, h4, h5, h6 {
+  font-weight: 500; /* medium */
+}

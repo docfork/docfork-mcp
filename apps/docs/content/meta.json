@@ -1,0 +1,24 @@
+{
+  "pages": [
+    "---Get Started---",
+    "index",
+    "get-started/installation",
+    "---Core---",
+    "core/cabinets",
+    "---Context & Control---",
+    "context/rules",
+    "context/identifiers",
+    "---Integrations---",
+    "integrations/overview",
+    "integrations/cursor",
+    "integrations/vscode",
+    "integrations/windsurf",
+    "integrations/claude-desktop",
+    "integrations/opencode",
+    "---Troubleshooting---",
+    "troubleshooting/common-fixes",
+    "troubleshooting/platform-specific",
+    "troubleshooting/client-specific",
+    "troubleshooting/debugging"
+  ]
+}
