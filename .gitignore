@@ -7,3 +7,9 @@ key.pem
 .docfork/
 .claude/
 .env*
+
+# turborepo
+.turbo
+
+# pnpm
+.pnpm-store/
