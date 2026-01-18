@@ -96,6 +96,7 @@ export default function DocforkOG({ title, description, logoUrl }: DocforkOGProp
               width: 68,
             }}
           >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={logoUrl}
               alt="Docfork Logo"
