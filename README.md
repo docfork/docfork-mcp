@@ -2,7 +2,7 @@
 
 [![Docfork cover](https://docfork.com/cover.png)](https://docfork.com)
 
-# Docfork MCP 
+# Docfork MCP
 
 **Stop hallucinations, context bloat, and outdated APIs.**
 
