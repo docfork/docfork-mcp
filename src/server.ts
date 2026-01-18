@@ -1,13 +1,10 @@
 import { createServer, IncomingMessage, ServerResponse, Server } from "http";
-import { randomUUID } from "crypto";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { isInitializeRequest } from "@modelcontextprotocol/sdk/types.js";
 import { DocforkAuthConfig, resolveAuthConfig, authContext } from "./config.js";
 
-// Map to store transports by session ID
-const transports: Record<string, StreamableHTTPServerTransport> = {};
+const maxRequestBodyBytes = 1_000_000;
 
 /**
  * Normalize a URL pathname for routing.
@@ -36,7 +33,7 @@ function isWellKnownMcpConfigPath(pathname: string): boolean {
 }
 
 /**
- * Detect client type from initialization request
+ * detect client type from request body
  */
 function detectClientType(requestBody: any): string {
   const clientInfo = requestBody?.params?.clientInfo;
@@ -65,13 +62,21 @@ function isOpenAIClient(requestBody: any, userAgent?: string): boolean {
 }
 
 /**
- * Parse request body as JSON
+ * parse request body as json with size cap
  */
 async function parseRequestBody(req: IncomingMessage): Promise<any> {
   return new Promise((resolve, reject) => {
     let body = "";
+    let seenBytes = 0;
     req.on("data", (chunk) => {
-      body += chunk.toString();
+      const text = chunk.toString();
+      seenBytes += Buffer.byteLength(text);
+      if (seenBytes > maxRequestBodyBytes) {
+        req.destroy();
+        reject(new Error("Request body too large"));
+        return;
+      }
+      body += text;
     });
     req.on("end", () => {
       try {
@@ -82,16 +87,6 @@ async function parseRequestBody(req: IncomingMessage): Promise<any> {
     });
     req.on("error", reject);
   });
-}
-
-/**
- * Get information about active sessions (for debugging/monitoring)
- */
-function getSessionInfo() {
-  return {
-    activeSessions: Object.keys(transports).length,
-    sessionIds: Object.keys(transports),
-  };
 }
 
 /**
@@ -159,212 +154,6 @@ function extractAuthConfigFromRequest(req: IncomingMessage): DocforkAuthConfig {
 }
 
 /**
- * Handle MCP POST requests
- */
-async function handleMcpPost(
-  req: IncomingMessage,
-  res: ServerResponse,
-  standardServerFactory: () => McpServer,
-  openaiServerFactory: () => McpServer
-): Promise<void> {
-  const sessionId = req.headers["mcp-session-id"] as string | undefined;
-
-  // Extract and resolve auth config from request headers
-  let authConfig: DocforkAuthConfig;
-  try {
-    authConfig = {
-      ...extractAuthConfigFromRequest(req),
-      clientIp: getClientIp(req),
-      transport: "http",
-    };
-  } catch (error: any) {
-    // validation error (e.g., cabinet without api key)
-    sendJsonError(res, 400, -32602, error.message || "Invalid configuration");
-    return;
-  }
-
-  // Ensure Accept header includes required content types for MCP
-  if (!req.headers.accept?.includes("text/event-stream")) {
-    req.headers.accept = "application/json, text/event-stream";
-  }
-
-  // Parse request body
-  let requestBody: any;
-  try {
-    requestBody = await parseRequestBody(req);
-  } catch {
-    sendJsonError(res, 400, -32700, "Parse error");
-    return;
-  }
-
-  try {
-    let transport: StreamableHTTPServerTransport;
-
-    if (sessionId && transports[sessionId]) {
-      // reuse existing transport
-      transport = transports[sessionId];
-    } else if (!sessionId && isInitializeRequest(requestBody)) {
-      // new initialization request - create new session
-      const newSessionId = randomUUID();
-
-      // Detect client type and select appropriate server factory
-      const clientType = detectClientType(requestBody);
-      console.log(`Client info: ${clientType}`);
-
-      const serverFactory = isOpenAIClient(requestBody, req.headers["user-agent"])
-        ? openaiServerFactory
-        : standardServerFactory;
-
-      transport = new StreamableHTTPServerTransport({
-        sessionIdGenerator: () => newSessionId,
-        // prefer json responses when possible; avoids long-lived sse connections in proxies
-        enableJsonResponse: true,
-        onsessioninitialized: (sid) => {
-          console.log(`Session initialized with ID: ${sid}`);
-          transports[sid] = transport;
-        },
-      });
-
-      // set up onclose handler to clean up transport when closed
-      transport.onclose = () => {
-        const sid = transport.sessionId;
-        if (sid && transports[sid]) {
-          console.log(`Transport closed for session ${sid}, removing from transports map`);
-          delete transports[sid];
-        }
-      };
-
-      // Run within AsyncLocalStorage context so auth flows automatically to tools
-      await authContext.run(authConfig, async () => {
-        // connect the transport to the MCP server BEFORE handling the request
-        // so responses can flow back through the same transport
-        const server = serverFactory();
-        await server.connect(transport);
-        await transport.handleRequest(req, res, requestBody);
-      });
-      return;
-    } else {
-      // invalid request - no session ID and not an initialize request
-      sendJsonError(
-        res,
-        sessionId ? 404 : 400,
-        -32000,
-        sessionId ? "Session not found" : "Bad Request: No valid session ID provided"
-      );
-      return;
-    }
-
-    // Handle request with existing transport - no need to reconnect
-    // the existing transport is already connected to the server
-    // Run within AsyncLocalStorage context for this request
-    await authContext.run(authConfig, async () => {
-      await transport.handleRequest(req, res, requestBody);
-    });
-  } catch (error) {
-    console.error("Error handling MCP request:", error);
-    if (!res.headersSent) {
-      sendJsonError(res, 500, -32603, "Internal server error");
-    }
-  }
-}
-
-/**
- * Handle MCP GET requests for SSE streams
- */
-async function handleMcpGet(
-  req: IncomingMessage,
-  res: ServerResponse,
-  standardServerFactory: () => McpServer,
-  openaiServerFactory: () => McpServer
-): Promise<void> {
-  const sessionId = req.headers["mcp-session-id"] as string | undefined;
-
-  if (sessionId) {
-    // unknown session ids should yield 404
-    if (!transports[sessionId]) {
-      res.writeHead(404, { "Content-Type": "text/plain" });
-      res.end("Session not found");
-      return;
-    }
-
-    // check for Last-Event-ID header for resumability
-    const lastEventId = req.headers["last-event-id"] as string | undefined;
-    if (lastEventId) {
-      console.log(`Client reconnecting with Last-Event-ID: ${lastEventId}`);
-    } else {
-      console.log(`Establishing new SSE stream for session ${sessionId}`);
-    }
-
-    await transports[sessionId].handleRequest(req, res);
-    return;
-  }
-
-  // stateless get for clients without sessions
-  let authConfig: DocforkAuthConfig;
-  try {
-    authConfig = {
-      ...extractAuthConfigFromRequest(req),
-      clientIp: getClientIp(req),
-      transport: "http",
-    };
-  } catch (error: any) {
-    sendJsonError(res, 400, -32602, error.message || "Invalid configuration");
-    return;
-  }
-
-  const clientType = detectClientType(undefined);
-  console.log(`Client info: ${clientType}`);
-  const serverFactory = isOpenAIClient(undefined, req.headers["user-agent"])
-    ? openaiServerFactory
-    : standardServerFactory;
-  const transport = new StreamableHTTPServerTransport({
-    enableJsonResponse: true,
-  });
-
-  res.on("close", () => {
-    transport.close();
-  });
-
-  await authContext.run(authConfig, async () => {
-    const server = serverFactory();
-    await server.connect(transport);
-    await transport.handleRequest(req, res);
-  });
-}
-
-/**
- * Handle MCP DELETE requests for session termination
- */
-async function handleMcpDelete(req: IncomingMessage, res: ServerResponse): Promise<void> {
-  const sessionId = req.headers["mcp-session-id"] as string | undefined;
-
-  if (!sessionId) {
-    res.writeHead(400, { "Content-Type": "text/plain" });
-    res.end("Missing session ID");
-    return;
-  }
-
-  // unknown session ids should yield 404
-  if (!transports[sessionId]) {
-    res.writeHead(404, { "Content-Type": "text/plain" });
-    res.end("Session not found");
-    return;
-  }
-
-  console.log(`Received session termination request for session ${sessionId}`);
-
-  try {
-    await transports[sessionId].handleRequest(req, res);
-  } catch (error) {
-    console.error("Error handling session termination:", error);
-    if (!res.headersSent) {
-      res.writeHead(500, { "Content-Type": "text/plain" });
-      res.end("Error processing session termination");
-    }
-  }
-}
-
-/**
  * Start the HTTP server with the given server factories
  * automatically finds an available port if the requested port is in use
  */
@@ -387,9 +176,9 @@ export async function startHttpServer(
     res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS, DELETE");
     res.setHeader(
       "Access-Control-Allow-Headers",
-      "Content-Type, Accept, Accept-Encoding, MCP-Session-Id, mcp-session-id, MCP-Protocol-Version, Authorization, X-Docfork-Cabinet, DOCFORK_API_KEY, DOCFORK_CABINET, Docfork-Api-Key, Docfork-Cabinet, docfork_api_key, docfork_cabinet, Last-Event-ID, x-custom-auth-headers, X-Custom-Auth-Headers"
+      "Content-Type, Accept, Accept-Encoding, MCP-Protocol-Version, Authorization, X-Docfork-Cabinet, DOCFORK_API_KEY, DOCFORK_CABINET, Docfork-Api-Key, Docfork-Cabinet, docfork_api_key, docfork_cabinet, Last-Event-ID, x-custom-auth-headers, X-Custom-Auth-Headers"
     );
-    res.setHeader("Access-Control-Expose-Headers", "MCP-Session-Id, mcp-session-id");
+    res.setHeader("Access-Control-Expose-Headers", "");
     res.setHeader("Access-Control-Max-Age", "86400"); // 24 hours
 
     // Handle preflight OPTIONS requests early
@@ -401,23 +190,71 @@ export async function startHttpServer(
 
     try {
       if (isMcpEndpointPath(pathname)) {
+        let authConfig: DocforkAuthConfig;
+        try {
+          authConfig = {
+            ...extractAuthConfigFromRequest(req),
+            clientIp: getClientIp(req),
+            transport: "http",
+          };
+        } catch (error: any) {
+          sendJsonError(res, 400, -32602, error.message || "Invalid configuration");
+          return;
+        }
+
+        if (!req.headers.accept?.includes("text/event-stream")) {
+          req.headers.accept = "application/json, text/event-stream";
+        }
+
+        let requestBody: any | undefined;
         if (req.method === "POST") {
-          await handleMcpPost(req, res, standardServerFactory, openaiServerFactory);
-        } else if (req.method === "GET") {
-          await handleMcpGet(req, res, standardServerFactory, openaiServerFactory);
-        } else if (req.method === "DELETE") {
-          await handleMcpDelete(req, res);
-        } else {
-          res.writeHead(405, { "Content-Type": "text/plain" });
-          res.end("Method not allowed");
+          try {
+            requestBody = await parseRequestBody(req);
+          } catch (error: any) {
+            if (error?.message === "Request body too large") {
+              sendJsonError(res, 413, -32700, "Request body too large");
+              return;
+            }
+            sendJsonError(res, 400, -32700, "Parse error");
+            return;
+          }
+        }
+
+        try {
+          const clientType = detectClientType(requestBody);
+          console.log(`Client info: ${clientType}`);
+
+          const serverFactory = isOpenAIClient(requestBody, req.headers["user-agent"])
+            ? openaiServerFactory
+            : standardServerFactory;
+
+          const transport = new StreamableHTTPServerTransport({
+            sessionIdGenerator: undefined,
+            enableJsonResponse: true,
+          });
+
+          res.on("close", () => {
+            transport.close();
+          });
+
+          await authContext.run(authConfig, async () => {
+            const server = serverFactory();
+            await server.connect(transport);
+            if (requestBody !== undefined) {
+              await transport.handleRequest(req, res, requestBody);
+            } else {
+              await transport.handleRequest(req, res);
+            }
+          });
+        } catch (error) {
+          console.error("Error handling MCP request:", error);
+          if (!res.headersSent) {
+            sendJsonError(res, 500, -32603, "Internal server error");
+          }
         }
       } else if (pathname === "/ping") {
         res.writeHead(200, { "Content-Type": "text/plain" });
         res.end("pong");
-      } else if (pathname === "/sessions" && req.method === "GET") {
-        // Return session information for monitoring
-        res.writeHead(200, { "Content-Type": "application/json" });
-        res.end(JSON.stringify(getSessionInfo(), null, 2));
       } else if (isWellKnownMcpConfigPath(pathname) && req.method === "GET") {
         // Return MCP configuration schema for server discovery
         const configSchema = {
@@ -428,8 +265,17 @@ export async function startHttpServer(
         res.writeHead(200, { "Content-Type": "application/json" });
         res.end(JSON.stringify({ configSchema }, null, 2));
       } else {
-        res.writeHead(404);
-        res.end("Not found");
+        res.writeHead(404, { "Content-Type": "application/json" });
+        res.end(
+          JSON.stringify(
+            {
+              error: "not_found",
+              message: "Endpoint not found. Use /mcp for MCP protocol communication.",
+            },
+            null,
+            2
+          )
+        );
       }
     } catch (error) {
       console.error("Error handling request:", error);
@@ -464,7 +310,6 @@ export async function startHttpServer(
           console.error(`Docfork MCP Server running on HTTP:`);
           console.error(`  • HTTP endpoint: http://localhost:${finalPort}/mcp`);
           console.error(`  • Health check: http://localhost:${finalPort}/ping`);
-          console.error(`  • Session info: http://localhost:${finalPort}/sessions`);
           resolve();
         });
       });
@@ -492,17 +337,6 @@ export async function startHttpServer(
   // Handle graceful shutdown
   const shutdown = async () => {
     console.log("Shutting down server...");
-    for (const sid in transports) {
-      try {
-        const transport = transports[sid];
-        if (transport?.close) {
-          await transport.close();
-        }
-        delete transports[sid];
-      } catch (error) {
-        console.error(`Error closing transport for session ${sid}:`, error);
-      }
-    }
     console.log("Server shutdown complete");
     process.exit(0);
   };
