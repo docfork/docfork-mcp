@@ -32,9 +32,9 @@ Standard AI models (Claude 4.5, GPT-5.1) have a knowledge cutoff. They don't kno
 
 ### 1. Get your Free API Key
 
-Go to **[app.docfork.com](https://app.docfork.com/signup)**.
+Grab a free key at **[app.docfork.com](https://app.docfork.com/signup)**.
 
-- **Free Tier:** 1,000 requests/month org-wide.
+- **Free Tier:** Generous limit for individual devs.
 - **Team:** 5 free seats included.
 - **Pro Tier & Private Docs**: Coming soon 🚀
 
@@ -43,13 +43,11 @@ Go to **[app.docfork.com](https://app.docfork.com/signup)**.
 <details open>
 <summary><b>Cursor (One-Click)</b></summary>
 
-1. Click the button below:
-
+**Option A: One-Click**
 [![Install MCP Server](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/en/install-mcp?name=docfork&config=eyJ1cmwiOiJodHRwczovL21jcC5kb2Nmb3JrLmNvbS9tY3AifQ%3D%3D)
 
-2. Or manually add to `Cursor Settings` > `Tools & MCP` > `New MCP Server`:
-
-**Remote (Recommended):**
+**Option B: Manual (Remote)**
+Add to `Cursor Settings` > `Tools & MCP`:
 
 ```json
 {
@@ -64,7 +62,7 @@ Go to **[app.docfork.com](https://app.docfork.com/signup)**.
 }
 ```
 
-**Local:**
+**Option C: Manual (Local)**
 
 ```json
 {
@@ -79,8 +77,9 @@ Go to **[app.docfork.com](https://app.docfork.com/signup)**.
 
 </details>
 
-<details open>
+<details>
 <summary><b>Claude Code</b></summary>
+<br>
 
 **Remote:**
 
@@ -96,77 +95,55 @@ claude mcp add docfork -- npx -y docfork --api-key YOUR_API_KEY
 
 </details>
 
-<details open>
-<summary><b>Opencode</b></summary>
-
-**Remote:**
-
-```json
-{
-  "mcp": {
-    "docfork": {
-      "type": "remote",
-      "url": "https://mcp.docfork.com/mcp",
-      "headers": {
-        "DOCFORK_API_KEY": "YOUR_API_KEY"
-      },
-      "enabled": true
-    }
-  }
-}
-```
-
-**Local:**
-
-```json
-{
-  "mcp": {
-    "docfork": {
-      "type": "local",
-      "command": ["npx", "-y", "docfork", "--api-key", "YOUR_API_KEY"],
-      "enabled": true
-    }
-  }
-}
-```
-
-</details>
-
-**[See Installation for Other MCP Clients (VS Code, Windsurf, Claude Desktop, etc.) → ](https://docs.docfork.com/integrations/overview)**
-
 <details>
-<summary><b>OAuth Authentication</b></summary>
+<summary><b>OAuth Setup (Alternative)</b></summary>
+<br>
 
-Docfork MCP server supports OAuth 2.0 authentication for MCP clients that implement the [MCP OAuth specification](https://modelcontextprotocol.io/specification/latest/basic/authorization).
-
-To use OAuth, change the endpoint from `/mcp` to `/mcp/oauth` in your client configuration:
+Docfork supports [MCP OAuth specs](https://modelcontextprotocol.io/specification/latest/basic/authorization). Change your endpoint to use OAuth:
 
 ```diff
 - "url": "https://mcp.docfork.com/mcp"
 + "url": "https://mcp.docfork.com/mcp/oauth"
 ```
 
-OAuth is only available for remote HTTP connections. For local MCP connections using stdio transport, use API key authentication instead.
+_Note: OAuth is for remote HTTP connections only. [View OAuth Guide →](https://docs.docfork.com/core/authentication)_
 
 </details>
 
+**[See Setup for Opencode, Windsurf, and 30+ others →](https://docs.docfork.com/integrations/overview)**
+
 ### 3. Usage
 
-Just tell your AI to `use docfork`:
+Tell your AI to fetch specific, version-accurate documentation for your stack:
 
 ```txt
-Create a basic Next.js app with the App Router. use docfork
+Implement a secure authentication flow using Better Auth and Supabase. use docfork
 ```
+
+```txt
+Create a responsive dashboard layout with Tailwind CSS and shadcn/ui. use docfork
+```
+
+### 4. Automate (Step 4)
+
+Don't want to type `use docfork` every time? Add a rule to make your AI fetch docs automatically.
+
+**[Add Rule to Cursor (One-Click)](https://cursor.com/link/rule?name=docfork-policy&text=You+have+access+to+the+docfork+MCP+server.+To+ensure+the+code+you+write+is+accurate+and+up-to-date%2C+you+must+follow+these+requirements%3A%0A%0A1.+Auto-Invoke%3A+Always+use+%60docfork_search_docs%60+when+asked+for+library+implementation%2C+API+setup%2C+or+debugging.%0A2.+Context+Strategy%3A%0A+++-+Search%3A+Call+%60docfork_search_docs%60.+Review+the+%60content%60+snippets+in+the+results.%0A+++-+Read%3A+Only+call+%60docfork_read_url%60+if+the+search+snippets+are+incomplete+or+you+need+the+full+file+context+for+a+complex+implementation.%0A+++-+Identity%3A+Use+the+%60docforkIdentifier%60+in+follow-up+searches+to+narrow+results+to+a+specific+library.%0A%0AIf+you+are+unsure+of+a+library%27s+latest+syntax%2C+search+with+docfork+first.)** — or [configure manually](https://docs.docfork.com/context/rules).
+
+Once enabled, your AI will automatically fetch the latest docs when you ask questions like:
+
+```txt
+Add a Prisma schema for a multi-tenant SaaS and generate the client.
+```
+
+---
 
 ## 🛡️ The Docfork Difference: Cabinets
 
-Unlike other tools that search the "entire internet" and return bloated results, Docfork lets you create **Cabinets**.
-
-Cabinets are curated, private indexes specific to your project stack.
+**Stop searching the entire internet.** Other MCP servers treat documentation like a noisy Google search. Docfork **Cabinets** hard-lock your AI to your specific stack (e.g., "Only use Tailwind v4 and React 19").
 
 1. Create a Cabinet in your **[Dashboard](https://app.docfork.com/signup)**.
-2. Add the libraries you need.
-3. Add the `DOCFORK_CABINET` header to your MCP config.
+2. Add the `DOCFORK_CABINET` header to your config:
 
 ```json
 {
@@ -175,72 +152,33 @@ Cabinets are curated, private indexes specific to your project stack.
       "url": "https://mcp.docfork.com/mcp",
       "headers": {
         "DOCFORK_API_KEY": "YOUR_API_KEY",
-        "DOCFORK_CABINET": "general"
+        "DOCFORK_CABINET": "my-project-stack"
       }
     }
   }
 }
 ```
 
-Now your AI knows you mean **Better Auth**, not Firebase or Auth0, because it's **_locked to your Cabinet_**.
-
-## 💡 Pro Tips
-
-### Set & Forget: Auto-Invoke Docfork
-
-**Add a Rule** to make your AI automatically fetch documentation whenever you mention a library:
-
-**[Add Rule to Cursor (One-Click)](https://cursor.com/link/rule?name=docfork-policy&text=You+have+access+to+the+docfork+MCP+server.+To+ensure+the+code+you+write+is+accurate+and+up-to-date%2C+you+must+follow+these+requirements%3A%0A%0A1.+Auto-Invoke%3A+Always+use+%60docfork_search_docs%60+when+asked+for+library+implementation%2C+API+setup%2C+or+debugging.%0A2.+Context+Strategy%3A%0A+++-+Search%3A+Call+%60docfork_search_docs%60.+Review+the+%60content%60+snippets+in+the+results.%0A+++-+Read%3A+Only+call+%60docfork_read_url%60+if+the+search+snippets+are+incomplete+or+you+need+the+full+file+context+for+a+complex+implementation.%0A+++-+Identity%3A+Use+the+%60docforkIdentifier%60+in+follow-up+searches+to+narrow+results+to+a+specific+library.%0A%0AIf+you+are+unsure+of+a+library%27s+latest+syntax%2C+search+with+docfork+first.)**
-
-**Manual Setup (Copy & Paste)**
-If you prefer manual configuration, add a rule to your MCP client to auto-invoke Docfork for code-related questions:
-
-```markdown
-You have access to the docfork MCP server. To ensure the code you write is accurate and up-to-date, you must follow these requirements:
-
-1. Auto-Invoke: Always use `docfork_search_docs` when asked for library implementation, API setup, or debugging.
-2. Context Strategy:
-   - Search: Call `docfork_search_docs`. Review the `content` snippets in the results.
-   - Read: Only call `docfork_read_url` if the search snippets are incomplete or you need the full file context for a complex implementation.
-   - Identity: Use the `docforkIdentifier` in follow-up searches to narrow results to a specific library.
-
-If you are unsure of a library's latest syntax, search with docfork first.
-```
+_[Learn more about Cabinet Scoping →](https://docs.docfork.com/core/cabinets)_
 
 ## 🔨 Available Tools
 
-Docfork provides two high-performancetools optimized for AI agents:
-
-| Tool                  | Purpose                                                                    | Key Parameters                          |
-| :-------------------- | :------------------------------------------------------------------------- | :-------------------------------------- |
-| `docfork_search_docs` | **The Entry Point.** Searches 10k+ libraries or your private Cabinets.     | `query`, `docforkIdentifier` (optional) |
-| `docfork_read_url`    | **The Deep Dive.** Fetches full Markdown content from a search result URL. | `url` (required)                        |
+| Tool                  | Purpose                                                                                                                 |
+| --------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `docfork_search_docs` | **Context-Aware Search.** Respects your `DOCFORK_CABINET` header to strictly limit results to your approved tech stack. |
+| `docfork_read_url`    | **The Deep Dive.** Fetches full Markdown content from a search result URL when the snippet isn't enough.                |
 
 > [!TIP]
-> **Identity First:** Always use the `docforkIdentifier` in your searches (e.g., `vercel/next.js`) for **_10x more accurate results_** within a specific library.
+> **Identity First:** Use the `docforkIdentifier` (e.g., `vercel/next.js`) for **10x more accurate results**. [See usage guide →](https://docs.docfork.com/core/tools)
 
-## 📖 Documentation
+## 📖 Documentation & Community
 
-Find specific guides and technical resources at **[docs.docfork.com](https://docs.docfork.com)**:
-
-### Installation
-
-- **[Quick Start & Major IDEs](https://docs.docfork.com/get-started/installation)** – Setup for Cursor, VS Code, Windsurf, & Claude.
-- **[All Supported Clients](https://docs.docfork.com/integrations/overview)** – Configuration reference for Zed, BoltAI, Docker, and 30+ others.
-
-### Features & Guides
-
-- **[Cabinet Scoping](https://docs.docfork.com/core/cabinets)** - How to create project-specific documentation silos.
-- **[Rules](https://docs.docfork.com/context/rules)** – Automate Docfork behavior using project-level rules.
-- **[Troubleshooting](https://docs.docfork.com/troubleshooting/common-fixes)** – Fix common connection or auth issues.
-
-## 📰 Media & Resources
-
-Keep up with the changelog and community discussions:
-
+- **[Installation Guides](https://docs.docfork.com/get-started/installation)** – Comprehensive setup for all IDEs.
+- **[Troubleshooting](https://docs.docfork.com/troubleshooting/common-fixes)** – Fix connection or auth issues.
 - **[Official Changelog](https://docfork.com/changelog)** – We ship weekly.
-- **[The Docfork Blog](https://docfork.com/blog)** – Read our latest posts and updates.
-- **[X (Twitter)](https://x.com/docfork_ai)** – Follow for @latest updates.
+- **[X (Twitter)](https://x.com/docfork_ai)** – Follow for latest updates.
+
+Found an issue? [Raise a GitHub issue](https://github.com/docfork/mcp/issues/new?labels=library&title=LIBRARY:%20) or [contact support](mailto:support@docfork.com).
 
 ## Star History
 
