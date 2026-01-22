@@ -32,7 +32,7 @@ Grab a free key at **[docfork.com](https://app.docfork.com/signup)**.
 
 ### 2. Install MCP
 
-<details open>
+<details>
 <summary><b>Install in Cursor</b></summary>
 
 Go to: `Settings` -> `Cursor Settings` -> `MCP` -> `Add new global MCP server`
