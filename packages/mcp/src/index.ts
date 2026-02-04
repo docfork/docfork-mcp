@@ -16,7 +16,7 @@ import {
   setGlobalAuthConfig,
   getAuthConfig,
 } from "./config.js";
-import { startHttpServer, startStdioServer } from "./server.js";
+import { startHttpServer, startStdioServer } from "./transport.js";
 
 /**
  * Create and configure the standard MCP server
