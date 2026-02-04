@@ -76,13 +76,6 @@ function detectClientType(requestBody: any): string {
   }
 }
 
-function isOpenAIClient(requestBody: any, userAgent?: string): boolean {
-  const clientInfo = requestBody?.params?.clientInfo;
-  const name = clientInfo?.name?.toLowerCase() || "";
-  const ua = userAgent?.toLowerCase() || "";
-  return name.includes("openai") || ua.includes("openai");
-}
-
 /**
  * parse request body as json with size cap
  */
@@ -188,8 +181,7 @@ function extractAuthConfigFromRequest(req: IncomingMessage): DocforkAuthConfig {
  */
 export async function startHttpServer(
   port: number,
-  standardServerFactory: () => McpServer,
-  openaiServerFactory: () => McpServer
+  standardServerFactory: () => McpServer
 ): Promise<void> {
   const maxAttempts = 10;
   let finalPort = port;
@@ -296,9 +288,7 @@ export async function startHttpServer(
           const clientType = detectClientType(requestBody);
           console.log(`Client info: ${clientType}`);
 
-          const serverFactory = isOpenAIClient(requestBody, req.headers["user-agent"])
-            ? openaiServerFactory
-            : standardServerFactory;
+          const serverFactory = standardServerFactory;
 
           const transport = new StreamableHTTPServerTransport({
             // stateless: do not issue mcp-session-id

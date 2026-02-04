@@ -4,7 +4,6 @@
  * Docfork MCP Server
  *
  * Main entry point supporting both stdio and HTTP transports.
- * Automatically detects OpenAI clients and routes to appropriate server.
  */
 
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
@@ -18,7 +17,6 @@ import {
   getAuthConfig,
 } from "./config.js";
 import { startHttpServer, startStdioServer } from "./server.js";
-import { getServer as getOpenAIServer } from "./openai.js";
 
 /**
  * Create and configure the standard MCP server
@@ -127,7 +125,7 @@ async function main() {
   } else {
     // HTTP transport with client detection
     // auth config will be resolved per-request from headers and stored in AsyncLocalStorage
-    await startHttpServer(config.port, getServer, getOpenAIServer);
+    await startHttpServer(config.port, getServer);
   }
 }
 
