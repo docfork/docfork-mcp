@@ -24,7 +24,7 @@ import { startHttpServer, startStdioServer } from "./transport.js";
 export const getServer = () => {
   const server = new McpServer({
     name: "Docfork",
-    version: "1.4.0",
+    version: "2.0.0",
     websiteUrl: "https://docfork.com",
     icons: [
       {
