@@ -36,51 +36,91 @@ export const getServer = () => {
 
   // register docfork search docs tool
   server.registerTool(
-    "docfork_search_docs",
+    "query_docs",
     {
-      title: "Search Documentation",
-      description:
-        "Search documentation across GitHub repositories or the web. For targeted searches INSIDE a specific library's documentation, use the docforkIdentifier parameter (author/repo format). Extract from GitHub URLs (e.g., github.com/facebook/react → 'facebook/react') and include in ALL subsequent searches about that library for focused, accurate results.",
+      title: "Query Documentation",
+      description: `Required: library is required.
+
+Use library to search, then lock to the exact repo:
+- start with a best-guess library/package name (e.g., react, nextjs, supabase) or a GitHub URL
+- once you identify the exact repo, always switch library to owner/repo (e.g., facebook/react) for follow-up queries
+- if the user provides /owner/repo (Context7 style), remove the leading slash before calling
+
+Examples:
+- library: react -> library: facebook/react
+- library: /vercel/next.js -> library: vercel/next.js
+
+Selection guidance when multiple candidates appear:
+- prefer exact name matches and official orgs over forks
+- prefer canonical docs domains and upstream repositories
+
+For ambiguous inputs, ask for clarification before proceeding (or pick the best match and state the assumption).
+
+IMPORTANT: do not call this tool more than 3 times per question.`,
       inputSchema: {
-        query: z.string().describe("Search query. Include language/framework names."),
-        docforkIdentifier: z
+        query: z
           .string()
-          .optional()
           .describe(
-            "CRITICAL for targeted library searches: Library identifier in author/repo format (e.g., 'facebook/react', 'vercel/next.js'). Use this to search INSIDE a specific library's documentation for focused, accurate results. Extract from URLs in docfork_search_docs results and ALWAYS include in all subsequent searches about that library."
+            "The question or task. Be specific and include relevant details (language, framework, error message)."
           ),
-        tokens: z.string().optional().describe("Token budget: 'dynamic' or number (100-10000)"),
+        library: z
+          .string()
+          .describe(
+            "Required. Preferred: exact owner/repo (e.g., facebook/react, vercel/next.js). If unknown, use a library/package name hint (e.g., react, nextjs) or a GitHub URL, then switch to exact owner/repo once identified. If you have /owner/repo, remove the leading slash."
+          ),
+        tokens: z
+          .union([z.literal("dynamic"), z.number().int().min(100).max(10000), z.string()])
+          .optional()
+          .describe("Token budget: dynamic or a number (100-10000)."),
       },
     },
-    async ({ query, tokens, docforkIdentifier }): Promise<CallToolResult> => {
+    async ({ query, tokens, library }): Promise<CallToolResult> => {
       const authConfig = getAuthConfig();
+      const tokensParam =
+        typeof tokens === "number" ? String(tokens) : (tokens as string | undefined);
       const response = await searchDocs(
         query as string,
-        docforkIdentifier as string | undefined,
-        tokens as string | undefined,
+        library as string,
+        tokensParam,
         authConfig
       );
 
       return {
-        content: response.sections.map((section) => ({
-          type: "text" as const,
-          text: `title: ${section.title}\nurl: ${section.url}`,
-        })),
+        content: [
+          ...response.sections.map((section) => {
+            return {
+              type: "text" as const,
+              text: `title: ${section.title}\nurl: ${section.url}\ncontent:\n${section.content}`,
+            };
+          }),
+        ],
       };
     }
   );
 
-  // register docfork read url tool
+  // register docfork fetch url tool
   server.registerTool(
-    "docfork_read_url",
+    "fetch_url",
     {
-      title: "Read Documentation URL",
-      description:
-        "Fetches and returns the full content of a documentation page as markdown. This is ESSENTIAL for getting complete, detailed information after searching. Always use this to read URLs from docfork_search_docs results to get the actual documentation content.",
+      title: "Fetch URL",
+      description: `Fetches and returns the full content of a URL as markdown.
+
+Usage:
+- Call query_docs first.
+- Review content chunks in the results.
+- Then call fetch_url for 1-2 of the most relevant URLs when chunks are incomplete or you need full context for exact API usage, configuration, or copy-pastable examples.
+
+Notes:
+- This is read-only and has no side effects.
+- Use exact URLs from query_docs results. Deep links and anchors are allowed (example: https://github.com/vercel/next.js/blob/canary/examples/with-knex/README.md#L27-L35).
+
+IMPORTANT: avoid reading many pages. Prefer the single most authoritative page.`,
       inputSchema: {
         url: z
           .string()
-          .describe("Full URL to read. Use exact URLs from docfork_search_docs results."),
+          .describe(
+            "Full URL to fetch. Use exact URLs from query_docs results. Anchors are allowed (e.g., #L27-L35)."
+          ),
       },
     },
     async (args): Promise<CallToolResult> => {
