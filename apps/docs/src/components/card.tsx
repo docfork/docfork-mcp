@@ -92,7 +92,14 @@ export function Card({
 }
 
 // Custom Cards wrapper that forces full width
-export function Cards({ children, className, ...props }: { children: React.ReactNode; className?: string }) {
+export function Cards({
+  children,
+  className,
+  ...props
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
   return (
     <div className={cn("flex flex-col gap-4 w-full", className)} {...props}>
       {children}

@@ -21,9 +21,7 @@ export default async function Page(props: PageProps<"/[[...slug]]">) {
     <DocsPage toc={page.data.toc} full={page.data.full} tableOfContentPopover={{ enabled: false }}>
       <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 pt-4">
         <div>
-          <DocsTitle className="font-medium">
-            {page.data.title}
-          </DocsTitle>
+          <DocsTitle className="font-medium">{page.data.title}</DocsTitle>
           <DocsDescription className="mt-2 lg:mb-4 mb-0">{page.data.description}</DocsDescription>
         </div>
         <div
@@ -63,8 +61,9 @@ export default async function Page(props: PageProps<"/[[...slug]]">) {
             Suggest edits
           </a>
           <a
-            href={`https://github.com/${docsGitConfig.user}/${docsGitConfig.repo
-              }/issues/new?title=Issue%20on%20docs&body=Path:%20${encodeURIComponent(page.url)}`}
+            href={`https://github.com/${docsGitConfig.user}/${
+              docsGitConfig.repo
+            }/issues/new?title=Issue%20on%20docs&body=Path:%20${encodeURIComponent(page.url)}`}
             target="_blank"
             rel="noopener noreferrer"
             className={cn(

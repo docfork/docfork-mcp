@@ -63,7 +63,11 @@ export function LLMCopyButton({
       )}
       onClick={onClick}
     >
-      {checked ? <Check className="size-4 text-fd-muted-foreground" /> : <Copy className="size-4 text-fd-muted-foreground" />}
+      {checked ? (
+        <Check className="size-4 text-fd-muted-foreground" />
+      ) : (
+        <Copy className="size-4 text-fd-muted-foreground" />
+      )}
       Copy page
     </button>
   );

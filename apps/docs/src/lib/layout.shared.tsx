@@ -18,7 +18,7 @@ export function baseOptions(): BaseLayoutProps {
     nav: {
       title: <Logo />,
       url: "https://docfork.com",
-      transparentMode: "none"
+      transparentMode: "none",
     },
   };
 }
