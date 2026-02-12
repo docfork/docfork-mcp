@@ -14,15 +14,14 @@ Define a **Docfork Cabinet** — `Next.js 16` + `Drizzle ORM` + `Better Auth` �
 
 Documentation context as precise as your dependency lockfile:
 
-- **Cabinets** — Lock your agent to a verified stack. Only your libraries. Zero bleed-through.
+- **Cabinets** — Lock your agent to a verified stack. Only your libraries. Fully isolated.
 
 - **10,000+ libraries** — Pre-chunked docs and code examples. ~200ms edge retrieval.
 
 - **Team-ready** — Share Cabinets and API keys across your org. Same context, every engineer.
 
 > **Set a Cabinet:** `Next.js 16` + `Drizzle ORM` + `Better Auth`.
-> Your agent only sees docs for your stack. No Express bleed-through. No Prisma confusion.
-
+> Your agent only sees docs for your stack. No stray Express docs. No Prisma confusion.
 
 ## 🚀 Quick Start
 
@@ -174,7 +173,7 @@ Add this to your Cline `cline_mcp_settings.json` file. To access it: Click the M
 
 </details>
 
-**[Windsurf, Roo Code, and 40+ more →](https://docs.docfork.com/integrations/overview)**
+**[Windsurf, Roo Code, and 40+ more →](https://docs.docfork.com/clients/overview)**
 
 <details>
 <summary><b>OAuth Authentication</b></summary>

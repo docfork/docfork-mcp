@@ -43,7 +43,7 @@ We use Fumadocs to keep our documentation in sync with the MCP server.
 We welcome contributions!
 
 - **Typos/Content**: Feel free to edit `.mdx` files in the `content/` directory directly via GitHub.
-- **New Integrations**: If you've tested Docfork with a new MCP client (e.g. a new IDE or Agent), add it to `content/docs/integrations/`.
+- **New Integrations**: If you've tested Docfork with a new MCP client (e.g. a new IDE or Agent), add it to `content/docs/clients/`.
 
 ---
 
