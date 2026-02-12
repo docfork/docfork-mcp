@@ -1168,19 +1168,19 @@ Add a Prisma schema for a multi-tenant SaaS and generate the client.
 
 Search documentation with context isolation. Set a Cabinet to restrict results to your approved stack.
 
-| Parameter | Required | Description |
-|-----------|----------|-------------|
-| `query` | Yes | What you're building or debugging. Be specific. |
-| `library` | Yes | Library name (`react`) or exact `owner/repo` (`facebook/react`). |
-| `tokens` | No | Token budget for response size. `"dynamic"` or `100`–`10000`. |
+| Parameter | Required | Description                                                      |
+| --------- | -------- | ---------------------------------------------------------------- |
+| `query`   | Yes      | What you're building or debugging. Be specific.                  |
+| `library` | Yes      | Library name (`react`) or exact `owner/repo` (`facebook/react`). |
+| `tokens`  | No       | Token budget for response size. `"dynamic"` or `100`–`10000`.    |
 
 ### `fetch_url`
 
 Fetch full Markdown content from a documentation URL when search chunks aren't enough.
 
-| Parameter | Required | Description |
-|-----------|----------|-------------|
-| `url` | Yes | URL from `query_docs` results. Anchors and deep paths supported. |
+| Parameter | Required | Description                                                      |
+| --------- | -------- | ---------------------------------------------------------------- |
+| `url`     | Yes      | URL from `query_docs` results. Anchors and deep paths supported. |
 
 ## 📖 Docs
 
