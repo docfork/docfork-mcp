@@ -39,6 +39,9 @@ jobs:
     permissions:
       id-token: write # Required for OIDC trusted publishing
       contents: write
+    env:
+      # Enforce trusted publishing path and avoid token-based fallback.
+      NODE_AUTH_TOKEN: ""
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v6
@@ -58,6 +61,12 @@ jobs:
           node-version: "22"
           registry-url: https://registry.npmjs.org/
           cache: "pnpm"
+          token: ""
+
+      - name: Ensure npm supports trusted publishing
+        run: |
+          npm i -g npm@^11.5.1
+          npm -v
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -101,16 +110,16 @@ jobs:
         if: ${{ !github.event.release.prerelease }}
         run: |
           cd packages/mcp
-          npm publish --access public
+          NODE_AUTH_TOKEN='' npm publish --access public
 
       - name: Publish to npm (pre-release)
         if: ${{ github.event.release.prerelease }}
         run: |
           cd packages/mcp
-          npm publish --access public --tag=beta
+          NODE_AUTH_TOKEN='' npm publish --access public --tag=beta
 
   publish_registry:
-    needs: build
+    needs: publish
     runs-on: ubuntu-latest
     permissions:
       id-token: write # required for oidc authentication with MCP registry
