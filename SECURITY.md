@@ -20,7 +20,7 @@ We take the security of Docfork MCP seriously and appreciate your efforts to res
 
 To report a security vulnerability:
 
-1. **Preferred**: Use [GitHub's private vulnerability reporting feature](https://github.com/docfork/docfork-mcp/security/advisories/new) to submit your report
+1. **Preferred**: Use [GitHub's private vulnerability reporting feature](https://github.com/docfork/docfork/security/advisories/new) to submit your report
 2. **Alternative**: Email security concerns directly to **[support@docfork.com](mailto:support@docfork.com)**
 
 ### What to Include

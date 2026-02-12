@@ -3,7 +3,7 @@ import { Logo } from "@/components/logo";
 
 export const mcpGitConfig = {
   user: "docfork",
-  repo: "docfork-mcp",
+  repo: "docfork",
   branch: "main",
 } as const;
 

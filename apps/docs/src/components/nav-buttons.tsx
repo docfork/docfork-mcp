@@ -31,7 +31,7 @@ export function NavButtons() {
           "px-3.5 py-1.5 bg-docfork text-nowrap"
         )}
       >
-        Sign Up
+        Dashboard
       </Link>
     </div>
   );
