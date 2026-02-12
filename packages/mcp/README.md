@@ -134,6 +134,46 @@ Add this to your OpenCode configuration file. See [OpenCode MCP docs](https://op
 
 </details>
 
+<details>
+<summary><b>Install in Cline</b></summary>
+
+Add this to your Cline `cline_mcp_settings.json` file. To access it: Click the MCP Servers icon in the top navigation bar → Select the "Configure" tab → Click "Configure MCP Servers" at the bottom. See [Cline MCP docs](https://docs.cline.bot/mcp/configuring-mcp-servers) for more info.
+
+#### Cline Remote Server Connection
+
+```json
+{
+  "mcpServers": {
+    "docfork": {
+      "url": "https://mcp.docfork.com/mcp",
+      "type": "streamableHttp",
+      "headers": {
+        "DOCFORK_API_KEY": "YOUR_API_KEY"
+      },
+      "alwaysAllow": ["query_docs", "fetch_url"],
+      "disabled": false
+    }
+  }
+}
+```
+
+#### Cline Local Server Connection
+
+```json
+{
+  "mcpServers": {
+    "docfork": {
+      "command": "npx",
+      "args": ["-y", "docfork", "--api-key", "YOUR_API_KEY"],
+      "alwaysAllow": ["query_docs", "fetch_url"],
+      "disabled": false
+    }
+  }
+}
+```
+
+</details>
+
 **[See Setup for Windsurf, Roo Code, and 40+ others →](https://docs.docfork.com/integrations/overview)**
 
 <details>
