@@ -6,7 +6,7 @@ import { DocforkAuthConfig } from "../config.js";
 interface SearchSection {
   url: string;
   title: string;
-  content: string;
+  description: string;
 }
 
 // response from the search API
@@ -17,15 +17,14 @@ interface SearchDocsResponse {
 
 export async function searchDocs(
   query: string,
-  docforkIdentifier?: string,
+  library: string,
   tokens?: string,
   auth?: DocforkAuthConfig
 ): Promise<SearchDocsResponse> {
   const url = new URL(`${API_URL}/search`);
   url.searchParams.set("query", query);
-  if (docforkIdentifier) {
-    url.searchParams.set("libraryId", docforkIdentifier);
-  }
+  url.searchParams.set("library", library);
+
   if (tokens) {
     url.searchParams.set("tokens", tokens);
   }

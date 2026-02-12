@@ -4,7 +4,6 @@
  * Docfork MCP Server
  *
  * Main entry point supporting both stdio and HTTP transports.
- * Automatically detects OpenAI clients and routes to appropriate server.
  */
 
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
@@ -17,72 +16,126 @@ import {
   setGlobalAuthConfig,
   getAuthConfig,
 } from "./config.js";
-import { startHttpServer, startStdioServer } from "./server.js";
-import { getServer as getOpenAIServer } from "./openai.js";
+import { startHttpServer, startStdioServer } from "./transport.js";
 
 /**
  * Create and configure the standard MCP server
  */
 export const getServer = () => {
-  const server = new McpServer({
-    name: "Docfork",
-    version: "1.4.0",
-    websiteUrl: "https://docfork.com",
-    icons: [
-      {
-        src: "https://docfork.com/icon.svg",
-        mimeType: "image/svg+xml",
-      },
-    ],
-  });
+  const server = new McpServer(
+    {
+      name: "Docfork",
+      version: "2.0.0",
+      websiteUrl: "https://docfork.com",
+      icons: [
+        {
+          src: "https://docfork.com/icon.svg",
+          mimeType: "image/svg+xml",
+        },
+      ],
+    },
+    {
+      instructions:
+        "Use query_docs to search library documentation and fetch_url to read full pages from the results.",
+    }
+  );
 
   // register docfork search docs tool
   server.registerTool(
-    "docfork_search_docs",
+    "query_docs",
     {
-      title: "Search Documentation",
-      description:
-        "Search documentation across GitHub repositories or the web. For targeted searches INSIDE a specific library's documentation, use the docforkIdentifier parameter (author/repo format). Extract from GitHub URLs (e.g., github.com/facebook/react → 'facebook/react') and include in ALL subsequent searches about that library for focused, accurate results.",
+      title: "Query Documentation",
+      description: `Searches documentation for a library and returns content chunks with titles, URLs, and summaries. The library parameter is required.
+
+The library parameter accepts two formats:
+- A short name or keyword when unsure of the exact repository
+- An exact owner/repo identifier once known
+
+Always prefer the exact owner/repo form for follow-up queries. If the user supplies a GitHub URL, extract the owner/repo from it.
+
+Selection guidance when multiple candidates appear:
+- prefer exact name matches and official orgs over forks
+- prefer canonical docs domains and upstream repositories
+
+For ambiguous inputs, pick the best match and state the assumption.
+
+Do not call this tool more than 3 times per question. If you cannot find what you need after 3 calls, use the best result you have.`,
       inputSchema: {
-        query: z.string().describe("Search query. Include language/framework names."),
-        docforkIdentifier: z
+        query: z
           .string()
-          .optional()
           .describe(
-            "CRITICAL for targeted library searches: Library identifier in author/repo format (e.g., 'facebook/react', 'vercel/next.js'). Use this to search INSIDE a specific library's documentation for focused, accurate results. Extract from URLs in docfork_search_docs results and ALWAYS include in all subsequent searches about that library."
+            "The question or task. Be specific and include relevant details. Good: 'How to set up server-side rendering in Next.js' or 'Zod schema validation for nested objects'. Bad: 'rendering' or 'validation'."
           ),
-        tokens: z.string().optional().describe("Token budget: 'dynamic' or number (100-10000)"),
+        library: z
+          .string()
+          .describe(
+            "Required. Exact owner/repo when known (e.g., facebook/react, vercel/next.js, supabase/supabase, TanStack/query). Otherwise a short library name or keyword (e.g., react, nextjs)."
+          ),
+        tokens: z
+          .union([z.literal("dynamic"), z.number().int().min(100).max(10000), z.string()])
+          .optional()
+          .describe("Token budget: dynamic or a number (100-10000)."),
+      },
+      annotations: {
+        readOnlyHint: true,
       },
     },
-    async ({ query, tokens, docforkIdentifier }): Promise<CallToolResult> => {
+    async ({ query, tokens, library }): Promise<CallToolResult> => {
       const authConfig = getAuthConfig();
+      const tokensParam =
+        typeof tokens === "number" ? String(tokens) : (tokens as string | undefined);
+      // normalize: strip leading slash from owner/repo (e.g., /vercel/next.js -> vercel/next.js)
+      const normalizedLibrary = (library as string).replace(/^\//, "");
       const response = await searchDocs(
         query as string,
-        docforkIdentifier as string | undefined,
-        tokens as string | undefined,
+        normalizedLibrary,
+        tokensParam,
         authConfig
       );
 
+      const resultHeader = [
+        "Results below. Each result includes:",
+        "- title: Section heading",
+        "- description: Brief summary",
+        "- url: Chunk URL. Use with fetch_url for full content, or navigate to a parent path for a table of contents.",
+        "",
+        "Select the most relevant result for the user's question. Use fetch_url if you need more context.",
+        "------",
+      ].join("\n");
+
       return {
-        content: response.sections.map((section) => ({
-          type: "text" as const,
-          text: `title: ${section.title}\nurl: ${section.url}`,
-        })),
+        content: [
+          {
+            type: "text" as const,
+            text: resultHeader,
+          },
+          ...response.sections.map((section) => ({
+            type: "text" as const,
+            text: `title: ${section.title}\ndescription: ${section.description}\nurl: ${section.url}`,
+          })),
+        ],
       };
     }
   );
 
-  // register docfork read url tool
+  // register docfork fetch url tool
   server.registerTool(
-    "docfork_read_url",
+    "fetch_url",
     {
-      title: "Read Documentation URL",
-      description:
-        "Fetches and returns the full content of a documentation page as markdown. This is ESSENTIAL for getting complete, detailed information after searching. Always use this to read URLs from docfork_search_docs results to get the actual documentation content.",
+      title: "Fetch URL",
+      description: `Fetches a URL and returns its content as markdown. Only accepts URLs from query_docs results or derived from them.
+
+- Pass a URL from query_docs results to retrieve the full content of that chunk.
+- Navigate to a broader path (drop anchors or trim to a parent directory) to get a table of contents with chunk previews.
+
+Do not use with arbitrary URLs. Prefer fewer, highly relevant fetches over many broad ones.`,
       inputSchema: {
         url: z
           .string()
-          .describe("Full URL to read. Use exact URLs from docfork_search_docs results."),
+          .describe("Full URL from query_docs results. Anchors and deep links are supported."),
+      },
+      annotations: {
+        readOnlyHint: true,
       },
     },
     async (args): Promise<CallToolResult> => {
@@ -127,7 +180,7 @@ async function main() {
   } else {
     // HTTP transport with client detection
     // auth config will be resolved per-request from headers and stored in AsyncLocalStorage
-    await startHttpServer(config.port, getServer, getOpenAIServer);
+    await startHttpServer(config.port, getServer);
   }
 }
 

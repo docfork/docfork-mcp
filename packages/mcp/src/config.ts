@@ -47,7 +47,6 @@ export interface ServerConfig {
   name: string;
   description: string;
   version: string;
-  defaultMinimumTokens: number;
   port: number;
   transport: "stdio" | "streamable-http";
   mcpClient?: string;
@@ -69,8 +68,7 @@ export function getServerConfig(): ServerConfig {
   return {
     name: "Docfork",
     description: "Gets the latest documentation and code examples for any library.",
-    version: "1.4.0",
-    defaultMinimumTokens: parseEnvInt("DEFAULT_MINIMUM_TOKENS", 10000),
+    version: "2.0.0",
     port: parseEnvInt("PORT", 3000),
     transport: (process.env.MCP_TRANSPORT || "stdio") as ServerConfig["transport"],
   };

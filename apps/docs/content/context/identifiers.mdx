@@ -25,7 +25,7 @@ When you know the library you are using, append the identifier to your prompt.
 <Conversation>
   <Message role="user">How do I use auth?</Message>
   <Message role="agent">
-    <Action>calling `docfork_search_docs` with query: `auth`</Action>
+    <Action>calling `query_docs` with query: `auth` and library: `auth`</Action>
     Results may include Auth0, Clerk, NextAuth, or other authentication libraries.
   </Message>
 </Conversation>
@@ -36,7 +36,7 @@ When you know the library you are using, append the identifier to your prompt.
   <Message role="user">Implement auth using `better-auth/better-auth`.</Message>
   <Message role="agent">
     <Action>
-      calling `docfork_search_docs` with query: `auth` and docforkIdentifier:
+      calling `query_docs` with query: `auth` and library:
 
       <br />
       `better-auth/better-auth`
@@ -50,5 +50,6 @@ When you know the library you are using, append the identifier to your prompt.
 
 You can find the identifier for any supported library in two ways:
 
-1. **Search Results:** When you run `docfork_search_docs`, the JSON response includes a `library_identifier` field for every result.
-2. **The Catalog:** Browse our [Library Catalog](https://docfork.com/search) to find the exact ID for your dependencies.
+1. **Direct use:** If you already know the `owner/repo`, pass it as the `library` value.
+2. **GitHub URLs:** Extract `owner/repo` from GitHub links in results and reuse it as `library`.
+3. **The Catalog:** Browse our [Library Catalog](https://docfork.com/search) to find the exact ID for your dependencies.

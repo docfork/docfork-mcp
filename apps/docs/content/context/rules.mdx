@@ -19,11 +19,11 @@ alwaysApply: true
 
 You have access to the docfork MCP server. To ensure the code you write is accurate and up-to-date, you must follow these requirements:
 
-1. Auto-Invoke: Always use `docfork_search_docs` tool when asked for library implementation, API setup, or debugging.
+1. Auto-Invoke: Always use `query_docs` tool when asked for library implementation, API setup, or debugging.
 2. Context Strategy:
-   - Search: Call `docfork_search_docs` tool. Review the `content` snippets in the results.
-   - Read: Only call `docfork_read_url` tool if the search snippets are incomplete or you need the full file context for a complex implementation.
-   - Identity: Use the `docforkIdentifier` in follow-up searches to narrow results to a specific library.
+   - Search: Call `query_docs` tool and review the content chunks in the results.
+   - Fetch: Only call `fetch_url` tool if the chunks are incomplete or you need the full file context for a complex implementation.
+   - Identity: `library` is required. Start with a best-guess library name (e.g., `react`). Once you identify the exact repo, always switch `library` to the exact `owner/repo` (e.g., `facebook/react`) for follow-up queries.
 
 If you are unsure of a library's latest syntax, search with docfork first.
 ```
