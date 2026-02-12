@@ -19,17 +19,22 @@ export default async function Page(props: PageProps<"/[[...slug]]">) {
 
   return (
     <DocsPage toc={page.data.toc} full={page.data.full} tableOfContentPopover={{ enabled: false }}>
-      <DocsTitle className="font-medium">
-        {page.data.title === "Welcome" ? "Docfork Documentation" : page.data.title}
-      </DocsTitle>
-      <DocsDescription className="mb-0">{page.data.description}</DocsDescription>
-      <div className="flex flex-row gap-2 items-center border-b pb-6">
-        <LLMCopyButton markdownUrl={`${page.url}.md`} />
-        <ViewOptions
-          markdownUrl={`${page.url}.md`}
-          // update it to match your repo
-          githubUrl={`https://github.com/${docsGitConfig.user}/${docsGitConfig.repo}/blob/${docsGitConfig.branch}/content/${page.path}`}
-        />
+      <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4 pt-4">
+        <div>
+          <DocsTitle className="font-medium">{page.data.title}</DocsTitle>
+          <DocsDescription className="mt-2 lg:mb-4 mb-0">{page.data.description}</DocsDescription>
+        </div>
+        <div
+          id="page-context-menu"
+          className="items-center shrink-0 min-w-[156px] lg:justify-end ml-auto flex lg:mt-2"
+        >
+          <LLMCopyButton markdownUrl={`${page.url}.md`} />
+          <ViewOptions
+            markdownUrl={`${page.url}.md`}
+            // update it to match your repo
+            githubUrl={`https://github.com/${docsGitConfig.user}/${docsGitConfig.repo}/blob/${docsGitConfig.branch}/content/${page.path}`}
+          />
+        </div>
       </div>
       <DocsBody>
         <MDX

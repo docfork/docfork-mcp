@@ -94,7 +94,7 @@ jobs:
         run: |
           cd packages/mcp
           mkdir -p release
-          tar -czf release/docfork-mcp.tar.gz \
+          tar -czf release/docfork.tar.gz \
             gemini-extension.json \
             dist/ \
             package.json
@@ -102,7 +102,7 @@ jobs:
       - name: Attach extension archive to release
         uses: softprops/action-gh-release@v2
         with:
-          files: packages/mcp/release/docfork-mcp.tar.gz
+          files: packages/mcp/release/docfork.tar.gz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

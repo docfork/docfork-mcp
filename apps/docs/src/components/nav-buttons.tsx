@@ -21,7 +21,7 @@ export function NavButtons() {
         Support
       </Link>
       <Link
-        href={process.env.NEXT_PUBLIC_APP_URL! + "/sign-up"}
+        href={"https://app.docfork.com"}
         target="_blank"
         rel="noopener noreferrer"
         className={cn(
@@ -31,7 +31,7 @@ export function NavButtons() {
           "px-3.5 py-1.5 bg-docfork text-nowrap"
         )}
       >
-        Sign Up
+        Dashboard
       </Link>
     </div>
   );
