@@ -12,8 +12,6 @@ import { cabinetFiling } from "@lucide/lab";
 
 **Docfork** is an MCP server that feeds your AI agent up-to-date documentation — scoped to the libraries you actually use.
 
-Define a **[Cabinet](/core/cabinets)** — `Next.js 16` + `Drizzle ORM` + `Better Auth` — and every query returns only docs from your stack.
-
 ## Where AI coding agents break
 
 AI agents write code from stale training data. You get:
@@ -51,7 +49,7 @@ You spend more time debugging the agent's output than writing the code yourself.
 
 ## Cabinets
 
-Ask about routing and you get results from Next.js, Express, Hono, and React Router — even if you only use one. That's context bleed, and it's the fastest way to get hallucinated code.
+Ask about routing and you get results from Next.js, Express, Hono, and React Router — even if you only use one. That's context bloat, and it's the fastest way to get hallucinated code.
 
 **Cabinets** lock your agent to a verified stack:
 
@@ -148,10 +146,9 @@ Then add `use docfork` to any prompt — or [set a rule](/best-practices) to mak
     icon={<Icon iconNode={cabinetFiling} />}
   />
   <Card
-    title="Get an API Key"
-    href="https://app.docfork.com"
-    external={true}
-    description="Unlock higher rate limits and use private repositories."
+    title="Authentication"
+    href="/core/authentication"
+    description="Set up API keys or OAuth for secure MCP access."
     icon={<KeyRound />}
   />
 </Cards>

@@ -4,47 +4,82 @@ description: Create project-scoped documentation indexes.
 ---
 
 import { Step, Steps } from "fumadocs-ui/components/steps";
+import { Callout } from "fumadocs-ui/components/callout";
 
-**Cabinets** are Docfork's primary "Context" mechanism. They function like an `.env` file for your documentation—locking your AI agent to a specific set of libraries to prevent hallucinations from unrelated frameworks.
+**Cabinets** lock Docfork to your stack. If your project uses `supabase/supabase-js` + `tanstack/query` + `vitejs/vite`, queries return docs from those libraries only.
 
-## How Cabinets Work
+![Cabinets dashboard](/images/cabinets.png)
 
-Instead of searching the entire index of 10,000+ libraries, a Cabinet limits the search scope to only the libraries you add to it.
+## How to use Cabinets
+
+Use this workflow in [app.docfork.com](https://app.docfork.com):
 
 <Steps>
   <Step>
-    ### Create
+    ### Create a Cabinet
 
-    Go to the [Dashboard](https://app.docfork.com) and create a Cabinet named after your
-    project (e.g., `general`).
+    Go to **Cabinets** and click **Create Cabinet**.
+
+    - Use a slug like `client-proj-01`
+    - Slugs should be lowercase letters, numbers, and dashes
+    - Add an optional description so teammates know what the Cabinet is for
+
   </Step>
   <Step>
-    ### Populate
+    ### Add libraries
 
-    Add the libraries you use:
-    - `stripe/stripe-node`
-    - `react-hook-form/react-hook-form`
+    ![Cabinet libraries](/images/cabinet-libraries.png)
+
+    Open the Cabinet and use **Add Library** in the Libraries tab.
+
+    Example stack:
+    - `vercel/next.js`
     - `shadcn-ui/ui`
+    - `vercel/ai`
+
   </Step>
   <Step>
-    ### Connect
+    ### Connect to MCP
 
-    Add the `DOCFORK_CABINET` header to your MCP configuration.
+    Add `DOCFORK_CABINET` to your MCP headers using the Cabinet slug.
+
   </Step>
 </Steps>
 
-## Configuration
+## MCP configuration
 
-**VS Code / Cursor Config:**
+Then, in your MCP client configuration, add the Cabinet slug to the headers:
 
-```json
+```diff
 {
-  "docfork": {
-    "url": "https://mcp.docfork.com/mcp",
-    "headers": {
-      "DOCFORK_API_KEY": "YOUR_API_KEY",
-      "DOCFORK_CABINET": "general"
+  "mcpServers": {
+    "docfork": {
+      "url": "https://mcp.docfork.com/mcp",
+      "headers": {
+        "DOCFORK_API_KEY": "YOUR_API_KEY",
++       "DOCFORK_CABINET": "client-proj-01"
+      }
     }
   }
 }
 ```
+
+## Cabinet settings
+
+![Cabinet settings](/images/cabinet-settings.png)
+
+In the **Settings** tab of a Cabinet, you can:
+
+- Update slug and description
+- Save changes for non-breaking metadata updates
+- Remove a Cabinet from your workspace
+
+<Callout type="warning" title="Deleting a Cabinet">
+  **Deleting a Cabinet removes library references only** - it **does not delete the libraries** from
+  Docfork's index. If you change your mind, you can recreate and re-add the libraries.
+</Callout>
+
+## Limits and team usage
+
+- Free tier supports up to **2 cabinets** per workspace and up to **20 libraries** per cabinet
+- Cabinets are workspace-scoped, so teammates share the same scoped context

@@ -6,17 +6,21 @@
     "get-started/best-practices",
     "---Core---",
     "core/cabinets",
-    "---Context & Control---",
-    "context/identifiers",
+    "core/authentication",
+    "core/teams",
     "---Clients---",
     "clients/cursor",
     "clients/claude-code",
     "clients/opencode",
     "clients/overview",
+    "---Comparisons---",
+    "docfork-vs-context7",
     "---Troubleshooting---",
     "troubleshooting/common-fixes",
     "troubleshooting/platform-specific",
     "troubleshooting/client-specific",
-    "troubleshooting/debugging"
+    "troubleshooting/debugging",
+    "---Security---",
+    "security"
   ]
 }

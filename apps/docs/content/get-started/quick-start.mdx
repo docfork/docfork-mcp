@@ -15,20 +15,16 @@ import { Card } from "fumadocs-ui/components/card";
 
 ## Choose your Client
 
-Select your AI editor below for specific installation instructions.
+Get set up in under 60 seconds with Cursor, Claude Code, or Opencode (and others).
 
-<Tabs items={['Cursor', 'VS Code', 'Windsurf', 'Claude Code', 'Claude Desktop', 'Opencode']}>
-
+<Tabs items={['Cursor', 'Claude Code', 'Opencode']}>
   <Tab value="Cursor">
-    ### Cursor (Recommended)
-    
-    The easiest way to install is via the Cursor "One-Click" flow.
-    
+    One-click install:
+
     [![Install MCP Server](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/en/install-mcp?name=docfork&config=eyJ1cmwiOiJodHRwczovL21jcC5kb2Nmb3JrLmNvbS9tY3AifQ%3D%3D)
-    
-    **Manual Configuration:**
-    If you prefer to edit your config manually, add this to `Cursor Settings > Tools & MCP > New MCP Server`:
-    
+
+    Or add manually to `~/.cursor/mcp.json`:
+
     ```json
     {
       "mcpServers": {
@@ -43,75 +39,13 @@ Select your AI editor below for specific installation instructions.
     ```
   </Tab>
 
-  <Tab value="VS Code">
-    ### VS Code
-    
-    Add this to your VS Code MCP configuration file. Ensure you use `type: "http"`.
-    
-    ```json
-    {
-      "mcpServers": {
-        "docfork": {
-          "type": "http",
-          "url": "https://mcp.docfork.com/mcp",
-          "headers": {
-            "DOCFORK_API_KEY": "YOUR_API_KEY"
-          }
-        }
-      }
-    }
-    ```
-  </Tab>
-
-  <Tab value="Windsurf">
-    ### Windsurf
-    
-    Windsurf uses Server-Sent Events (SSE). Use the following configuration:
-    
-    ```json
-    {
-      "mcpServers": {
-        "docfork": {
-          "serverUrl": "https://mcp.docfork.com/sse",
-          "headers": {
-            "DOCFORK_API_KEY": "YOUR_API_KEY"
-          }
-        }
-      }
-    }
-    ```
-  </Tab>
-  
   <Tab value="Claude Code">
-    ### Claude Code (CLI)
-    
-    Run the following command in your terminal to add Docfork to the Claude CLI:
-    
     ```bash
     claude mcp add --transport http docfork https://mcp.docfork.com/mcp --header "DOCFORK_API_KEY: YOUR_API_KEY"
     ```
   </Tab>
 
-  <Tab value="Claude Desktop">
-    ### Claude Desktop
-    
-    For Claude Desktop, we recommend a local installation using `npx`:
-    
-    ```json
-    {
-      "mcpServers": {
-        "docfork": {
-          "command": "npx",
-          "args": ["-y", "docfork", "--api-key", "YOUR_API_KEY"]
-        }
-      }
-    }
-    ```
-  </Tab>
-
-    <Tab value="Opencode">
-    ### Opencode
-
+  <Tab value="Opencode">
     Add this to your Opencode configuration file:
 
     ```json
@@ -128,9 +62,7 @@ Select your AI editor below for specific installation instructions.
       }
     }
     ```
-
   </Tab>
-
 </Tabs>
 
 ## Verify Installation
