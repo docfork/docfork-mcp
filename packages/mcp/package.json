@@ -1,5 +1,5 @@
 {
-  "name": "@docfork/mcp",
+  "name": "docfork",
   "version": "2.0.0",
   "description": "Up-to-date code documentation for AI agents.",
   "mcpName": "io.github.docfork/docfork",

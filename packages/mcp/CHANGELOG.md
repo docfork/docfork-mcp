@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Scoped `fetch_url` to URLs from `query_docs` results only
 - Unified stdio and HTTP into a single transport. Less config, fewer moving parts so contributions are now easier to make.
 - Search results return descriptions only. Leaner context window, fewer wasted tokens
+- Consolidated release publishing into one workflow and switched npm publishing to GitHub OIDC trusted publishing (tokenless)
 
 ### Removed
 
