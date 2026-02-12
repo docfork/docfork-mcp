@@ -14,7 +14,7 @@
     "format:check": "prettier --check \"**/*.{js,ts,tsx,json,md,mdx}\""
   },
   "dependencies": {
-    "@takumi-rs/core": "^0.65.0",
+    "@takumi-rs/core": "^0.66.13",
     "@takumi-rs/image-response": "^0.65.0",
     "@vercel/analytics": "^1.6.1",
     "fumadocs-core": "16.4.7",
