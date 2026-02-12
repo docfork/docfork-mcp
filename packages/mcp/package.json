@@ -1,6 +1,6 @@
 {
   "name": "@docfork/mcp",
-  "version": "1.4.0",
+  "version": "2.0.0",
   "description": "Up-to-date code documentation for AI agents.",
   "mcpName": "io.github.docfork/docfork",
   "type": "module",
@@ -19,8 +19,7 @@
     "typecheck": "tsc --noEmit",
     "test": "echo \"No tests specified\" && exit 0",
     "clean": "rm -rf dist node_modules",
-    "preversion": "npm run lint:check && npm run typecheck && npm run build",
-    "version": "node -e \"const fs=require('fs');const pkg=require('./package.json');const srv=require('./server.json');srv.version=pkg.version;srv.packages[0].version=pkg.version;fs.writeFileSync('server.json',JSON.stringify(srv,null,2)+'\\n');\" && git add server.json"
+    "preversion": "npm run lint:check && npm run typecheck && npm run build"
   },
   "repository": {
     "type": "git",

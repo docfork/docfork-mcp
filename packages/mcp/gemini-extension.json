@@ -1,11 +1,16 @@
 {
   "name": "docfork-mcp",
   "description": "Up-to-date code documentation for AI agents.",
-  "version": "1.4.0",
+  "version": "2.0.0",
   "mcpServers": {
     "docfork": {
       "command": "node",
-      "args": ["-y", "docfork", "--api-key", "${DOCFORK_API_KEY}"]
+      "args": [
+        "-y",
+        "docfork",
+        "--api-key",
+        "${DOCFORK_API_KEY}"
+      ]
     }
   }
 }

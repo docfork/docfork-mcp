@@ -163,7 +163,21 @@ Implement a secure authentication flow using Better Auth and Supabase. use docfo
 Don't want to type `use docfork` every time? Add a rule to make your AI fetch docs automatically.
 
 > [!NOTE]
-> **[Add Rule to Cursor (One-Click)](https://cursor.com/link/rule?name=docfork-policy&text=You+have+access+to+the+docfork+MCP+server.+To+ensure+the+code+you+write+is+accurate+and+up-to-date%2C+you+must+follow+these+requirements%3A%0A%0A1.+Auto-Invoke%3A+Always+use+%60docfork_search_docs%60+when+asked+for+library+implementation%2C+API+setup%2C+or+debugging.%0A2.+Context+Strategy%3A%0A+++-+Search%3A+Call+%60docfork_search_docs%60.+Review+the+%60content%60+snippets+in+the+results.%0A+++-+Read%3A+Only+call+%60docfork_read_url%60+if+the+search+snippets+are+incomplete+or+you+need+the+full+file+context+for+a+complex+implementation.%0A+++-+Identity%3A+Use+the+%60docforkIdentifier%60+in+follow-up+searches+to+narrow+results+to+a+specific+library.%0A%0AIf+you+are+unsure+of+a+library%27s+latest+syntax%2C+search+with+docfork+first.)**
+> **[Add Rule to Cursor (One-Click)](<https://cursor.com/link/rule?name=docfork-policy&text=You+have+access+to+the+docfork+MCP+server.+To+ensure+the+code+you+write+is+accurate+and+up-to-date%2C+you+must+follow+these+requirements%3A%0A%0A1.+Auto-Invoke%3A+Always+use+%60query_docs%60+when+asked+for+library+implementation%2C+API+setup%2C+or+debugging.%0A2.+Context+Strategy%3A%0A+++-+Search%3A+Call+%60query_docs%60+and+review+the+content+chunks+in+the+results.%0A+++-+Fetch%3A+Only+call+%60fetch_url%60+if+the+chunks+are+incomplete+or+you+need+the+full+file+context+for+a+complex+implementation.%0A+++-+Identity%3A+%60library%60+is+required.+Start+with+a+best-guess+library+name+(e.g.%2C+%60react%60).+Once+you+identify+the+exact+repo%2C+always+switch+%60library%60+to+the+exact+%60owner%2Frepo%60+(e.g.%2C+%60facebook%2Freact%60)+for+follow-up+queries.+If+you+have+%60%2Fowner%2Frepo%60%2C+remove+the+leading+slash.%0A%0AIf+you+are+unsure+of+a+library%27s+latest+syntax%2C+search+with+docfork+first.>)**
+
+Copy rule:
+
+```markdown title=".cursor/rules/docfork-policy.md"
+You have access to the docfork MCP server. To ensure the code you write is accurate and up-to-date, you must follow these requirements:
+
+1. Auto-Invoke: Always use `query_docs` when asked for library implementation, API setup, or debugging.
+2. Context Strategy:
+   - Search: Call `query_docs` and review the content chunks in the results.
+   - Fetch: Only call `fetch_url` if the chunks are incomplete or you need the full file context for a complex implementation.
+   - Identity: `library` is required. Start with a best-guess library name (e.g., `react`). Once you identify the exact repo, always switch `library` to the exact `owner/repo` (e.g., `facebook/react`) for follow-up queries.
+
+If you are unsure of a library's latest syntax, search with docfork first.
+```
 
 Once enabled, your AI will automatically fetch the latest docs when you ask questions like:
 
@@ -173,10 +187,10 @@ Add a Prisma schema for a multi-tenant SaaS and generate the client.
 
 ## 🔨 Available Tools
 
-| Tool                  | Purpose                                                                                                                 |
-| --------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| `docfork_search_docs` | **Context-Aware Search.** Respects your `DOCFORK_CABINET` header to strictly limit results to your approved tech stack. |
-| `docfork_read_url`    | **The Deep Dive.** Fetches full Markdown content from a search result URL when the snippet isn't enough.                |
+| Tool         | Purpose                                                                                                                 |
+| ------------ | ----------------------------------------------------------------------------------------------------------------------- |
+| `query_docs` | **Context-Aware Search.** Respects your `DOCFORK_CABINET` header to strictly limit results to your approved tech stack. |
+| `fetch_url`  | **Fetch URL.** Fetches full Markdown content from a URL when chunks aren't enough.                                      |
 
 ## 📖 Documentation
 
